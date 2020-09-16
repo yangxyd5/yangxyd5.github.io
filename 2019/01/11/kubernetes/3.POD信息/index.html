@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="POD 配置清单pods.metadata POD元数据labels 标签 labels 定义标签，键值对组成的标签  labels:  app: myapp  tier: frontend pods.spec 规范nodeName 运行节点  在使用资源清单定义 pod 时候，使用 nodeName 可以直接绑定资源对象在哪个 POD 运行的节点  apiVersion: v1kind: Pod">
+<meta property="og:type" content="article">
+<meta property="og:title" content="POD 对象">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/01/11/kubernetes/3.POD信息/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="POD 配置清单pods.metadata POD元数据labels 标签 labels 定义标签，键值对组成的标签  labels:  app: myapp  tier: frontend pods.spec 规范nodeName 运行节点  在使用资源清单定义 pod 时候，使用 nodeName 可以直接绑定资源对象在哪个 POD 运行的节点  apiVersion: v1kind: Pod">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-02-28T08:04:32.315Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="POD 对象">
+<meta name="twitter:description" content="POD 配置清单pods.metadata POD元数据labels 标签 labels 定义标签，键值对组成的标签  labels:  app: myapp  tier: frontend pods.spec 规范nodeName 运行节点  在使用资源清单定义 pod 时候，使用 nodeName 可以直接绑定资源对象在哪个 POD 运行的节点  apiVersion: v1kind: Pod">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/01/11/kubernetes/3.POD信息/">
+
+
+
+
+
+  <title>POD 对象 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/01/11/kubernetes/3.POD信息/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">POD 对象</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-11T00:00:00+08:00">
+                2019-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="POD-配置清单"><a href="#POD-配置清单" class="headerlink" title="POD 配置清单"></a>POD 配置清单</h1><h2 id="pods-metadata-POD元数据"><a href="#pods-metadata-POD元数据" class="headerlink" title="pods.metadata POD元数据"></a>pods.metadata POD元数据</h2><h3 id="labels-标签"><a href="#labels-标签" class="headerlink" title="labels 标签"></a>labels 标签</h3><ul>
+<li>labels 定义标签，键值对组成的标签</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">labels:</span><br><span class="line">  app: myapp</span><br><span class="line">  tier: frontend</span><br></pre></td></tr></table></figure>
+<h2 id="pods-spec-规范"><a href="#pods-spec-规范" class="headerlink" title="pods.spec 规范"></a>pods.spec 规范</h2><p>nodeName 运行节点</p>
+<ul>
+<li>在使用资源清单定义 pod 时候，使用 nodeName 可以直接绑定资源对象在哪个 POD 运行的节点</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-deme</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">nodeName:</span> <span class="string">node2</span>                           <span class="comment"># 直接指定 POD 运行的节点</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">    <span class="attr">imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br></pre></td></tr></table></figure>
+<h3 id="nodeSelector-节点选择"><a href="#nodeSelector-节点选择" class="headerlink" title="nodeSelector 节点选择"></a>nodeSelector 节点选择</h3><ul>
+<li>在使用资源清单定义 pod 时候，使用 nodeSelector （节点标签选择器）字段，来定义节点的倾向性</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-deme</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">nodeSelector:</span>                            <span class="comment"># 在 spec 中定义这个 POD 的节点倾向性</span></span><br><span class="line">  	<span class="attr">disktype:</span> <span class="string">ssd</span>                         <span class="comment"># 这个 POD 最终会运行在拥有 disktype 标签且值为 ssd 的 nodes 上</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">    <span class="attr">imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">    <span class="attr">ports:</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>从文件启动 pod，观察 pod 运行的节点，会发现已经运行在有标签的 node 节点上了</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl create -f pod-demo.yaml</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">kubectl get pods -o wide</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NAME       READY   STATUS    RESTARTS   AGE   IP            NODE    NOMINATED NODE   READINESS GATES</span><br><span class="line">pod-demo   1/1     Running   0          21s   10.244.2.29   node3   &lt;none&gt;           &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="restartPolicy-POD重启策略"><a href="#restartPolicy-POD重启策略" class="headerlink" title="restartPolicy POD重启策略"></a>restartPolicy POD重启策略</h3><p>Always：一旦容器挂了，那么总是重启它，k8s 每次重启策略为 30 秒的两倍，直到等待 300 秒重启。</p>
+<p>OnFailure：只有其状态为错误的时候才去重启它</p>
+<p>Never：从来不重启，挂了就挂了</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">一旦某个 POD 被调度到某个节点上，只要这个节点在，那么它就不会被重新调度，只能被重启，除非 POD 被删除才会被重新调度，或者 node 挂了，才会被重新调度，否则只要 node 在，那么 POD 就不会被重新调度，如果 POD 启动失败，那么将不断的重启 POD。</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">当需要终止 POD ，k8s 发送 <span class="built_in">kill</span> -15 信号，让容器平滑的终止，等待 30 秒的宽限期，如果没有终止，那么则发送 <span class="built_in">kill</span> 信号</span><br></pre></td></tr></table></figure>
+<h3 id="hostNetwork-主机网络空间"><a href="#hostNetwork-主机网络空间" class="headerlink" title="hostNetwork 主机网络空间"></a>hostNetwork 主机网络空间</h3><p>使用布尔值指定是否让 POD 使用主机的网络名称空间</p>
+<h3 id="hostPID-主机PID空间"><a href="#hostPID-主机PID空间" class="headerlink" title="hostPID 主机PID空间"></a>hostPID 主机PID空间</h3><p>使用布尔值指定是否让 POD 使用主机的PID名称空间</p>
+<h3 id="hostAliases名称解析"><a href="#hostAliases名称解析" class="headerlink" title="hostAliases名称解析"></a>hostAliases名称解析</h3><p>向容器内添加域名解析</p>
+<h2 id="securityContext-安全上下文"><a href="#securityContext-安全上下文" class="headerlink" title="securityContext 安全上下文"></a>securityContext 安全上下文</h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">security-context-demo</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">securityContext:</span>                             <span class="comment"># POD 内所有容器的安全策略</span></span><br><span class="line">    <span class="attr">runAsUser:</span> <span class="number">1000</span>                            <span class="comment"># 主进程运行为 1000 用户，不指定为 root</span></span><br><span class="line">    <span class="attr">runAsGroup:</span> <span class="number">3000</span>                           <span class="comment"># 主进程运行为 1000 组，不指定为 root</span></span><br><span class="line">    <span class="attr">fsGroup:</span> <span class="number">2000</span>                              <span class="comment"># 指定创建文件的组为 2000</span></span><br><span class="line">  <span class="attr">volumes:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">sec-ctx-vol</span></span><br><span class="line">    <span class="attr">emptyDir:</span> <span class="string">&#123;&#125;</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="attr">securityContext:</span>                             <span class="comment"># 单独指定容器的安全策略</span></span><br><span class="line">      <span class="attr">runAsUser:</span> <span class="number">1000</span>                            <span class="comment"># 主进程运行为 1000 用户，不指定为 root</span></span><br><span class="line">      <span class="attr">runAsGroup:</span> <span class="number">3000</span>                           <span class="comment"># 主进程运行为 1000 组，不指定为 root</span></span><br><span class="line">      <span class="attr">fsGroup:</span> <span class="number">2000</span>                              <span class="comment"># 指定创建文件的组为 2000</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">sec-ctx-demo</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">busybox</span></span><br><span class="line">    <span class="attr">command:</span> <span class="string">[</span> <span class="string">"sh"</span><span class="string">,</span> <span class="string">"-c"</span><span class="string">,</span> <span class="string">"sleep 1h"</span> <span class="string">]</span></span><br><span class="line">    <span class="attr">volumeMounts:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">sec-ctx-vol</span></span><br><span class="line">      <span class="attr">mountPath:</span> <span class="string">/data/demo</span></span><br><span class="line">    <span class="attr">securityContext:</span></span><br><span class="line">      <span class="attr">allowPrivilegeEscalation:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+<h3 id="containers-配置"><a href="#containers-配置" class="headerlink" title="containers 配置"></a>containers 配置</h3><blockquote>
+<p>  kubectl explain pods.spec.containers</p>
+</blockquote>
+<p>描述 POD 内所运行容器，语法：containers &lt;[]Object&gt;，表示它的值为数组，数组内使用对象的方式来描述一个容器，对象可以有以下参数：</p>
+<ul>
+<li>可用参数</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>args</td>
+<td></td>
+</tr>
+<tr>
+<td>command</td>
+<td></td>
+</tr>
+<tr>
+<td>env</td>
+<td>向容器传递环境变量</td>
+</tr>
+<tr>
+<td>envFrom</td>
+<td></td>
+</tr>
+<tr>
+<td>image</td>
+<td></td>
+</tr>
+<tr>
+<td>imagePullPolicy</td>
+<td></td>
+</tr>
+<tr>
+<td>lifecycle</td>
+<td></td>
+</tr>
+<tr>
+<td>livenessProbe</td>
+<td></td>
+</tr>
+<tr>
+<td>name</td>
+<td></td>
+</tr>
+<tr>
+<td>ports</td>
+<td></td>
+</tr>
+<tr>
+<td>readinessProbe</td>
+<td></td>
+</tr>
+<tr>
+<td>resources</td>
+<td></td>
+</tr>
+<tr>
+<td>securityContext</td>
+<td></td>
+</tr>
+<tr>
+<td>stdin</td>
+<td></td>
+</tr>
+<tr>
+<td>stdinOnce</td>
+<td></td>
+</tr>
+<tr>
+<td>terminationMessagePath</td>
+<td></td>
+</tr>
+<tr>
+<td>terminationMessagePolicy</td>
+<td></td>
+</tr>
+<tr>
+<td>tty</td>
+<td></td>
+</tr>
+<tr>
+<td>volumeDevices</td>
+<td></td>
+</tr>
+<tr>
+<td>volumeMounts</td>
+<td></td>
+</tr>
+<tr>
+<td>workingDir</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>示例型配置</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: pod-deme                     <span class="comment"># pod 的名称</span></span><br><span class="line">  namespace: default</span><br><span class="line">  labels:</span><br><span class="line">    app: myapp</span><br><span class="line">    tier: frontend</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: myapp                      <span class="comment"># 运行的容器名称</span></span><br><span class="line">      image: ikubernetes/myapp:v1      <span class="comment"># 容器的镜像</span></span><br><span class="line">      imagePullPolicy: IfNotPresent    <span class="comment"># 从仓库获取镜像的策略</span></span><br><span class="line">      ports:                           <span class="comment"># 定义容器暴漏的端口</span></span><br><span class="line">    - name: busybox</span><br><span class="line">      image: busybox:latest</span><br><span class="line">      <span class="built_in">command</span>:</span><br><span class="line">        - <span class="string">"/bin/sh"</span></span><br><span class="line">        - <span class="string">"-c"</span></span><br><span class="line">        - <span class="string">"sleep 10"</span></span><br></pre></td></tr></table></figure>
+<h4 id="imagePullPolicy下载策略"><a href="#imagePullPolicy下载策略" class="headerlink" title="imagePullPolicy下载策略"></a>imagePullPolicy下载策略</h4><ul>
+<li>imagePullPolicy 镜像获取的策略，详见：kubectl explain pods.spec.containers</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Always            <span class="comment"># 总是从仓库下载</span></span><br><span class="line">Never             <span class="comment"># 从不下载，本地有就用，没有就失败</span></span><br><span class="line">IfNotPresent      <span class="comment"># 如果本地存在就直接使用，如果不存在就下载</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>  如果标签是 latest 那么则始终从仓库下载</p>
+</blockquote>
+<h4 id="ports-端口信息"><a href="#ports-端口信息" class="headerlink" title="ports 端口信息"></a>ports 端口信息</h4><ul>
+<li>ports 定义容器保暴露的，详见：<code>kubectl explain pods.spec.containers.ports</code></li>
+</ul>
+<p>在此处暴露的端口可为系统提供有关容器的网络连接的信息，但主要是信息性的，此处没有指定的端口也不会阻止容器暴露该端口，容器中任何侦听 0.0.0.0 地址的端口都可以从网络访问</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">ports:</span>                    <span class="comment"># 定义两个端口对象一个 http 一个 https</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span>              <span class="comment"># 定义这个端口的名称，方便别的对象取引用</span></span><br><span class="line">  <span class="attr">containerPort:</span> <span class="number">80</span>       <span class="comment"># 端口号</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">https</span>             <span class="comment"># 方便引用的名称</span></span><br><span class="line">  <span class="attr">containerPort:</span> <span class="number">443</span>      <span class="comment"># 这个端口号仅仅是起到信息的作用，方便查看和使用名称引用</span></span><br></pre></td></tr></table></figure>
+<h4 id="env-传递环境变量"><a href="#env-传递环境变量" class="headerlink" title="env 传递环境变量"></a>env 传递环境变量</h4><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>在容器中获取 POD 的信息</p>
+<ol>
+<li>可以使用环境变量</li>
+<li>可以使用 downwardAPI</li>
+<li><a href="https://kubernetes.io/zh/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/" target="_blank" rel="noopener">https://kubernetes.io/zh/docs/tasks/inject-data-application/downward-api-volume-expose-pod-information/</a></li>
+</ol>
+<h4 id="command-覆盖-ENTRYPOINT"><a href="#command-覆盖-ENTRYPOINT" class="headerlink" title="command 覆盖 ENTRYPOINT"></a>command 覆盖 ENTRYPOINT</h4><ul>
+<li>command 定义容器运行的程序，详见：</li>
+</ul>
+<p>一个 entrypoint array 而 command 启动的程序是不会运行在 Shell 中的，如果想要运行在 Shell 中需要自己填写，如果没有提供这个指令，那么将运行 docker 镜像中的 ENTRYPOINT。</p>
+<h4 id="args-覆盖-CMD"><a href="#args-覆盖-CMD" class="headerlink" title="args 覆盖 CMD"></a>args 覆盖 CMD</h4><ul>
+<li>args 向 command 传递参数的</li>
+</ul>
+<p>如果你没有定义 args 而镜像中又存在 ENTRYPOINT 指令和 CMD 指令，那么镜像自己的 CMD 将作为参数传递给 ENTRYPOINT。如果手动指定了 args 那么镜像中的 CMD 字段不再作为参数进行传递。</p>
+<p>如果在 args 中引用了变量，则需要使用 $(VAR_NAME) 来引用一个变量，如果不想在这里进行命令替换，那么可以 $$(VAR_NAME)，转义后在容器内使用。</p>
+<h4 id="command、args-与-ENTRYPOINT、CMD"><a href="#command、args-与-ENTRYPOINT、CMD" class="headerlink" title="command、args 与 ENTRYPOINT、CMD"></a>command、args 与 ENTRYPOINT、CMD</h4><table>
+<thead>
+<tr>
+<th style="text-align:left">描述</th>
+<th style="text-align:left">Docker字段名称</th>
+<th style="text-align:left">Kubernetes字段名称</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">该命令由容器运行</td>
+<td style="text-align:left">Entrypoint</td>
+<td style="text-align:left">command</td>
+</tr>
+<tr>
+<td style="text-align:left">传递给命令的参数</td>
+<td style="text-align:left">Cmd</td>
+<td style="text-align:left">args</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>如果不为 Container 提供 command 或 args，则使用 Docker 镜像中定义的默认值。</li>
+<li>如果为 Container 提供 command 但没有 args，则仅使用提供的命令。 默认的 EntryPoint 和 Docker 镜像中定义的默认 Cmd 将被忽略。</li>
+<li>如果仅为 Container 提供 args，则 Docker 镜像中定义的默认 Entrypoint 将与您提供的 args 一起运行。</li>
+<li>如果提供 command 和 args，则会忽略 Docker 镜像中定义的默认 Entrypoint 和默认 Cmd。 您的 command 与您的 args 一起运行。</li>
+</ul>
+<h4 id="annotations-注解信息"><a href="#annotations-注解信息" class="headerlink" title="annotations 注解信息"></a>annotations 注解信息</h4><p>annotations 与 label 不同的地方在于，它不能用于挑选资源对象，仅为对象提供元数据，它的长度不受限制</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-deme</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line">  <span class="attr">annotations:</span>                                      <span class="comment"># 注解关键字</span></span><br><span class="line">    <span class="attr">jinheng/created-by:</span> <span class="string">"yangjinheng"</span>               <span class="comment"># 添加键值对的资源注解</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">    <span class="attr">imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br></pre></td></tr></table></figure>
+<h4 id="POD-生命周期"><a href="#POD-生命周期" class="headerlink" title="POD 生命周期"></a>POD 生命周期</h4><ul>
+<li>一般状态</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Pending：已经创建但是没有适合运行它的节点，已经调度，但是尚未完成</span><br><span class="line">Running：运行状态</span><br><span class="line">Failed： 启动失败</span><br><span class="line">Succeed：成功，这个状态很短</span><br><span class="line">Unkown： 未知的状态，如果 Apiserver 与 kubelet 通信失败则会处于这个状态</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建 POD 阶段</li>
+</ul>
+<p>用户的创建请求提交给 apiserver ，而 apiserver 会将请求的目标状态保存在 etcd 中，而后 apiserver 会请求 schedule 进行调度，并且把调度的结果更新在 etcd 的 pod 状态中，随后一旦保存在 etcd 中，并完成 schedule 更新后目标节点的 kubelet 就会从 etcd 的状态变化得知有新任务给自己，所以此时会拿到用户所希望的资源清单目标状态，根据清单在当前节点运行这个 POD，如果创建成功或者失败，则将结果发回给 apiserver ，apiserver 再次保存在 etcd 中。</p>
+<h4 id="livenessProbe-存活性探测"><a href="#livenessProbe-存活性探测" class="headerlink" title="livenessProbe 存活性探测"></a>livenessProbe 存活性探测</h4><blockquote>
+<p>  详细见：kubectl explain pods.spec.containers.livenessProbe</p>
+</blockquote>
+<ul>
+<li>livenessProbe / readinessProbe 是 k8s 两个生命周期，这两个生命周期都可以定义探针来探测容器状态做出不同反应</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">livenessProbe     <span class="comment"># 指示容器是否正在运行。如果存活探测失败，则依据 restartPolicy 策略来进行重启</span></span><br><span class="line">readinessProbe    <span class="comment"># 指示容器是否准备好服务请求。如果就绪探测失败端点控制器将从与 Pod 匹配的所有 Service 的端点中删除该 Pod 的 IP 地址</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>livenessProbe / readinessProbe 可用的探针和探针特性，探针只能定义一种类型，例如：HTTPGetAction</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">exec</span>          <span class="comment"># 在容器内执行指定命令。如果命令退出时返回码为 0 则认为诊断成功。</span></span><br><span class="line">tcpSocket     <span class="comment"># 对指定端口上的容器的 IP 地址进行 TCP 检查。如果端口打开，则诊断被认为是成功的。</span></span><br><span class="line">httpGet       <span class="comment"># HTTP GET 请求指定端口和路径上的容器。如果响应码大于等于200 且小于 400，则诊断被认为是成功的。</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">failureThreshold</span>    <span class="comment"># 探测几次才判定为探测失败，默认为 3 次。</span></span><br><span class="line"><span class="string">periodSeconds</span>       <span class="comment"># 每次探测周期的间隔时长。</span></span><br><span class="line"><span class="string">timeoutSeconds</span>      <span class="comment"># 每次探测发出后等待结果的超时时间，默认为 1 秒。</span></span><br><span class="line"><span class="string">initalDelaySeconds</span>  <span class="comment"># 在容器启动后延迟多久去进行探测，默认为启动容器后立即探测。</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 exec 探针，实验结果应该为 39 秒后 POD 显示 ERROR ，但不自动重启 POD</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: execlive</span><br><span class="line">  namespace: default</span><br><span class="line">  labels:</span><br><span class="line">    app: myapp</span><br><span class="line">    tier: frontend</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">    - name: busybox</span><br><span class="line">      image: busybox</span><br><span class="line">      <span class="built_in">command</span>:</span><br><span class="line">        - <span class="string">"/bin/sh"</span></span><br><span class="line">        - <span class="string">"-c"</span></span><br><span class="line">        - <span class="string">"touch /tmp/healthy; sleep 30; rm -rf /tmp/healthy; sleep 3600"</span>    <span class="comment"># 创建一个文件等待 30 秒，这个时间探针应该是成功的，30 秒后则失败</span></span><br><span class="line">      livenessProbe:                                   <span class="comment"># 容器的存活性检测，如果失败则按照 restartPolicy 策略来重启 POD</span></span><br><span class="line">        <span class="built_in">exec</span>:                                          <span class="comment"># exec 类型探针，进入容器执行一条命令</span></span><br><span class="line">          <span class="built_in">command</span>: [<span class="string">"test"</span>, <span class="string">"-e"</span> ,<span class="string">"/tmp/healthy"</span>]      <span class="comment"># 执行的命令为测试文件存在性</span></span><br><span class="line">        initialDelaySeconds: 2                         <span class="comment"># 容器启动后延迟多久进行探测</span></span><br><span class="line">        periodSeconds: 3                               <span class="comment"># 每次探测周期的间隔时长为 3 秒</span></span><br><span class="line">        failureThreshold: 3                            <span class="comment"># 3 次失败后则判定为容器探测存活性失败</span></span><br><span class="line">  restartPolicy: Never                                 <span class="comment"># 当探测到容器失败是否重启 POD</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 httpGet 探针，实验结果应该大约 40 秒后探测存活性失败，自动重启 POD，第一次重启会立即进行，随后是 30 秒的2倍直到 300 秒。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">httpgetlive</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">      <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">          <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">https</span></span><br><span class="line">          <span class="attr">containerPort:</span> <span class="number">443</span></span><br><span class="line">      <span class="attr">livenessProbe:</span>                   <span class="comment"># 容器的存活性检测，如果失败则按照 restartPolicy 策略来重启 POD</span></span><br><span class="line">        <span class="attr">httpGet:</span>                       <span class="comment"># httpget 探针</span></span><br><span class="line">          <span class="attr">path:</span> <span class="string">/error.html</span>            <span class="comment"># 探测的页面，为了效果这个页面不存在</span></span><br><span class="line">          <span class="attr">port:</span> <span class="string">http</span>                   <span class="comment"># 探测的端口，使用名称引用容器的端口</span></span><br><span class="line">          <span class="attr">httpHeaders:</span>                 <span class="comment"># httpget 时候设置请求头</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">X-Custom-Header</span></span><br><span class="line">              <span class="attr">value:</span> <span class="string">Awesome</span></span><br><span class="line">        <span class="attr">initialDelaySeconds:</span> <span class="number">15</span>        <span class="comment"># 容器启动后延迟多久进行探测</span></span><br><span class="line">        <span class="attr">timeoutSeconds:</span> <span class="number">1</span>              <span class="comment"># 每次探测发出等待结果的时长</span></span><br><span class="line">  <span class="attr">restartPolicy:</span> <span class="string">Always</span>                <span class="comment"># 当探测到容器失败是否重启 POD</span></span><br></pre></td></tr></table></figure>
+<h4 id="readinessProbe-就绪性检测"><a href="#readinessProbe-就绪性检测" class="headerlink" title="readinessProbe 就绪性检测"></a>readinessProbe 就绪性检测</h4><p>例如有一个容器运行的是 tomcat ，而 tomcat 展开 war 包，部署完成的时间可能较长，而默认 k8s 会在容器启动就标记为 read 状态，接收 service 的调度请求，但是容器启动不代表 tomcat 已经成功运行，所以需要 readinessProbe 进行就绪性探测，来决定是否可以接入 service 上。</p>
+<ul>
+<li>livenessProbe / readinessProbe 可用的探针和探针特性基本一样，探针只能定义一种类型，例如：HTTPGetAction</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">livenessProbe     <span class="comment"># 指示容器是否正在运行。如果存活探测失败，则依据 restartPolicy 策略来进行重启</span></span><br><span class="line">readinessProbe    <span class="comment"># 指示容器是否准备好服务请求。如果就绪探测失败端点控制器将从与 Pod 匹配的所有 Service 的端点中删除该 Pod 的 IP 地址</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 httpGet 探针，实验结果应该大约 40 秒后探测存活性失败，自动重启 POD，第一次重启会立即进行，随后是 30 秒的2倍直到 300 秒。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">httpgetread</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">      <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">          <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">https</span></span><br><span class="line">          <span class="attr">containerPort:</span> <span class="number">443</span></span><br><span class="line">      <span class="attr">livenessProbe:</span>                   <span class="comment"># 容器的存活性检测，如果失败则按照 restartPolicy 策略来重启 POD</span></span><br><span class="line">        <span class="attr">httpGet:</span>                       <span class="comment"># httpget 探针</span></span><br><span class="line">          <span class="attr">path:</span> <span class="string">/error.html</span>            <span class="comment"># 探测的页面，为了效果这个页面不存在</span></span><br><span class="line">          <span class="attr">port:</span> <span class="string">http</span>                   <span class="comment"># 探测的端口，使用名称引用容器的端口</span></span><br><span class="line">          <span class="attr">httpHeaders:</span>                 <span class="comment"># httpget 时候设置请求头</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">X-Custom-Header</span></span><br><span class="line">              <span class="attr">value:</span> <span class="string">Awesome</span></span><br><span class="line">        <span class="attr">initialDelaySeconds:</span> <span class="number">15</span>        <span class="comment"># 容器启动后延迟多久进行探测</span></span><br><span class="line">        <span class="attr">timeoutSeconds:</span> <span class="number">1</span>              <span class="comment"># 每次探测发出等待结果的时长</span></span><br><span class="line">  <span class="attr">restartPolicy:</span> <span class="string">Always</span>                <span class="comment"># 当探测到容器失败是否重启 POD</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>手动进入容器，删除 index.html 以触发就绪性探针的检测</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl <span class="built_in">exec</span> -it httpgetread -- /bin/sh</span><br><span class="line">$ rm -f /usr/share/nginx/html/index.html</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果这个 POD 的 READY 状态已经变成非就绪了，此时 service 不会再调度到这个节点了</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@node1 ~]<span class="comment"># kubectl get pods -w</span></span><br><span class="line">NAME                            READY   STATUS    RESTARTS   AGE</span><br><span class="line">httpgetread                     0/1     Running   0          2m50s</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在容器内再创建一个文件，以触发就绪性探针的检测</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl <span class="built_in">exec</span> -it httpgetread -- /bin/sh</span><br><span class="line">$ <span class="built_in">echo</span> <span class="string">"hello worlld"</span> &gt;&gt;/usr/share/nginx/html/index.html</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果这个 POD 的的 READY 状态已经编程就绪了，此时 service 会调度到这个节点了</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@node1 ~]<span class="comment"># kubectl get pods -w</span></span><br><span class="line">NAME                            READY   STATUS    RESTARTS   AGE</span><br><span class="line">httpgetread                     1/1     Running   0          8m15s</span><br></pre></td></tr></table></figure>
+<h4 id="lifecycle-生命周期钩子"><a href="#lifecycle-生命周期钩子" class="headerlink" title="lifecycle 生命周期钩子"></a>lifecycle 生命周期钩子</h4><blockquote>
+<p>  详见：kubectl explain pods.spec.containers.lifecycle</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">postStart           <span class="comment"># 在容器启动后立即执行的命令，如果这个操作失败了，那么容器会终止，且根据 restartPolicy 来决定是否重启</span></span><br><span class="line">preStop             <span class="comment"># 在容器终止前立即执行的命令</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>postStart / preStop 的基本使用</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">  name: lifecycle-demo</span><br><span class="line">spec:</span><br><span class="line">  containers:</span><br><span class="line">  - name: lifecycle-demo-container</span><br><span class="line">    image: nginx</span><br><span class="line"></span><br><span class="line">    lifecycle:</span><br><span class="line">      postStart:</span><br><span class="line">        <span class="built_in">exec</span>:</span><br><span class="line">          <span class="built_in">command</span>: [<span class="string">"/bin/sh"</span>, <span class="string">"-c"</span>, <span class="string">"echo Hello from the postStart handler &gt; /usr/share/message"</span>]</span><br><span class="line">      preStop:</span><br><span class="line">        <span class="built_in">exec</span>:</span><br><span class="line">          <span class="built_in">command</span>: [<span class="string">"/usr/sbin/nginx"</span>,<span class="string">"-s"</span>,<span class="string">"quit"</span>]</span><br></pre></td></tr></table></figure>
+<p>POD控制器</p>
+<p>控制器管理的 POD 可以实现，自动维护 POD 副本数量，它能实现 POD 的扩容和缩容，但是不能实现滚的那个更新等高级功能。</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ReplicationController</td>
+<td>原来 k8s 只有这一种控制器，目前已经接近废弃</td>
+</tr>
+<tr>
+<td>ReplicaSet</td>
+<td>代用户创建指定数量的 POD 副本，还支持扩缩容，被称为新一代的 ReplicationController。主要由 3 个指标，1. 用户希望的 POD 副本，2. 标签选择器，判定 POD 是否归自己管理，3. 如果 POD 副本不够，按照哪个 POD template 创建 POD，但一般我们不直接使用 ReplicaSet。</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>Deployment 通过控制 ReplicaSet 来实现功能，除了支持 ReplicaSet 的扩缩容意外，还支持滚动更新和回滚等，还提供了声明式的配置，这个是我们日常使用最多的控制器。它是用来管理无状态的应用。</td>
+</tr>
+<tr>
+<td>DaemonSet</td>
+<td>用于确保集群内的每个 node 上只运行一个指定的 POD，如果有新增的节点也都会自动运行这个 POD，所以这个控制器无需定义 POD 运行的数量，只需要定义标签选择器和 POD template。所以可以跟根据标签选择器选中的 node 上只运行一个 POD 副本。</td>
+</tr>
+<tr>
+<td>Job</td>
+<td>执行一个一次性任务，例如数据库备份，任务完成后正常退出，则 POD 不会再被启动了，除非任务异常终止。</td>
+</tr>
+<tr>
+<td>CronJob</td>
+<td>执行一些周期性任务</td>
+</tr>
+<tr>
+<td>StatefulSet</td>
+<td>管理有状态的 POD ，但是对每个不同的有状态应用需要自行编写脚本，完成对有状态服务的管理，为了解决 StatefulSet 不方便编写有状态应用管理的问题。k8s 还提供了 helm 这样类似于 yum 的方式，方便用户从 helm 市场来安装一个有状态的应用。</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/10/kubernetes/1.简介和基础/" rel="next" title="Kubernetes简介和基础">
+                <i class="fa fa-chevron-left"></i> Kubernetes简介和基础
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/12/kubernetes/4.存储卷/" rel="prev" title="存储卷">
+                存储卷 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#POD-配置清单"><span class="nav-number">1.</span> <span class="nav-text">POD 配置清单</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pods-metadata-POD元数据"><span class="nav-number">1.1.</span> <span class="nav-text">pods.metadata POD元数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#labels-标签"><span class="nav-number">1.1.1.</span> <span class="nav-text">labels 标签</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pods-spec-规范"><span class="nav-number">1.2.</span> <span class="nav-text">pods.spec 规范</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nodeSelector-节点选择"><span class="nav-number">1.2.1.</span> <span class="nav-text">nodeSelector 节点选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#restartPolicy-POD重启策略"><span class="nav-number">1.2.2.</span> <span class="nav-text">restartPolicy POD重启策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hostNetwork-主机网络空间"><span class="nav-number">1.2.3.</span> <span class="nav-text">hostNetwork 主机网络空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hostPID-主机PID空间"><span class="nav-number">1.2.4.</span> <span class="nav-text">hostPID 主机PID空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hostAliases名称解析"><span class="nav-number">1.2.5.</span> <span class="nav-text">hostAliases名称解析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#securityContext-安全上下文"><span class="nav-number">1.3.</span> <span class="nav-text">securityContext 安全上下文</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#containers-配置"><span class="nav-number">1.3.1.</span> <span class="nav-text">containers 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#imagePullPolicy下载策略"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">imagePullPolicy下载策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ports-端口信息"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">ports 端口信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#env-传递环境变量"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">env 传递环境变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#command-覆盖-ENTRYPOINT"><span class="nav-number">1.3.1.4.</span> <span class="nav-text">command 覆盖 ENTRYPOINT</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#args-覆盖-CMD"><span class="nav-number">1.3.1.5.</span> <span class="nav-text">args 覆盖 CMD</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#command、args-与-ENTRYPOINT、CMD"><span class="nav-number">1.3.1.6.</span> <span class="nav-text">command、args 与 ENTRYPOINT、CMD</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#annotations-注解信息"><span class="nav-number">1.3.1.7.</span> <span class="nav-text">annotations 注解信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#POD-生命周期"><span class="nav-number">1.3.1.8.</span> <span class="nav-text">POD 生命周期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#livenessProbe-存活性探测"><span class="nav-number">1.3.1.9.</span> <span class="nav-text">livenessProbe 存活性探测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#readinessProbe-就绪性检测"><span class="nav-number">1.3.1.10.</span> <span class="nav-text">readinessProbe 就绪性检测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lifecycle-生命周期钩子"><span class="nav-number">1.3.1.11.</span> <span class="nav-text">lifecycle 生命周期钩子</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

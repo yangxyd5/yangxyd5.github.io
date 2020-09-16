@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="本文使用 K8S 集群上运行 EFK，使用 Ceph 集群作为 ElasticSearch 集群的持久存储。用到知识有：Storage Class、PVC、Helm，另外，很多服务镜像需要翻墙。helm install 阻塞过程会下载镜像可能会比较慢。helm 里面有很多可以定制的项目，这里我就不定制了，反正我的资源也够用，懒得调了。感觉没啥可以写的 😂本文由于浏览量较多，所以我第二次更新些的更">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Helm + storageclass + EFK">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/12/31/kubernetes/K8S+Ceph+EFK/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="本文使用 K8S 集群上运行 EFK，使用 Ceph 集群作为 ElasticSearch 集群的持久存储。用到知识有：Storage Class、PVC、Helm，另外，很多服务镜像需要翻墙。helm install 阻塞过程会下载镜像可能会比较慢。helm 里面有很多可以定制的项目，这里我就不定制了，反正我的资源也够用，懒得调了。感觉没啥可以写的 😂本文由于浏览量较多，所以我第二次更新些的更">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-01-06T02:14:14.917Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Helm + storageclass + EFK">
+<meta name="twitter:description" content="本文使用 K8S 集群上运行 EFK，使用 Ceph 集群作为 ElasticSearch 集群的持久存储。用到知识有：Storage Class、PVC、Helm，另外，很多服务镜像需要翻墙。helm install 阻塞过程会下载镜像可能会比较慢。helm 里面有很多可以定制的项目，这里我就不定制了，反正我的资源也够用，懒得调了。感觉没啥可以写的 😂本文由于浏览量较多，所以我第二次更新些的更">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/12/31/kubernetes/K8S+Ceph+EFK/">
+
+
+
+
+
+  <title>Helm + storageclass + EFK | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/12/31/kubernetes/K8S+Ceph+EFK/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Helm + storageclass + EFK</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-31T00:00:00+08:00">
+                2019-12-31
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文使用 K8S 集群上运行 EFK，使用 Ceph 集群作为 ElasticSearch 集群的持久存储。<br>用到知识有：Storage Class、PVC、Helm，另外，很多服务镜像需要翻墙。<br>helm install 阻塞过程会下载镜像可能会比较慢。<br>helm 里面有很多可以定制的项目，这里我就不定制了，反正我的资源也够用，懒得调了。<br>感觉没啥可以写的 😂<br>本文由于浏览量较多，所以我第二次更新些的更详细些，上一次是 5 月份。</p>
+<h1 id="Ceph-集群部署"><a href="#Ceph-集群部署" class="headerlink" title="Ceph 集群部署"></a>Ceph 集群部署</h1><p>本文主要针对 K8S 提供 StorageClass 而写的，主要为 K8S 提供两种存储能力：rbd（块存储）、cephfs（文件存储），这两种的区别就像一块硬盘与一个目录，在 K8S 上使用区别也只有读写模式上：ReadWriteOnce（rbd）、ReadWriteMany（cephfs）。<br>和 K8S 其他外部存储一样，每种存储需要一个 provisioner 插件，rbd 和 cephfs 各需要一个 provisioner。<br>这个笔记不打算写 K8S 是怎么部署的，我用的是 RKE 部署的。<br>另外网上有基于 K8S 的 ceph operator 好像已经进入稳定版本了，叫 rook-ceph ，有需要将 Ceph 托管在 K8S 集群上的小伙伴可以了解一下，由于太简单了，这里不说了。</p>
+<h2 id="先看结果"><a href="#先看结果" class="headerlink" title="先看结果"></a>先看结果</h2><ul>
+<li>ceph 集群部署状态</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cluster 13a06d21-3a21-4dfd-999e-bb2084ebab7b</span><br><span class="line"> health HEALTH_OK</span><br><span class="line"> monmap e1: 3 mons at &#123;node1=172.16.100.11:6789/0,node2=172.16.100.12:6789/0,node3=172.16.100.13:6789/0&#125;</span><br><span class="line">        election epoch 20, quorum 0,1,2 node1,node2,node3</span><br><span class="line">  fsmap e20: 1/1/1 up &#123;0=node1=up:active&#125;, 2 up:standby</span><br><span class="line"> osdmap e36: 3 osds: 3 up, 3 <span class="keyword">in</span></span><br><span class="line">        flags sortbitwise,require_jewel_osds</span><br><span class="line">  pgmap v118: 320 pgs, 3 pools, 88707 bytes data, 22 objects</span><br><span class="line">        331 MB used, 76428 MB / 76759 MB avail</span><br><span class="line">             320 active+clean</span><br></pre></td></tr></table></figure>
+<ul>
+<li>kubectl get pods -n kube-system</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NAME                                      READY   STATUS      RESTARTS   AGE</span><br><span class="line">cephfs-provisioner-c5f48fb64-xsbwh        1/1     Running     2          14h    <span class="comment"># cephfs-provisioner 为 k8s 提供 ceph 的 cephfs 申请能力</span></span><br><span class="line">rbd-provisioner-c5d5c84f4-9zt2z           1/1     Running     3          14h    <span class="comment"># rbd-provisioner 为 K8S 提供 ceph 的 rbd 申请能力</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>kubectl get sc</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NAME       PROVISIONER       AGE</span><br><span class="line">ceph-rbd   ceph.com/rbd      14h    <span class="comment"># ceph-rbd 的存储类</span></span><br><span class="line">cephfs     ceph.com/cephfs   14h    <span class="comment"># cephfs 的存储类</span></span><br></pre></td></tr></table></figure>
+<h2 id="Ceph-配置"><a href="#Ceph-配置" class="headerlink" title="Ceph 配置"></a>Ceph 配置</h2><ul>
+<li>官方网站</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">https://docs.ceph.com/docs/master/</span><br></pre></td></tr></table></figure>
+<ul>
+<li>最低配置要求</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">CEPH-MDS 元数据服务器：四核处理器</span><br><span class="line">OSD：双核处理器</span><br><span class="line">CEPH-MON：四核处理器</span><br><span class="line">小型集群 1-2G、大型集群 5-10G</span><br><span class="line">OSD 磁盘大小：建议最小硬盘驱动器大小为 1TB、每 TB 磁盘约需要 1G 内存</span><br></pre></td></tr></table></figure>
+<ul>
+<li>主机配置</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 主机 IP 地址     配置           硬盘               K8S 角色                         Ceph 角色</span></span><br><span class="line">172.16.100.11    2U/6G    sda(20G)、sdb(30G)    K8S（master、etcd）    ceph（ceph-deploy、mon、mds、osd）</span><br><span class="line">172.16.100.12    2U/6G    sda(20G)、sdb(30G)    K8S（worker）          ceph（ceph-deploy、mon、mds、osd）</span><br><span class="line">172.16.100.13    2U/6G    sda(20G)、sdb(30G)    K8S（worker）          ceph（ceph-deploy、mon、mds、osd）</span><br></pre></td></tr></table></figure>
+<ul>
+<li>操作系统准备</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 关闭 selinux</span></span><br><span class="line">setenforce 0</span><br><span class="line">sed -i <span class="string">'/^SELINUX=/cSELINUX=disabled'</span> /etc/selinux/config</span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭防火墙</span></span><br><span class="line">systemctl stopfirewalld</span><br><span class="line">systemctl <span class="built_in">disable</span> firewalld</span><br><span class="line"></span><br><span class="line"><span class="comment"># 短主机名到 IP 的映射，不要映射 FQDN，而是映射为 hostname -s</span></span><br><span class="line">cat &gt;&gt;/etc/hosts&lt;&lt;EOF</span><br><span class="line">172.16.100.11    node1</span><br><span class="line">172.16.100.12    node2</span><br><span class="line">172.16.100.13    node3</span><br><span class="line">EOF</span><br><span class="line">cat /etc/hosts</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在部署的控制主机上执行免密通信的操作</span></span><br><span class="line">ssh-keygen -q -P <span class="string">''</span> -f ~/.ssh/id_rsa</span><br><span class="line"></span><br><span class="line">nodes=(</span><br><span class="line">    172.16.100.11</span><br><span class="line">    172.16.100.12</span><br><span class="line">    172.16.100.13</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> node <span class="keyword">in</span> <span class="variable">$&#123;nodes[*]&#125;</span> ;<span class="keyword">do</span></span><br><span class="line">    ssh-copy-id root@<span class="variable">$node</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 同步系统时间</span></span><br><span class="line">yum install -y chrony</span><br><span class="line"></span><br><span class="line">sed -i <span class="string">'/^server/d'</span> /etc/chrony.conf</span><br><span class="line">sed -i <span class="string">'3iserver ntp1.aliyun.com iburst'</span> /etc/chrony.conf</span><br><span class="line">sed -i <span class="string">'3iserver cn.ntp.org.cn iburst'</span> /etc/chrony.conf</span><br><span class="line">sed -i <span class="string">'3iserver us.ntp.org.cn iburst'</span> /etc/chrony.conf</span><br><span class="line"></span><br><span class="line">systemctl start chronyd</span><br><span class="line">systemctl <span class="built_in">enable</span> chronyd</span><br></pre></td></tr></table></figure>
+<h2 id="部署-Ceph"><a href="#部署-Ceph" class="headerlink" title="部署 Ceph"></a>部署 Ceph</h2><ul>
+<li>配置 Ceph 源</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cat &gt;&gt;/etc/yum.repos.d/ceph.repo&lt;&lt;EOF</span><br><span class="line">[Ceph-x86_64]</span><br><span class="line">name=Ceph x86_64 packages</span><br><span class="line">baseurl=https://mirrors.aliyun.com/ceph/rpm-jewel/el7/x86_64/</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=0</span><br><span class="line"><span class="built_in">type</span>=rpm-md</span><br><span class="line"></span><br><span class="line">[Ceph-noarch]</span><br><span class="line">name=Ceph noarch packages</span><br><span class="line">baseurl=https://mirrors.aliyun.com/ceph/rpm-jewel/el7/noarch/</span><br><span class="line">enabled=1</span><br><span class="line">gpgcheck=0</span><br><span class="line"><span class="built_in">type</span>=rpm-md</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在主节点安装 ceph-deploy</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y ceph-deploy</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建部署时候使用的工作目录</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mkdir my-cluster ; <span class="built_in">cd</span> my-cluster</span><br></pre></td></tr></table></figure>
+<ul>
+<li>指定 initial-monitor（初始的 mon 节点）初始化一个集群，生成配置文件、keyring、一个日志文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 语法：ceph-deploy new [initial-monitor-node(s)]</span></span><br><span class="line">ceph-deploy new node1 node2 node3</span><br></pre></td></tr></table></figure>
+<ul>
+<li>为集群安装软件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph-deploy install --no-adjust-repos node1 node2 node3</span><br></pre></td></tr></table></figure>
+<ul>
+<li>配置公共网络</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">'public network = 172.16.100.0/24'</span> &gt;&gt;./ceph.conf</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在初始化时指定的 mon 主机安装软件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph-deploy mon create-initial</span><br></pre></td></tr></table></figure>
+<h2 id="块存储rbd"><a href="#块存储rbd" class="headerlink" title="块存储rbd"></a>块存储rbd</h2><ul>
+<li>创建 OSD</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph-deploy disk zap node1:/dev/sdb node2:/dev/sdb node3:/dev/sdb</span><br><span class="line">ceph-deploy osd create node1:/dev/sdb node2:/dev/sdb node3:/dev/sdb</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果有报错，想清除配置和所有数据，可以重新执行上面一步（这步视情况执行）</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph-deploy purge node1 node2 node3</span><br><span class="line">ceph-deploy purgedata node1 node2 node3</span><br><span class="line">ceph-deploy forgetkeys &amp;&amp; rm ceph.*</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看所有 pool</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph osd pool ls</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以看到已经存在一个 rbd 叫做</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rbd</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看最大副本数量和最小副本数量</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph osd pool get rbd size</span><br><span class="line">ceph osd pool get rbd min_size</span><br></pre></td></tr></table></figure>
+<h2 id="文件存储cephfs"><a href="#文件存储cephfs" class="headerlink" title="文件存储cephfs"></a>文件存储cephfs</h2><ul>
+<li>部署元数据服务器</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph-deploy mds create node1 node2 node3</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 mds 就绪状态，如果没有就绪，证明 mds 有问题，排查一下</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph mds <span class="built_in">stat</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建两个 pool 用来存储数据和元数据</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph osd pool create cephfs_data 128</span><br><span class="line">ceph osd pool create cephfs_metadata 128</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建一个 cephfs</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph fs new cephfs cephfs_metadata cephfs_data</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看已经创建的 cephfs</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph fs ls</span><br></pre></td></tr></table></figure>
+<h2 id="可能的问题"><a href="#可能的问题" class="headerlink" title="可能的问题"></a>可能的问题</h2><ul>
+<li>问题和解决方法：ceph -s 有警告 too many PGs per OSD (320 &gt; max 300)</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@node1 ~]<span class="comment"># ceph -s</span></span><br><span class="line">    cluster 13a06d21-3a21-4dfd-999e-bb2084ebab7b</span><br><span class="line">     health HEALTH_WARN</span><br><span class="line">            too many PGs per OSD (320 &gt; max 300)</span><br><span class="line">     monmap e1: 3 mons at &#123;node1=172.16.100.11:6789/0,node2=172.16.100.12:6789/0,node3=172.16.100.13:6789/0&#125;</span><br><span class="line">            election epoch 12, quorum 0,1,2 node1,node2,node3</span><br><span class="line">      fsmap e20: 1/1/1 up &#123;0=node1=up:active&#125;, 2 up:standby</span><br><span class="line">     osdmap e36: 3 osds: 3 up, 3 <span class="keyword">in</span></span><br><span class="line">            flags sortbitwise,require_jewel_osds</span><br><span class="line">      pgmap v116: 320 pgs, 3 pools, 88707 bytes data, 22 objects</span><br><span class="line">            331 MB used, 76427 MB / 76759 MB avail</span><br><span class="line">                 320 active+clean</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">'mon_pg_warn_max_per_osd = 1000'</span> &gt;&gt; /etc/ceph/ceph.conf</span><br><span class="line"></span><br><span class="line">systemctl restart ceph-mon.target</span><br></pre></td></tr></table></figure>
+<h1 id="K8S-StorageClass"><a href="#K8S-StorageClass" class="headerlink" title="K8S StorageClass"></a>K8S StorageClass</h1><p>PVC 申请 PV 的时候，未必有符合条件的 PV，k8s 为我们准备了 StorageClass 可以在 PVC 申请 PV 的时候通过 StorageClass 动态生成 PV。</p>
+<p>StorageClass 可以动态的到 CephFS 、NFS 等存储（或者云端存储）产生一个 PV，要求存储设备必须支持 RESTfull 风格的接口。</p>
+<ul>
+<li>不同的外部存储提供的能力表</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Volume Plugin</th>
+<th style="text-align:left">ReadWriteOnce</th>
+<th style="text-align:left">ReadOnlyMany</th>
+<th style="text-align:left">ReadWriteMany</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">AWSElasticBlockStore</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">AzureFile</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+</tr>
+<tr>
+<td style="text-align:left">AzureDisk</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">Cinder</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">CSI</td>
+<td style="text-align:left">depends on the driver</td>
+<td style="text-align:left">depends on the driver</td>
+<td style="text-align:left">depends on the driver</td>
+</tr>
+<tr>
+<td style="text-align:left">FC</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">FlexVolume</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">depends on the driver</td>
+</tr>
+<tr>
+<td style="text-align:left">Flocker</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">GCEPersistentDisk</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">Glusterfs</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+</tr>
+<tr>
+<td style="text-align:left">HostPath</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">iSCSI</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">Quobyte</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+</tr>
+<tr>
+<td style="text-align:left">NFS</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+</tr>
+<tr>
+<td style="text-align:left">CephFS</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+</tr>
+<tr>
+<td style="text-align:left">RBD</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">VsphereVolume</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">- (works when Pods are collocated)</td>
+</tr>
+<tr>
+<td style="text-align:left">PortworxVolume</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">✓</td>
+</tr>
+<tr>
+<td style="text-align:left">ScaleIO</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+</tr>
+<tr>
+<td style="text-align:left">StorageOS</td>
+<td style="text-align:left">✓</td>
+<td style="text-align:left">-</td>
+<td style="text-align:left">-</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Ceph-fs"><a href="#Ceph-fs" class="headerlink" title="Ceph fs"></a>Ceph fs</h2><h3 id="创建-CephFs"><a href="#创建-CephFs" class="headerlink" title="创建 CephFs"></a>创建 CephFs</h3><ul>
+<li>创建两个 poll ，CephFS 需要使用两个 Pool 来分别存储数据和元数据</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph osd pool create cephfs_data 128</span><br><span class="line">ceph osd pool create cephfs_metadata 128</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建一个 CephFS</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph fs new cephfs cephfs_metadata cephfs_data</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 CephFS </li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph fs ls</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 mds 状态是否进入 active</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph mds <span class="built_in">stat</span></span><br></pre></td></tr></table></figure>
+<h3 id="安装-cephfs-provisioner"><a href="#安装-cephfs-provisioner" class="headerlink" title="安装 cephfs-provisioner"></a>安装 cephfs-provisioner</h3><ul>
+<li>K8S 官方的外部存储 provisioner 项目，Cephfs 在 ceph/cephfs/deploy/rbac 这个目录中</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">https://github.com/kubernetes-incubator/external-storage.git</span><br></pre></td></tr></table></figure>
+<ul>
+<li>克隆项目</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/kubernetes-incubator/external-storage.git</span><br></pre></td></tr></table></figure>
+<ul>
+<li>部署 cephfs-provisioner</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl apply -f external-storage/ceph/rbd/deploy/rbac/</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 cephfs-provisioner 容器运行状态</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl get pods -n kube-system</span><br></pre></td></tr></table></figure>
+<h3 id="创建-StorageClass"><a href="#创建-StorageClass" class="headerlink" title="创建 StorageClass"></a>创建 StorageClass</h3><ul>
+<li>使用 cephfs 的官方示例</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">https://github.com/kubernetes-incubator/external-storage/tree/master/ceph/cephfs/example</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建 Secret 使用 CephX 认证</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">---</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Secret</span><br><span class="line">metadata:</span><br><span class="line">  name: ceph-admin-secret</span><br><span class="line">  namespace: kube-system</span><br><span class="line"><span class="built_in">type</span>: <span class="string">"kubernetes.io/rbd"</span></span><br><span class="line">data:</span><br><span class="line">  <span class="comment"># ceph auth get-key client.admin | base64                                                  # 从这个命令中取得 keyring 认证的 base64 密钥串复制到下面</span></span><br><span class="line">  key: QVFER3U5TmM1NXQ4SlJBQXhHMGltdXZlNFZkUXRvN2tTZ1BENGc9PQ==</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建存储类</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">kind:</span> <span class="string">StorageClass</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">storage.k8s.io/v1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">cephfs</span></span><br><span class="line"><span class="attr">provisioner:</span> <span class="string">ceph.com/cephfs</span></span><br><span class="line"><span class="attr">parameters:</span></span><br><span class="line">    <span class="attr">monitors:</span> <span class="number">172.16</span><span class="number">.100</span><span class="number">.11</span><span class="string">:6789,192.172.16.100.12:6789,172.16.100.13:6789</span>                  <span class="comment"># monitor 地址</span></span><br><span class="line">    <span class="attr">adminId:</span> <span class="string">admin</span>                                                                          <span class="comment"># 管理员ID</span></span><br><span class="line">    <span class="attr">adminSecretName:</span> <span class="string">ceph-admin-secret</span>                                                      <span class="comment"># 使用 ceph-admin-secret 这个 Secret</span></span><br><span class="line">    <span class="attr">adminSecretNamespace:</span> <span class="string">kube-system</span>                                                       <span class="comment"># Secret 所在名称空间</span></span><br><span class="line">    <span class="attr">claimRoot:</span> <span class="string">/pvc-volumes</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建 PVC</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">PersistentVolumeClaim</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">ceph-cephfs-pvc</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">storageClassName:</span> <span class="string">cephfs</span></span><br><span class="line">  <span class="attr">accessModes:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ReadWriteMany</span></span><br><span class="line">  <span class="attr">resources:</span></span><br><span class="line">    <span class="attr">requests:</span></span><br><span class="line">      <span class="attr">storage:</span> <span class="string">10Gi</span></span><br></pre></td></tr></table></figure>
+<h2 id="Ceph-rbd"><a href="#Ceph-rbd" class="headerlink" title="Ceph rbd"></a>Ceph rbd</h2><p>注意：RBD 模式是不支持 ReadWriteMany 的</p>
+<h3 id="配置-Ceph-储存池"><a href="#配置-Ceph-储存池" class="headerlink" title="配置 Ceph 储存池"></a>配置 Ceph 储存池</h3><ul>
+<li>所有节点安装依赖</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y ceph-common</span><br></pre></td></tr></table></figure>
+<ul>
+<li>加载内核模块，并且写入开机启动</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">modprobe rbd</span><br><span class="line">lsmod | grep rbd</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"rbd"</span> &gt;&gt; /etc/modules-load.d/ceph.conf</span><br><span class="line">systemctl <span class="built_in">enable</span> systemd-modules-load.service</span><br></pre></td></tr></table></figure>
+<ul>
+<li>因为有默认的存储池叫 rbd ，权限要求不严格的情况这一步不需要执行，创建 ceph 存储池，创建用户</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ceph osd pool create kube 4096                                                               <span class="comment"># 创建 pool</span></span><br><span class="line">ceph osd pool ls                                                                             <span class="comment"># 查看 pool</span></span><br><span class="line"></span><br><span class="line">ceph auth get-or-create client.kube mon <span class="string">'allow r'</span> osd <span class="string">'allow rwx pool=kube'</span> -o /etc/ceph/ceph.client.kube.keyring</span><br><span class="line">ceph auth list                                                                               <span class="comment"># 授权 client.kube 用户访问 kube 这个 pool</span></span><br><span class="line"></span><br><span class="line">scp /etc/ceph/ceph.client.kube.keyring node1:/etc/ceph/                                      <span class="comment"># 将用户 keyring 文件拷贝到各个 ceph 节点</span></span><br><span class="line">scp /etc/ceph/ceph.client.kube.keyring node1:/etc/ceph/</span><br></pre></td></tr></table></figure>
+<h3 id="安装-rbd-provisioner"><a href="#安装-rbd-provisioner" class="headerlink" title="安装 rbd-provisioner"></a>安装 rbd-provisioner</h3><ul>
+<li>K8S 官方的外部存储 provisioner 项目，Cephfs 在 ceph/rbd/deploy/rbac 这个目录中</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">https://github.com/kubernetes-incubator/external-storage.git</span><br></pre></td></tr></table></figure>
+<ul>
+<li>克隆项目</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/kubernetes-incubator/external-storage.git</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修复一个官方遗漏的一个权限，这允许 rbd-provisioner 访问 ceph 的密钥</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cat &gt;&gt;external-storage/ceph/rbd/deploy/rbac/clusterrole.yaml&lt;&lt;EOF</span><br><span class="line">  - apiGroups: [<span class="string">""</span>]</span><br><span class="line">    resources: [<span class="string">"secrets"</span>]</span><br><span class="line">    verbs: [<span class="string">"create"</span>, <span class="string">"get"</span>, <span class="string">"list"</span>, <span class="string">"watch"</span>]</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<ul>
+<li>部署 rbd-provisioner</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl apply -f external-storage/ceph/rbd/deploy/rbac/</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 rbd-provisioner 容器运行状态</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl get pods -n kube-system</span><br></pre></td></tr></table></figure>
+<h3 id="创建-StorageClass-1"><a href="#创建-StorageClass-1" class="headerlink" title="创建 StorageClass"></a>创建 StorageClass</h3><ul>
+<li>使用 ceph rbd 的官方示例</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">https://github.com/kubernetes-incubator/external-storage/tree/master/ceph/rbd/examples</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建 Secret 使用 CephX 认证，如果已经存在，则不需要再次创建</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Secret</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">ceph-admin-secret</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">kube-system</span></span><br><span class="line"><span class="attr">type:</span> <span class="string">"kubernetes.io/rbd"</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="comment"># ceph auth get-key client.admin | base64                                                  # 从这个命令中取得 keyring 认证的 base64 密钥串复制到下面</span></span><br><span class="line">  <span class="attr">key:</span> <span class="string">QVFER3U5TmM1NXQ4SlJBQXhHMGltdXZlNFZkUXRvN2tTZ1BENGc9PQ==</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建存储类</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">StorageClass</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">storage.k8s.io/v1</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">ceph-rbd</span></span><br><span class="line"><span class="attr">provisioner:</span> <span class="string">ceph.com/rbd</span></span><br><span class="line"><span class="attr">parameters:</span></span><br><span class="line">  <span class="attr">monitors:</span> <span class="number">172.16</span><span class="number">.100</span><span class="number">.11</span><span class="string">:6789,192.172.16.100.12:6789,172.16.100.13:6789</span>                    <span class="comment"># monitor 地址</span></span><br><span class="line">  <span class="attr">pool:</span> <span class="string">rbd</span>                                                                                 <span class="comment"># 存储池的名称</span></span><br><span class="line">  <span class="attr">adminId:</span> <span class="string">admin</span>                                                                            <span class="comment"># 管理员ID</span></span><br><span class="line">  <span class="attr">adminSecretName:</span> <span class="string">ceph-admin-secret</span>                                                        <span class="comment"># 使用 ceph-admin-secret 这个 Secret</span></span><br><span class="line">  <span class="attr">adminSecretNamespace:</span> <span class="string">kube-system</span>                                                         <span class="comment"># Secret 所在名称空间</span></span><br><span class="line">  <span class="attr">userId:</span> <span class="string">admin</span>                                                                             <span class="comment"># 用户ID</span></span><br><span class="line">  <span class="attr">userSecretName:</span> <span class="string">ceph-admin-secret</span>                                                         <span class="comment"># 使用 ceph-admin-secret 这个 Secret</span></span><br><span class="line">  <span class="attr">userSecretNamespace:</span> <span class="string">kube-system</span>                                                          <span class="comment"># Secret 所在名称空间</span></span><br><span class="line">  <span class="attr">fsType:</span> <span class="string">ext4</span>                                                                              <span class="comment"># 文件系统</span></span><br><span class="line">  <span class="attr">imageFormat:</span> <span class="string">"2"</span></span><br><span class="line">  <span class="attr">imageFeatures:</span> <span class="string">"layering"</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建 PVC</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">PersistentVolumeClaim</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">ceph-rbd-pvc</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">storageClassName:</span> <span class="string">ceph-rbd</span></span><br><span class="line">  <span class="attr">accessModes:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">ReadWriteOnce</span></span><br><span class="line">  <span class="attr">resources:</span></span><br><span class="line">    <span class="attr">requests:</span></span><br><span class="line">      <span class="attr">storage:</span> <span class="string">10Gi</span></span><br></pre></td></tr></table></figure>
+<h1 id="部署-EFK"><a href="#部署-EFK" class="headerlink" title="部署 EFK"></a>部署 EFK</h1><h2 id="Helm-Elasticsearch"><a href="#Helm-Elasticsearch" class="headerlink" title="Helm Elasticsearch"></a>Helm Elasticsearch</h2><ul>
+<li>下载 elasticsearch 的 StatfullSet 的 chart</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">helm fetch stable/elasticsearch</span><br></pre></td></tr></table></figure>
+<ul>
+<li>编辑 values.yaml，修改 storageClass 指向上面创建的 storageClass</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">storageClass:</span> <span class="string">"ceph-rbd"</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 helm 指定 values.yaml 部署 elasticsearch</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">helm install --name els1 -f values.yaml stable/elasticsearch</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装后查看，调试直到全部处于 READY 状态</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ kubectl get pods</span><br><span class="line">NAME                                         READY   STATUS    RESTARTS   AGE</span><br><span class="line">els1-elasticsearch-client-55696f5bdd-qczbf   1/1     Running   1          78m</span><br><span class="line">els1-elasticsearch-client-55696f5bdd-tdwdc   1/1     Running   1          78m</span><br><span class="line">els1-elasticsearch-data-0                    1/1     Running   1          78m</span><br><span class="line">els1-elasticsearch-data-1                    1/1     Running   1          56m</span><br><span class="line">els1-elasticsearch-master-0                  1/1     Running   1          78m</span><br><span class="line">els1-elasticsearch-master-1                  1/1     Running   1          53m</span><br><span class="line">els1-elasticsearch-master-2                  1/1     Running   1          52m</span><br><span class="line">rbd-provisioner-9b8ffbcc-nxdjd               1/1     Running   2          81m</span><br></pre></td></tr></table></figure>
+<ul>
+<li>也可以使用 helm 命令查看</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ helm status els1</span><br><span class="line"></span><br><span class="line">LAST DEPLOYED: Sun May 12 16:28:56 2019</span><br><span class="line">NAMESPACE: default</span><br><span class="line">STATUS: DEPLOYED</span><br><span class="line"></span><br><span class="line">RESOURCES:</span><br><span class="line">==&gt; v1/ConfigMap</span><br><span class="line">NAME                     DATA  AGE</span><br><span class="line">els1-elasticsearch       4     88m</span><br><span class="line">els1-elasticsearch-test  1     88m</span><br><span class="line"></span><br><span class="line">==&gt; v1/Pod(related)</span><br><span class="line">NAME                                        READY  STATUS   RESTARTS  AGE</span><br><span class="line">els1-elasticsearch-client-55696f5bdd-qczbf  1/1    Running  1         88m</span><br><span class="line">els1-elasticsearch-client-55696f5bdd-tdwdc  1/1    Running  1         88m</span><br><span class="line">els1-elasticsearch-data-0                   1/1    Running  1         88m</span><br><span class="line">els1-elasticsearch-data-1                   1/1    Running  1         66m</span><br><span class="line">els1-elasticsearch-master-0                 1/1    Running  1         88m</span><br><span class="line">els1-elasticsearch-master-1                 1/1    Running  1         63m</span><br><span class="line">els1-elasticsearch-master-2                 1/1    Running  1         62m</span><br><span class="line"></span><br><span class="line">==&gt; v1/Service</span><br><span class="line">NAME                          TYPE       CLUSTER-IP     EXTERNAL-IP  PORT(S)   AGE</span><br><span class="line">els1-elasticsearch-client     ClusterIP  10.98.197.185  &lt;none&gt;       9200/TCP  88m</span><br><span class="line">els1-elasticsearch-discovery  ClusterIP  None           &lt;none&gt;       9300/TCP  88m</span><br><span class="line"></span><br><span class="line">==&gt; v1/ServiceAccount</span><br><span class="line">NAME                       SECRETS  AGE</span><br><span class="line">els1-elasticsearch-client  1        88m</span><br><span class="line">els1-elasticsearch-data    1        88m</span><br><span class="line">els1-elasticsearch-master  1        88m</span><br><span class="line"></span><br><span class="line">==&gt; v1beta1/Deployment</span><br><span class="line">NAME                       READY  UP-TO-DATE  AVAILABLE  AGE</span><br><span class="line">els1-elasticsearch-client  2/2    2           2          88m</span><br><span class="line"></span><br><span class="line">==&gt; v1beta1/StatefulSet</span><br><span class="line">NAME                       READY  AGE</span><br><span class="line">els1-elasticsearch-data    2/2    88m</span><br><span class="line">els1-elasticsearch-master  3/3    88m</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">NOTES:</span><br><span class="line">The elasticsearch cluster has been installed.</span><br><span class="line"></span><br><span class="line">Elasticsearch can be accessed:</span><br><span class="line"></span><br><span class="line">  * Within your cluster, at the following DNS name at port 9200:</span><br><span class="line"></span><br><span class="line">    els1-elasticsearch-client.default.svc</span><br><span class="line"></span><br><span class="line">  * From outside the cluster, run these commands <span class="keyword">in</span> the same shell:</span><br><span class="line"></span><br><span class="line">    <span class="built_in">export</span> POD_NAME=$(kubectl get pods --namespace default -l <span class="string">"app=elasticsearch,component=client,release=els1"</span> -o jsonpath=<span class="string">"&#123;.items[0].metadata.name&#125;"</span>)</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"Visit http://127.0.0.1:9200 to use Elasticsearch"</span></span><br><span class="line">    kubectl port-forward --namespace default <span class="variable">$POD_NAME</span> 9200:9200</span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动一个临时的容器，解析集群地址，测试集群信息，查看集群节点</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ kubectl run cirros1 --rm -it --image=cirros -- /bin/sh</span><br><span class="line"></span><br><span class="line">/ <span class="comment"># nslookup els1-elasticsearch-client.default.svc</span></span><br><span class="line">Server:    10.96.0.10</span><br><span class="line">Address 1: 10.96.0.10 kube-dns.kube-system.svc.cluster.local</span><br><span class="line"></span><br><span class="line">Name:      els1-elasticsearch-client.default.svc</span><br><span class="line">Address 1: 10.98.197.185 els1-elasticsearch-client.default.svc.cluster.local</span><br><span class="line">/ <span class="comment"># curl els1-elasticsearch-client.default.svc.cluster.local:9200/_cat/nodes</span></span><br><span class="line">10.244.2.28  7 96 2 0.85 0.26 0.16 di - els1-elasticsearch-data-0</span><br><span class="line">10.244.1.37  7 83 1 0.04 0.06 0.11 di - els1-elasticsearch-data-1</span><br><span class="line">10.244.2.25 19 96 2 0.85 0.26 0.16 i  - els1-elasticsearch-client-55696f5bdd-tdwdc</span><br><span class="line">10.244.2.27 28 96 2 0.85 0.26 0.16 mi * els1-elasticsearch-master-2</span><br><span class="line">10.244.1.39 19 83 1 0.04 0.06 0.11 i  - els1-elasticsearch-client-55696f5bdd-qczbf</span><br><span class="line">10.244.2.29 21 96 2 0.85 0.26 0.16 mi - els1-elasticsearch-master-1</span><br><span class="line">10.244.1.38 23 83 1 0.04 0.06 0.11 mi - els1-elasticsearch-master-0</span><br></pre></td></tr></table></figure>
+<h2 id="Helm-fluentd-elasticsearch"><a href="#Helm-fluentd-elasticsearch" class="headerlink" title="Helm fluentd-elasticsearch"></a>Helm fluentd-elasticsearch</h2><ul>
+<li>安装 kiwigrid 源</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">helm repo add kiwigrid https://kiwigrid.github.io</span><br></pre></td></tr></table></figure>
+<ul>
+<li>下载 fluentd-elasticsearch</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">helm fetch kiwigrid/fluentd-elasticsearch</span><br></pre></td></tr></table></figure>
+<ul>
+<li>获取集群地址</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">els1-elasticsearch-client.default.svc.cluster.local:9200</span><br></pre></td></tr></table></figure>
+<ul>
+<li>编辑修改 values.yaml，指定 elasticsearch 集群的位置</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">elasticsearch:</span><br><span class="line">  host: <span class="string">'els1-elasticsearch-client.default.svc.cluster.local'</span></span><br><span class="line">  port: 9200</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改对污点的容忍程度，使其容忍 Master 节点的污点，也运行在 Master 节点上收集信息</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">tolerations:</span> </span><br><span class="line">  <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">node-role.kubernetes.io/master</span></span><br><span class="line">    <span class="attr">operator:</span> <span class="string">Exists</span></span><br><span class="line">    <span class="attr">effect:</span> <span class="string">NoSchedule</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果使用 prometheus 监控应该打开 prometheusRole 规则</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">podAnnotations:</span></span><br><span class="line">  <span class="attr">prometheus.io/scrape:</span> <span class="string">"true"</span></span><br><span class="line">  <span class="attr">prometheus.io/port:</span> <span class="string">"24231"</span></span><br><span class="line">  </span><br><span class="line"><span class="attr">service:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">ClusterIP</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">"monitor-agent"</span></span><br><span class="line">      <span class="attr">port:</span> <span class="number">24231</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 helm 指定 values.yaml 部署 fluentd-elasticsearch</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">helm install --name flu1 -f values.yaml kiwigrid/fluentd-elasticsearch</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看状态 flu1 这个 helm 服务的运行状态</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@master fluentd-elasticsearch]<span class="comment"># helm status flu1</span></span><br><span class="line">LAST DEPLOYED: Sun May 12 18:13:12 2019</span><br><span class="line">NAMESPACE: default</span><br><span class="line">STATUS: DEPLOYED</span><br><span class="line"></span><br><span class="line">RESOURCES:</span><br><span class="line">==&gt; v1/ClusterRole</span><br><span class="line">NAME                        AGE</span><br><span class="line">flu1-fluentd-elasticsearch  17m</span><br><span class="line"></span><br><span class="line">==&gt; v1/ClusterRoleBinding</span><br><span class="line">NAME                        AGE</span><br><span class="line">flu1-fluentd-elasticsearch  17m</span><br><span class="line"></span><br><span class="line">==&gt; v1/ConfigMap</span><br><span class="line">NAME                        DATA  AGE</span><br><span class="line">flu1-fluentd-elasticsearch  6     17m</span><br><span class="line"></span><br><span class="line">==&gt; v1/DaemonSet</span><br><span class="line">NAME                        DESIRED  CURRENT  READY  UP-TO-DATE  AVAILABLE  NODE SELECTOR  AGE</span><br><span class="line">flu1-fluentd-elasticsearch  3        3        3      3           3          &lt;none&gt;         17m</span><br><span class="line"></span><br><span class="line">==&gt; v1/Pod(related)</span><br><span class="line">NAME                              READY  STATUS   RESTARTS  AGE</span><br><span class="line">flu1-fluentd-elasticsearch-p49fc  1/1    Running  1         17m</span><br><span class="line">flu1-fluentd-elasticsearch-q5b9k  1/1    Running  0         17m</span><br><span class="line">flu1-fluentd-elasticsearch-swfvt  1/1    Running  0         17m</span><br><span class="line"></span><br><span class="line">==&gt; v1/Service</span><br><span class="line">NAME                        TYPE       CLUSTER-IP      EXTERNAL-IP  PORT(S)    AGE</span><br><span class="line">flu1-fluentd-elasticsearch  ClusterIP  10.106.106.209  &lt;none&gt;       24231/TCP  17m</span><br><span class="line"></span><br><span class="line">==&gt; v1/ServiceAccount</span><br><span class="line">NAME                        SECRETS  AGE</span><br><span class="line">flu1-fluentd-elasticsearch  1        17m</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">NOTES:</span><br><span class="line">1. To verify that Fluentd has started, run:</span><br><span class="line"></span><br><span class="line">  kubectl --namespace=default get pods -l <span class="string">"app.kubernetes.io/name=fluentd-elasticsearch,app.kubernetes.io/instance=flu1"</span></span><br><span class="line"></span><br><span class="line">THIS APPLICATION CAPTURES ALL CONSOLE OUTPUT AND FORWARDS IT TO elasticsearch . Anything that might be identifying,</span><br><span class="line">including things like IP addresses, container images, and object names will NOT be anonymized.</span><br><span class="line">2. Get the application URL by running these commands:</span><br><span class="line">  <span class="built_in">export</span> POD_NAME=$(kubectl get pods --namespace default -l <span class="string">"app.kubernetes.io/name=fluentd-elasticsearch,app.kubernetes.io/instance=flu1"</span> -o jsonpath=<span class="string">"&#123;.items[0].metadata.name&#125;"</span>)</span><br><span class="line">  <span class="built_in">echo</span> <span class="string">"Visit http://127.0.0.1:8080 to use your application"</span></span><br><span class="line">  kubectl port-forward <span class="variable">$POD_NAME</span> 8080:80</span><br></pre></td></tr></table></figure>
+<ul>
+<li>是否生成了索引，直接使用访问 elasticsearch 的 RESTfull API 接口。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ kubectl run cirros1 --rm -it --image=cirros -- /bin/sh</span><br><span class="line">/ <span class="comment"># curl els1-elasticsearch-client.default.svc.cluster.local:9200/_cat/indices</span></span><br><span class="line">green open logstash-2019.05.10 a2b-GyKsSLOZPqGKbCpyJw 5 1   158 0 84.2kb   460b</span><br><span class="line">green open logstash-2019.05.09 CwYylNhdRf-A5UELhrzHow 5 1 71418 0 34.3mb 17.4mb</span><br><span class="line">green open logstash-2019.05.12 5qRFpV46RGG_bWC4xbsyVA 5 1 34496 0 26.1mb 13.2mb</span><br></pre></td></tr></table></figure>
+<h2 id="Helm-kibana"><a href="#Helm-kibana" class="headerlink" title="Helm kibana"></a>Helm kibana</h2><ul>
+<li>下载 stable/kibana</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">helm fetch stable/kibana</span><br></pre></td></tr></table></figure>
+<ul>
+<li>编辑 values.yaml，修改 elasticsearch 指向 elasticsearch 集群的地址</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">elasticsearch.hosts: http://els1-elasticsearch-client.default.svc.cluster.local:920</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改 service 的工作模式，使得可以从集群外部访问</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">service:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">NodePort</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 helm 指定 values.yaml 部署 kibana</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">helm install --name kib1 -f values.yaml stable/kibana</span><br></pre></td></tr></table></figure>
+<ul>
+<li>获取 service 端口</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ kubectl get svc</span><br><span class="line">NAME                           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)         AGE</span><br><span class="line">els1-elasticsearch-client      ClusterIP   10.98.197.185   &lt;none&gt;        9200/TCP        4h51m</span><br><span class="line">els1-elasticsearch-discovery   ClusterIP   None            &lt;none&gt;        9300/TCP        4h51m</span><br><span class="line">flu1-fluentd-elasticsearch     ClusterIP   10.101.97.11    &lt;none&gt;        24231/TCP       157m</span><br><span class="line">kib1-kibana                    NodePort    10.103.7.215    &lt;none&gt;        443:31537/TCP   6m50s</span><br><span class="line">kubernetes                     ClusterIP   10.96.0.1       &lt;none&gt;        443/TCP         3d4h</span><br></pre></td></tr></table></figure>
+<ul>
+<li>由于 service 工作在 NodePort 模式下，所以可以在集群外部访问了</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">172.16.100.6:31537</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/07/go/3.网络编程/" rel="next" title="网络编程基础和框架">
+                <i class="fa fa-chevron-left"></i> 网络编程基础和框架
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/01/11/kubernetes/14.PodPreset/" rel="prev" title="PodPreset">
+                PodPreset <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ceph-集群部署"><span class="nav-number">1.</span> <span class="nav-text">Ceph 集群部署</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#先看结果"><span class="nav-number">1.1.</span> <span class="nav-text">先看结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ceph-配置"><span class="nav-number">1.2.</span> <span class="nav-text">Ceph 配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署-Ceph"><span class="nav-number">1.3.</span> <span class="nav-text">部署 Ceph</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#块存储rbd"><span class="nav-number">1.4.</span> <span class="nav-text">块存储rbd</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件存储cephfs"><span class="nav-number">1.5.</span> <span class="nav-text">文件存储cephfs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可能的问题"><span class="nav-number">1.6.</span> <span class="nav-text">可能的问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#K8S-StorageClass"><span class="nav-number">2.</span> <span class="nav-text">K8S StorageClass</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ceph-fs"><span class="nav-number">2.1.</span> <span class="nav-text">Ceph fs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-CephFs"><span class="nav-number">2.1.1.</span> <span class="nav-text">创建 CephFs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-cephfs-provisioner"><span class="nav-number">2.1.2.</span> <span class="nav-text">安装 cephfs-provisioner</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-StorageClass"><span class="nav-number">2.1.3.</span> <span class="nav-text">创建 StorageClass</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ceph-rbd"><span class="nav-number">2.2.</span> <span class="nav-text">Ceph rbd</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置-Ceph-储存池"><span class="nav-number">2.2.1.</span> <span class="nav-text">配置 Ceph 储存池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装-rbd-provisioner"><span class="nav-number">2.2.2.</span> <span class="nav-text">安装 rbd-provisioner</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-StorageClass-1"><span class="nav-number">2.2.3.</span> <span class="nav-text">创建 StorageClass</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#部署-EFK"><span class="nav-number">3.</span> <span class="nav-text">部署 EFK</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Helm-Elasticsearch"><span class="nav-number">3.1.</span> <span class="nav-text">Helm Elasticsearch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Helm-fluentd-elasticsearch"><span class="nav-number">3.2.</span> <span class="nav-text">Helm fluentd-elasticsearch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Helm-kibana"><span class="nav-number">3.3.</span> <span class="nav-text">Helm kibana</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

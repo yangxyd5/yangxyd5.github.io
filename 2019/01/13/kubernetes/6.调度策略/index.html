@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="调度策略Master 主要是运行集群的控制平面组件的，apiserver、scheduler、controlermanager，Master 还依赖与 etcd 这样的存储节点。 kubeadm 部署的集群会将 Master 的控制组件都运行为静态 POD 了，从本质来讲，这些组件就是运行在 Master 节点专为集群提供服务的进程，Master 是不负责运行工作负载的。 node 节点是负责运行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="调度策略">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/01/13/kubernetes/6.调度策略/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="调度策略Master 主要是运行集群的控制平面组件的，apiserver、scheduler、controlermanager，Master 还依赖与 etcd 这样的存储节点。 kubeadm 部署的集群会将 Master 的控制组件都运行为静态 POD 了，从本质来讲，这些组件就是运行在 Master 节点专为集群提供服务的进程，Master 是不负责运行工作负载的。 node 节点是负责运行">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-02-28T08:05:40.858Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="调度策略">
+<meta name="twitter:description" content="调度策略Master 主要是运行集群的控制平面组件的，apiserver、scheduler、controlermanager，Master 还依赖与 etcd 这样的存储节点。 kubeadm 部署的集群会将 Master 的控制组件都运行为静态 POD 了，从本质来讲，这些组件就是运行在 Master 节点专为集群提供服务的进程，Master 是不负责运行工作负载的。 node 节点是负责运行">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/01/13/kubernetes/6.调度策略/">
+
+
+
+
+
+  <title>调度策略 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/01/13/kubernetes/6.调度策略/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">调度策略</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-13T00:00:00+08:00">
+                2019-01-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="调度策略"><a href="#调度策略" class="headerlink" title="调度策略"></a>调度策略</h1><p>Master 主要是运行集群的控制平面组件的，apiserver、scheduler、controlermanager，Master 还依赖与 etcd 这样的存储节点。</p>
+<p>kubeadm 部署的集群会将 Master 的控制组件都运行为静态 POD 了，从本质来讲，这些组件就是运行在 Master 节点专为集群提供服务的进程，Master 是不负责运行工作负载的。</p>
+<p>node 节点是负责运行工作负载 POD 的相关节点，用户只需要将运行任务提交给 Master 就可以了，用户无需关心运行在哪个 node 节点上，Master 整合了所有 node 为一个虚拟的资源池。</p>
+<h2 id="POD创建流程"><a href="#POD创建流程" class="headerlink" title="POD创建流程"></a>POD创建流程</h2><p>用户创建的任务最终应该运行在哪个 node 节点上，是由 Master 节点上的 scheduler 决定的，而 scheduler 也是允许用户定义它的工作特性的，默认情况下，我们没有定义它，其实是使用的默认的 scheduler 调度器。</p>
+<p>当我们使用 kubectl describe pods myapp 查看 POD 信息时候，会有一个 Events 字段中，有关于调度结果的相关信息。</p>
+<p>Scheduler 会从众多的 node 节点中挑选出符合 POD 运行要求的节点，然后将选定的 node 节点信息记录在 etcd 中，kubelet 始终 waitch 着 apiserver 上的关于本节点的信息变化，kubelet 就会去 apiserver 获取关于变化信息的配置清单，根据配置清单的定义去创建 POD。</p>
+<h2 id="Service创建过程"><a href="#Service创建过程" class="headerlink" title="Service创建过程"></a>Service创建过程</h2><p>当用户创建一个 service 的时候，这个请求会提交给 apiserver，apiserver 将清单文件写入 etcd 中，然后每个 node 节点上的 kube-proxy 会 waitch apiserver 关于 service 资源的相关变动，发生变化时候，每个节点的 kube-proxy 会将 service 创建为 iptables/ipvs 规则。</p>
+<p>从通信角度来讲：kubectl、kubelet、kube-proxy 都是 apiserver 的客户端，这些组件与 apiserver 进行交互时候，数据格式为 json，内部的数据序列化方式为 protocolbuff。</p>
+<h2 id="资源限制维度"><a href="#资源限制维度" class="headerlink" title="资源限制维度"></a>资源限制维度</h2><ol>
+<li>资源需求：运行 POD 需要的最低资源需求</li>
+<li>资源限制：POD 可以占用的最高资源限额</li>
+</ol>
+<h2 id="Scheduler-调度过程"><a href="#Scheduler-调度过程" class="headerlink" title="Scheduler 调度过程"></a>Scheduler 调度过程</h2><ol>
+<li>预选阶段：排除完全不符合运行这个 POD 的节点、例如资源最低要求、资源最高限额、端口是否被占用</li>
+<li>优选阶段：基于一系列的算法函数计算出每个节点的优先级，按照优先级排序，取得分最高的 node</li>
+<li>选中阶段：如果优选阶段产生多个结果，那么随机挑选一个节点</li>
+</ol>
+<ul>
+<li>POD 中影响调度的字段，在 kubectl explain pods.spec 中</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nodeName          <span class="comment"># 直接指定 POD 的运行节点</span></span><br><span class="line">nodeSelector      <span class="comment"># 根据 node 上的标签来对 node 进行预选，这就是节点的亲和性</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>其他影响调度的因素</li>
+</ul>
+<p>节点亲和性调度：表现为 nodeSelector 字段</p>
+<p>POD 间亲和性：POD 更倾向和某些 POD 运行在一起，例如同一个机房、同一个机器</p>
+<p>POD 间反亲和性：POD 和某 POD 更倾向不能运行在一起，这叫反亲和性，例如：监听同一个 nodeport，有机密数据的</p>
+<p>Taints（污点）：给某些 node 打上污点，</p>
+<p>Tolerations（污点容忍）：一个 POD 能够容忍 node 上的污点，如果运行过程中 node 出现新的污点，那么 POD 可以</p>
+<p>驱逐POD：node 给一个限定的时间，让 POD 离开这个节点。</p>
+<h2 id="预选因素"><a href="#预选因素" class="headerlink" title="预选因素"></a>预选因素</h2><p>下面的预选条件需要满足所有的预选条件才可以通过预选</p>
+<ol>
+<li>CheckNodeConditionPred</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">检查节点是否正常</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>GeneralPredicates</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>子策略</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>HostName</td>
+<td>检查主机名称是不是 pod.spec.hostname 指定的 NodeName</td>
+</tr>
+<tr>
+<td>PodFitsHostPorts</td>
+<td>检查 Pod 内每一个容器 pods.spec.containers.ports.hostPort 清单是否已被其它容器占用，如果有所需的 HostPort 不满足需求，那么 Pod 不能调度到这个主机上</td>
+</tr>
+<tr>
+<td>MatchNodeSelector</td>
+<td>检查 POD 容器上定义了 pods.spec.nodeSelector 查看 node 标签是否能够匹配</td>
+</tr>
+<tr>
+<td>PodFitsResources</td>
+<td>检查 node 是否有足够的资源运行此 POD 的基本要求</td>
+</tr>
+</tbody>
+</table>
+<ol start="3">
+<li>NoDiskConflict（默认没有启用）</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">检查 pod 定义的存储是否在 node 节点上使用。</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>PodToleratesNodeTaints</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">检查节点的污点 nodes.spec.taints 是否是 POD 污点容忍清单中 pods.spec.tolerations 的子集</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>PodToleratesNodeNoExecuteTaints</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">检查 pod 是否容忍节点上有 NoExecute 污点。NoExecute 这个污点是啥意思呢。如果一个 pod 上运行在一个没有污点的节点上后，这个节点又给加上污点了，那么 NoExecute 表示这个新加污点的节点会驱逐其上正在运行的 pod；不加 NoExecute 不会驱逐节点上运行的 pod，表示接受既成事实，这是默认策略。</span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>CheckNodeLabelPresence（默认没有启用）</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">检查节点上指定标签的存在性，如果节点有pod指定的标签，那么这个节点就被选中。</span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>CheckServiceAffinity（默认没有启用）</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">一个 Service 下可以有多个 POD，比如这些 POD 都运行在 1、2、3 机器上，而没有运行在 4、5、6 机器上，那么CheckServiceAffinity 就表示新加入的 POD 都集中运行在 1、2、3 机器上，这样集中好处是一个 Service 下 POD 之间内部通信的效率变高了。</span><br></pre></td></tr></table></figure>
+<ol start="8">
+<li>MaxEBSVolumeCount</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">确保已挂载的亚马逊 EBS 存储卷不超过设置的最大值，默认39</span><br></pre></td></tr></table></figure>
+<ol start="9">
+<li>MaxGCEPDVolumeCount</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">确保已挂载的GCE存储卷不超过设置的最大值，默认16</span><br></pre></td></tr></table></figure>
+<p>10 MaxAzureDiskVolumeCount</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">确保已挂载的Azure存储卷不超过设置的最大值，默认16</span><br></pre></td></tr></table></figure>
+<ol start="11">
+<li>CheckVolumeBinding</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">检查节点上的 PVC 是否被别的 POD 绑定了</span><br></pre></td></tr></table></figure>
+<ol start="12">
+<li>NoVolumeZoneConflict</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">检查给定的 zone (机房) 限制前提下，检查如果在此主机上部署 POD 是否存在卷冲突</span><br></pre></td></tr></table></figure>
+<ol start="13">
+<li>CheckNodeMemoryPressure</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">检查 node 节点上内存是否存在压力</span><br></pre></td></tr></table></figure>
+<ol start="14">
+<li>CheckNodeDiskPressure</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">检查磁盘 IO 是否压力过大</span><br></pre></td></tr></table></figure>
+<ol start="15">
+<li>CheckNodePIDPressure</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">检查 node 节点上 PID 资源是否存在压力</span><br></pre></td></tr></table></figure>
+<ol start="16">
+<li>MatchInterPodAffinity</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">检查 Pod 是否满足亲和性或者反亲和性</span><br></pre></td></tr></table></figure>
+<h2 id="优选函数"><a href="#优选函数" class="headerlink" title="优选函数"></a>优选函数</h2><p>在每个节点执行优选函数，将结果每个优选函数相加，得分最高的胜出。</p>
+<ol>
+<li>least_requested.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">选择消耗最小的节点（根据空闲比率评估 cpu(总容量-sum(已使用)*10/总容量)）</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>balanced_resource_allocation.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">均衡资源的使用方式，表示以 cpu 和内存占用率的相近程度作为评估标准，二者占用越接近，得分就越高，得分高的胜出。</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>node_prefer_avoid_pods.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">看节点是否有注解信息 &quot;scheduler.alpha.kubernetes.io/preferAvoidPods&quot; 。没有这个注解信息，说明这个节点是适合运行这个 POD 的。</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>taint_toleration.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">将 pods.spec.tolerations 与 nodes.spec.taints 列表项进行匹配度检查，匹配的条目越多，得分越低。</span><br></pre></td></tr></table></figure>
+<ol start="5">
+<li>selector_spreading.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">查找当前 POD 对象对应的 service、statefulset、replicatset 等所匹配的标签选择器，在节点上运行的带有这样标签的 POD 越少得分越高，这样的 POD 优选被选出。 这就是说我们要把同一个标签选择器下运行的 POD 散开(spreading)到多个节点上。</span><br></pre></td></tr></table></figure>
+<ol start="6">
+<li>interpod_affinity_test.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">遍历 POD 对象亲和性的条目，并将那些能够匹配到节点权重相加，值越大的得分越高，得分高的胜出。</span><br></pre></td></tr></table></figure>
+<ol start="7">
+<li>most_requested.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">表示尽可能的把一个节点的资源先用完，这个和 least_requested 相反，二者不能同时使用。</span><br></pre></td></tr></table></figure>
+<ol start="8">
+<li>node_label.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">根据节点是否拥有标签，不关心标签是什么，来评估分数。</span><br></pre></td></tr></table></figure>
+<ol start="9">
+<li>image_locality.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">表示根据满足当前 POD 对象需求的已有镜的体积大小之和来选择节点的。</span><br></pre></td></tr></table></figure>
+<ol start="10">
+<li>node_affinity.go</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">根据 POD 对象中的 nodeselector，对节点进行匹配度检查，能够成功匹配的数量越多，得分就越高。</span><br></pre></td></tr></table></figure>
+<h2 id="选择函数"><a href="#选择函数" class="headerlink" title="选择函数"></a>选择函数</h2><p>当通过优选的节点有多个，那么从中随机选择一台</p>
+<h1 id="高级调度设置"><a href="#高级调度设置" class="headerlink" title="高级调度设置"></a>高级调度设置</h1><p>节点选择器：nodeselector、nodeName</p>
+<p>节点亲和调度：nodeAffinity</p>
+<h2 id="节点选择器"><a href="#节点选择器" class="headerlink" title="节点选择器"></a>节点选择器</h2><ul>
+<li>使用 nodeselector 来将预选范围缩小，没有被 nodeselector 选中的节点将被预选阶段淘汰</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-schedule-demo</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">  <span class="attr">nodeSelector:</span></span><br><span class="line">    <span class="attr">gpu:</span> <span class="string">ok</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>此时如果没有任何一个节点有 gpu 这个标签，那么这个 POD 的调度将会被挂起，Pending 状态，直到满足条件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl label nodes node2 gpu=ok --overwrite</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 POD 被调度的节点，POD 已经被调度到 node2 节点了</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl get pods -o wide</span><br></pre></td></tr></table></figure>
+<h2 id="对节点的亲和性"><a href="#对节点的亲和性" class="headerlink" title="对节点的亲和性"></a>对节点的亲和性</h2><p>亲和性定义，详见：kubectl explain pods.spec.affinity.nodeAffinity</p>
+<ul>
+<li>POD 对节点亲和性定义</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">nodeAffinity             &lt;Object&gt;                                <span class="comment"># POD 对 node 节点的亲和性</span></span><br><span class="line">  preferredDuringSchedulingIgnoredDuringExecution  &lt;[]Object&gt;    <span class="comment"># 软亲和性要求，尽量满足亲和性</span></span><br><span class="line">    preference           &lt;Object&gt;                                <span class="comment"># 亲和的节点对象</span></span><br><span class="line">      matchExpressions   &lt;[]Object&gt;                              <span class="comment"># 查找表达式</span></span><br><span class="line">        key              &lt;string&gt;                                <span class="comment"># 标签</span></span><br><span class="line">        operator         &lt;string&gt;                                <span class="comment"># 操作：比较</span></span><br><span class="line">        values           &lt;[]string&gt;                              <span class="comment"># 值</span></span><br><span class="line">      matchFields        &lt;[]Object&gt;                              <span class="comment"># 查找字段</span></span><br><span class="line">        key              &lt;string&gt;                                <span class="comment"># 标签</span></span><br><span class="line">        operator         &lt;string&gt;                                <span class="comment"># 操作：比较</span></span><br><span class="line">        values           &lt;[]string&gt;                              <span class="comment"># 值</span></span><br><span class="line">    weight               &lt;<span class="built_in">integer</span>&gt;                               <span class="comment"># 权重 1 - 100</span></span><br><span class="line">  requiredDuringSchedulingIgnoredDuringExecution   &lt;Object&gt;      <span class="comment"># 硬亲和性要求，不满足则 Pending</span></span><br><span class="line">    nodeSelectorTerms    &lt;[]Object&gt;                              <span class="comment"># 选择器对象列表</span></span><br><span class="line">      matchExpressions   &lt;[]Object&gt;                              <span class="comment"># 选择器对象列表</span></span><br><span class="line">        key              &lt;string&gt;                                <span class="comment"># 标签</span></span><br><span class="line">        operator         &lt;string&gt;                                <span class="comment"># 操作：比较</span></span><br><span class="line">        values           &lt;[]string&gt;                              <span class="comment"># 值</span></span><br><span class="line">      matchFields        &lt;[]Object&gt;                              <span class="comment"># 查找字段</span></span><br><span class="line">        key              &lt;string&gt;                                <span class="comment"># 标签</span></span><br><span class="line">        operator         &lt;string&gt;                                <span class="comment"># 操作：比较</span></span><br><span class="line">        values           &lt;[]string&gt;                              <span class="comment"># 值</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>示例配置</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-nodeaffinity1-demo</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">  <span class="attr">affinity:</span></span><br><span class="line">    <span class="attr">nodeAffinity:</span></span><br><span class="line">      <span class="attr">requiredDuringSchedulingIgnoredDuringExecution:</span>        <span class="comment"># 硬亲和性要求，不满足就 Pending</span></span><br><span class="line">        <span class="attr">nodeSelectorTerms:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">matchExpressions:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">zone</span></span><br><span class="line">            <span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">            <span class="attr">values:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">foo</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">bar</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-nodeaffinity2-demo</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">  <span class="attr">affinity:</span></span><br><span class="line">    <span class="attr">nodeAffinity:</span></span><br><span class="line">      <span class="attr">preferredDuringSchedulingIgnoredDuringExecution:</span>     <span class="comment"># 软亲和性要求，不满足也可以对凑</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">preference:</span></span><br><span class="line">          <span class="attr">matchExpressions:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">zone</span></span><br><span class="line">            <span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">            <span class="attr">values:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">foo</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">bar</span></span><br><span class="line">        <span class="attr">weight:</span> <span class="number">50</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看结果，kubectl get pods</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NAME                     READY   STATUS    RESTARTS   AGE</span><br><span class="line">pod-nodeaffinity1-demo   0/1     Pending   0          6m16s  <span class="comment"># 硬亲和性要求，没有就等待</span></span><br><span class="line">pod-nodeaffinity2-demo   1/1     Running   0          7s     <span class="comment"># 软亲和性要求，没有合适主机也可以凑和</span></span><br></pre></td></tr></table></figure>
+<h2 id="对-POD-的亲和性"><a href="#对-POD-的亲和性" class="headerlink" title="对 POD 的亲和性"></a>对 POD 的亲和性</h2><p>POD 和 POD 出于高效的通信这种需求，所以需要将 POD 和 POD 组织在同一台机器，同一个机房，例如：LNMT 如果能运行在同一个主机上更好。</p>
+<ol>
+<li><p>想把一组 POD 运行在一起，使用节点亲和性就可以实现，为了达成这个目的，我们需要：把节点标签精心编排，希望在一起运行的 POD，就使用同一组标签选择器来选择节点，这种方式需要管理节点标签和 POD 亲和性才能做到。</p>
+</li>
+<li><p>想把一组 POD 运行在一起，使用 POD 亲和性，我们可以设置 POD 对某个 POD 的亲和性，那么比如：LNMT，那么 MySQL 和 Tomcat 可以设置为更加亲和 Ngninx 所在的主机或机柜，所以必须有个前提就是 POD 和 POD 怎么才是最近的，这个标准是什么，也就是什么是同一位置，怎么才能知道 node 和 node 是在一个机柜。</p>
+<p>所以可以为同一个机柜的 node 节点打上相同的标签。</p>
+</li>
+<li><p>MySQL 和 Tomcat 一定不能和 Nginx 运行在一起，这就是反亲和性。</p>
+</li>
+</ol>
+<ul>
+<li>POD 对其他 POD 的亲和性，详见：kubectl explain pods.spec.affinity.podAffinity</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">podAffinity</span>                <span class="string">&lt;Object&gt;</span>                              <span class="comment"># POD 对其他 POD 的亲和性</span></span><br><span class="line">  <span class="string">preferredDuringSchedulingIgnoredDuringExecution</span>  <span class="string">&lt;[]Object&gt;</span>    <span class="comment"># 软性亲和性，尽量满足亲和性</span></span><br><span class="line">    <span class="string">podAffinityTerm</span>        <span class="string">&lt;Object&gt;</span>                              <span class="comment"># 亲和的 POD 对象</span></span><br><span class="line">      <span class="string">labelSelector</span>        <span class="string">&lt;Object&gt;</span>                              <span class="comment"># 标签选择器对象列表</span></span><br><span class="line">        <span class="string">matchExpressions</span>   <span class="string">&lt;[]Object&gt;</span>                            <span class="comment"># 标签选择器对象，选 POD 标签</span></span><br><span class="line">          <span class="string">key</span>              <span class="string">&lt;string&gt;</span>                              <span class="comment"># 标签</span></span><br><span class="line">          <span class="string">operator</span>         <span class="string">&lt;string&gt;</span>                              <span class="comment"># 操作：比较</span></span><br><span class="line">          <span class="string">values</span>           <span class="string">&lt;[]string&gt;</span>                            <span class="comment"># 值</span></span><br><span class="line">        <span class="string">matchLabels</span>        <span class="string">&lt;map[string]string&gt;</span>                   <span class="comment"># 集合标签选择器</span></span><br><span class="line">      <span class="string">namespaces</span>           <span class="string">&lt;[]string&gt;</span>                            <span class="comment"># 名称空间的列表</span></span><br><span class="line">      <span class="string">topologyKey</span>	       <span class="string">&lt;string&gt;</span>                              <span class="comment"># 亲和判断条件</span></span><br><span class="line">    <span class="string">weight</span>                 <span class="string">&lt;integer&gt;</span>                             <span class="comment"># 权重 1 - 100</span></span><br><span class="line">  <span class="string">requiredDuringSchedulingIgnoredDuringExecution</span>   <span class="string">&lt;[]Object&gt;</span>    <span class="comment"># 硬性亲和性，不满足则 Pending</span></span><br><span class="line">    <span class="string">labelSelector</span>          <span class="string">&lt;Object&gt;</span>                              <span class="comment"># 标签选择器对象列表</span></span><br><span class="line">      <span class="string">matchExpressions</span>   <span class="string">&lt;[]Object&gt;</span>                              <span class="comment"># 标签选择器对象，选 POD 标签</span></span><br><span class="line">        <span class="string">key</span>              <span class="string">&lt;string&gt;</span>                                <span class="comment"># 标签</span></span><br><span class="line">        <span class="string">operator</span>         <span class="string">&lt;string&gt;</span>                                <span class="comment"># 操作：比较</span></span><br><span class="line">        <span class="string">values</span>           <span class="string">&lt;[]string&gt;</span>                              <span class="comment"># 值</span></span><br><span class="line">      <span class="string">matchLabels</span>        <span class="string">&lt;map[string]string&gt;</span>                     <span class="comment"># 集合标签选择器</span></span><br><span class="line">    <span class="string">namespaces</span>             <span class="string">&lt;[]string&gt;</span>                            <span class="comment"># 名称空间的列表</span></span><br><span class="line">    <span class="string">topologyKey</span>            <span class="string">&lt;string&gt;</span>                              <span class="comment"># 亲和判断条件</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>示例配置</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod1</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod2</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">db</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">db</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">busybox</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">busybox:latest</span></span><br><span class="line">    <span class="attr">imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">    <span class="attr">command:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"sh"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"-c"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"sleep 3600"</span></span><br><span class="line">  <span class="attr">affinity:</span></span><br><span class="line">    <span class="attr">podAffinity:</span></span><br><span class="line">      <span class="attr">requiredDuringSchedulingIgnoredDuringExecution:</span>   <span class="comment"># 硬亲和性要求，不满足的 Pending</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">labelSelector:</span></span><br><span class="line">          <span class="attr">matchExpressions:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">app</span></span><br><span class="line">            <span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">            <span class="attr">values:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">myapp</span></span><br><span class="line">        <span class="attr">topologyKey:</span> <span class="string">kubernetes.io/hostname</span>             <span class="comment"># 亲和性的依据为同一个主机名则亲和</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看结果，kubectl get pods -o wide</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NAME   READY   STATUS    RESTARTS   AGE     IP           NODE    NOMINATED NODE   READINESS GATES</span><br><span class="line">pod1   1/1     Running   0          3m33s   10.244.2.4   node3   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">pod2   1/1     Running   0          3m33s   10.244.2.5   node3   &lt;none&gt;           &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="对-POD-的反亲和性"><a href="#对-POD-的反亲和性" class="headerlink" title="对 POD 的反亲和性"></a>对 POD 的反亲和性</h2><ul>
+<li>POD 对其他 POD 的反亲和性，详见：kubectl explain pods.spec.affinity.podAntiAffinity</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">podAntiAffinity</span>              <span class="string">&lt;Object&gt;</span>                            <span class="comment"># POD 对其他 POD 的反亲和性</span></span><br><span class="line">  <span class="string">preferredDuringSchedulingIgnoredDuringExecution</span>  <span class="string">&lt;[]Object&gt;</span>    <span class="comment"># 软性反亲和性，尽量满足亲和性</span></span><br><span class="line">    <span class="string">podAffinityTerm</span>        <span class="string">&lt;Object&gt;</span>                              <span class="comment"># 反亲和的 POD 对象</span></span><br><span class="line">      <span class="string">labelSelector</span>        <span class="string">&lt;Object&gt;</span>                              <span class="comment"># 标签选择器对象列表</span></span><br><span class="line">        <span class="string">matchExpressions</span>   <span class="string">&lt;[]Object&gt;</span>                            <span class="comment"># 标签选择器对象，选 POD 标签</span></span><br><span class="line">          <span class="string">key</span>              <span class="string">&lt;string&gt;</span>                              <span class="comment"># 标签</span></span><br><span class="line">          <span class="string">operator</span>         <span class="string">&lt;string&gt;</span>                              <span class="comment"># 操作：比较</span></span><br><span class="line">          <span class="string">values</span>           <span class="string">&lt;[]string&gt;</span>                            <span class="comment"># 值</span></span><br><span class="line">        <span class="string">matchLabels</span>        <span class="string">&lt;map[string]string&gt;</span>                   <span class="comment"># 集合标签选择器</span></span><br><span class="line">      <span class="string">namespaces</span>           <span class="string">&lt;[]string&gt;</span>                            <span class="comment"># 名称空间的列表</span></span><br><span class="line">      <span class="string">topologyKey</span>	       <span class="string">&lt;string&gt;</span>                              <span class="comment"># 亲和判断条件</span></span><br><span class="line">    <span class="string">weight</span>                 <span class="string">&lt;integer&gt;</span>                             <span class="comment"># 权重 1 - 100</span></span><br><span class="line">  <span class="string">requiredDuringSchedulingIgnoredDuringExecution</span>   <span class="string">&lt;[]Object&gt;</span>    <span class="comment"># 硬性反亲和性，不满足则 Pending</span></span><br><span class="line">    <span class="string">labelSelector</span>          <span class="string">&lt;Object&gt;</span>                              <span class="comment"># 标签选择器对象列表</span></span><br><span class="line">      <span class="string">matchExpressions</span>   <span class="string">&lt;[]Object&gt;</span>                              <span class="comment"># 标签选择器对象，选 POD 标签</span></span><br><span class="line">        <span class="string">key</span>              <span class="string">&lt;string&gt;</span>                                <span class="comment"># 标签</span></span><br><span class="line">        <span class="string">operator</span>         <span class="string">&lt;string&gt;</span>                                <span class="comment"># 操作：比较</span></span><br><span class="line">        <span class="string">values</span>           <span class="string">&lt;[]string&gt;</span>                              <span class="comment"># 值</span></span><br><span class="line">      <span class="string">matchLabels</span>        <span class="string">&lt;map[string]string&gt;</span>                     <span class="comment"># 集合标签选择器</span></span><br><span class="line">    <span class="string">namespaces</span>             <span class="string">&lt;[]string&gt;</span>                            <span class="comment"># 名称空间的列表</span></span><br><span class="line">    <span class="string">topologyKey</span>            <span class="string">&lt;string&gt;</span>                              <span class="comment"># 亲和判断条件</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>配置清单</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod3</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod4</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">db</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">db</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">busybox</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">busybox:latest</span></span><br><span class="line">    <span class="attr">imagePullPolicy:</span> <span class="string">IfNotPresent</span></span><br><span class="line">    <span class="attr">command:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"sh"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"-c"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"sleep 3600"</span></span><br><span class="line">  <span class="attr">affinity:</span></span><br><span class="line">    <span class="attr">podAntiAffinity:</span></span><br><span class="line">      <span class="attr">requiredDuringSchedulingIgnoredDuringExecution:</span>   <span class="comment"># 硬亲和性要求，不满足的 Pending</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">labelSelector:</span></span><br><span class="line">          <span class="attr">matchExpressions:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">app</span></span><br><span class="line">            <span class="attr">operator:</span> <span class="string">In</span></span><br><span class="line">            <span class="attr">values:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="string">myapp</span></span><br><span class="line">        <span class="attr">topologyKey:</span> <span class="string">kubernetes.io/hostname</span>             <span class="comment"># 反亲和性的依据为同一个主机名</span></span><br></pre></td></tr></table></figure>
+<h2 id="taint-污点"><a href="#taint-污点" class="headerlink" title="taint 污点"></a>taint 污点</h2><p>污点只用在 node 上的键值属性（nodes.spec.taints），它的作用是拒绝不能容忍这些污点的 POD 运行的，因此需要在 POD 上定义容忍度（pods.spec.tolerations），它也是键值数据，是一个列表，表示 POD 可以容忍的污点列表。</p>
+<p>一个 POD 能不能运行在一个节点上，就是 pods.spec.tolerations 列表中是否包括了 nodes.spec.taints 中的数据。</p>
+<ul>
+<li>node 污点清单格式，详见：kubectl explain node.spec.taints</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">taints</span>          <span class="string">&lt;[]Object&gt;</span>     <span class="comment"># 污点对象列表</span></span><br><span class="line">  <span class="string">effect</span>        <span class="string">&lt;string&gt;</span>       <span class="comment"># 当 POD 不能容忍这个污点的时候，要采取的行为，也就是排斥不容忍污点的 POD</span></span><br><span class="line">    <span class="string">NoSchedule</span>                 <span class="comment"># 影响调度过程，但是已经调度完成 POD 无影响</span></span><br><span class="line">    <span class="string">PreferNoSchedule</span>           <span class="comment"># 影响调度过程，尝试驱逐调度已经完成的但不容忍新污点的 POD</span></span><br><span class="line">    <span class="string">NoExecute</span>                  <span class="comment"># 新增的污点，影响新的调度过程，且强力驱逐调度已经完成的但不容忍新污点的 POD</span></span><br><span class="line">  <span class="string">key</span>           <span class="string">&lt;string&gt;</span>       <span class="comment"># 键</span></span><br><span class="line">  <span class="string">timeAdded</span>     <span class="string">&lt;string&gt;</span>       <span class="comment"># </span></span><br><span class="line">  <span class="string">value</span>         <span class="string">&lt;string&gt;</span>       <span class="comment"># 值</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看一个 node 节点的污点，custom-columns 根据 go 模板显示一个字段，HAHAHAHA 自定义字段名，–no-headers 不显示字段名</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl get nodes 172.16.100.101 --no-headers --output=custom-columns=HAHAHAHA:.spec.taints</span><br><span class="line"></span><br><span class="line">kubectl get nodes 172.16.100.11 -o yaml |grep -A 5 taints</span><br></pre></td></tr></table></figure>
+<ul>
+<li>给 node 打上污点，键为 node-type 值为 production，污点动作</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl taint node node2 node-type=production:NoSchedule</span><br></pre></td></tr></table></figure>
+<ul>
+<li>删除 node 上的一个污点</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl taint node node2 node-type-</span><br></pre></td></tr></table></figure>
+<ul>
+<li>测试清单</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">myapp-deploy</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">4</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">      <span class="attr">release:</span> <span class="string">canary</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">        <span class="attr">release:</span> <span class="string">canary</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v2</span></span><br><span class="line">          <span class="attr">ports:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">              <span class="attr">containerPort:</span> <span class="number">80</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看结果，kubectl get pods -o wide，因为 POD 没有定义容忍 node2 的污点</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">NAME</span>                            <span class="string">READY</span>   <span class="string">STATUS</span>    <span class="string">RESTARTS</span>   <span class="string">AGE</span>   <span class="string">IP</span>            <span class="string">NODE</span>    <span class="string">NOMINATED</span> <span class="string">NODE</span>   <span class="string">READINESS</span> <span class="string">GATES</span></span><br><span class="line"><span class="string">myapp-deploy-675558bfc5-4x5cf</span>   <span class="number">1</span><span class="string">/1</span>     <span class="string">Running</span>   <span class="number">0</span>          <span class="string">9s</span>    <span class="number">10.244</span><span class="number">.2</span><span class="number">.13</span>   <span class="string">node3</span>   <span class="string">&lt;none&gt;</span>           <span class="string">&lt;none&gt;</span></span><br><span class="line"><span class="string">myapp-deploy-675558bfc5-58f2s</span>   <span class="number">1</span><span class="string">/1</span>     <span class="string">Running</span>   <span class="number">0</span>          <span class="string">9s</span>    <span class="number">10.244</span><span class="number">.2</span><span class="number">.10</span>   <span class="string">node3</span>   <span class="string">&lt;none&gt;</span>           <span class="string">&lt;none&gt;</span></span><br><span class="line"><span class="string">myapp-deploy-675558bfc5-gz4kv</span>   <span class="number">1</span><span class="string">/1</span>     <span class="string">Running</span>   <span class="number">0</span>          <span class="string">9s</span>    <span class="number">10.244</span><span class="number">.2</span><span class="number">.12</span>   <span class="string">node3</span>   <span class="string">&lt;none&gt;</span>           <span class="string">&lt;none&gt;</span></span><br><span class="line"><span class="string">myapp-deploy-675558bfc5-hlxdd</span>   <span class="number">1</span><span class="string">/1</span>     <span class="string">Running</span>   <span class="number">0</span>          <span class="string">9s</span>    <span class="number">10.244</span><span class="number">.2</span><span class="number">.11</span>   <span class="string">node3</span>   <span class="string">&lt;none&gt;</span>           <span class="string">&lt;none&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>此时给 node3 也打上污点，并驱逐原有的 POD</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl taint node node3 node-type=dev:NoExecute</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看结果，kubectl get pods -o wide，因为 node3 新增的污点驱逐了不能容忍污点的 POD ，所以 POD 被挂起</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NAME                            READY   STATUS    RESTARTS   AGE   IP       NODE     NOMINATED NODE   READINESS GATES</span><br><span class="line">myapp-deploy-675558bfc5-22wpj   0/1     Pending   0          10s   &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">myapp-deploy-675558bfc5-lctv5   0/1     Pending   0          14s   &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">myapp-deploy-675558bfc5-m5qdh   0/1     Pending   0          15s   &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">myapp-deploy-675558bfc5-z8c4q   0/1     Pending   0          14s   &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="POD-污点容忍"><a href="#POD-污点容忍" class="headerlink" title="POD 污点容忍"></a>POD 污点容忍</h2><ul>
+<li>主节点上的污点</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">taints:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">effect:</span> <span class="string">NoSchedule</span></span><br><span class="line">  <span class="attr">key:</span> <span class="string">node-role.kubernetes.io/controlplane</span></span><br><span class="line">  <span class="attr">value:</span> <span class="string">"true"</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">effect:</span> <span class="string">NoExecute</span></span><br><span class="line">  <span class="attr">key:</span> <span class="string">node-role.kubernetes.io/etcd</span></span><br><span class="line">  <span class="attr">value:</span> <span class="string">"true"</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>POD 容忍度，详见：kubectl explain pods.spec.tolerations</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">tolerations</span>            <span class="string">&lt;[]Object&gt;</span>    <span class="comment"># 容忍度对象</span></span><br><span class="line">  <span class="string">effect</span>               <span class="string">&lt;string&gt;</span>      <span class="comment"># 能否容忍 node 上的污点驱逐策略，为空表示容忍任何驱逐策略</span></span><br><span class="line">    <span class="string">NoSchedule</span>                       <span class="comment"># 能容忍 node 污点的 NoSchedule</span></span><br><span class="line">    <span class="string">PreferNoSchedule</span>                 <span class="comment"># 能容忍 node 污点的 PreferNoSchedule</span></span><br><span class="line">    <span class="string">NoExecute</span>                        <span class="comment"># 能容忍 node 污点的 NoExecute</span></span><br><span class="line">  <span class="string">key</span>                  <span class="string">&lt;string&gt;</span>      <span class="comment"># 污点的键</span></span><br><span class="line">  <span class="string">operator</span>             <span class="string">&lt;string&gt;</span>      <span class="comment"># Exists 污点存在不管什么值，Equal 污点的值必须等值</span></span><br><span class="line">  <span class="string">tolerationSeconds</span>    <span class="string">&lt;integer&gt;</span>     <span class="comment"># 容忍时间，即如果被驱逐，可以等多久再走，默认 0 秒，NoExecute 使用</span></span><br><span class="line">  <span class="string">value</span>                <span class="string">&lt;string&gt;</span>      <span class="comment"># 污点的值</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>给 node2 、node3 分别打污点</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl taint node node2 node-type=production:NoSchedule</span><br><span class="line">kubectl taint node node3 node-type=dev:NoExecute</span><br></pre></td></tr></table></figure>
+<ul>
+<li>定义 POD 清单文件，容忍 node 上存在 node-type 值为 dev 的污点、接受被驱逐。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">myapp-deploy</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">4</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">      <span class="attr">release:</span> <span class="string">canary</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">        <span class="attr">release:</span> <span class="string">canary</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">          <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v2</span></span><br><span class="line">          <span class="attr">ports:</span></span><br><span class="line">            <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">              <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">      <span class="attr">tolerations:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">node-role.kubernetes.io/etcd</span></span><br><span class="line">        <span class="attr">operator:</span> <span class="string">Exists</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">node-role.kubernetes.io/controlplane</span></span><br><span class="line">        <span class="attr">operator:</span> <span class="string">Exists</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看结果，kubectl get pods -o wide，运行在自己容忍的污点的节点上了</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">NAME</span>                           <span class="string">READY</span>   <span class="string">STATUS</span>    <span class="string">RESTARTS</span>   <span class="string">AGE</span>     <span class="string">IP</span>            <span class="string">NODE</span>    <span class="string">NOMINATED</span> <span class="string">NODE</span>   <span class="string">READINESS</span> <span class="string">GATES</span></span><br><span class="line"><span class="string">myapp-deploy-97578cf74-5v2r6</span>   <span class="number">1</span><span class="string">/1</span>     <span class="string">Running</span>   <span class="number">0</span>          <span class="string">6m22s</span>   <span class="number">10.244</span><span class="number">.2</span><span class="number">.16</span>   <span class="string">node3</span>   <span class="string">&lt;none&gt;</span>           <span class="string">&lt;none&gt;</span></span><br><span class="line"><span class="string">myapp-deploy-97578cf74-gbfj7</span>   <span class="number">1</span><span class="string">/1</span>     <span class="string">Running</span>   <span class="number">0</span>          <span class="string">6m22s</span>   <span class="number">10.244</span><span class="number">.2</span><span class="number">.14</span>   <span class="string">node3</span>   <span class="string">&lt;none&gt;</span>           <span class="string">&lt;none&gt;</span></span><br><span class="line"><span class="string">myapp-deploy-97578cf74-l4lbv</span>   <span class="number">1</span><span class="string">/1</span>     <span class="string">Running</span>   <span class="number">0</span>          <span class="string">6m22s</span>   <span class="number">10.244</span><span class="number">.2</span><span class="number">.15</span>   <span class="string">node3</span>   <span class="string">&lt;none&gt;</span>           <span class="string">&lt;none&gt;</span></span><br><span class="line"><span class="string">myapp-deploy-97578cf74-zvn8f</span>   <span class="number">1</span><span class="string">/1</span>     <span class="string">Running</span>   <span class="number">0</span>          <span class="string">6m20s</span>   <span class="number">10.244</span><span class="number">.2</span><span class="number">.17</span>   <span class="string">node3</span>   <span class="string">&lt;none&gt;</span>           <span class="string">&lt;none&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>为节点增加新的污点，设置驱离 POD</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl taint node node3 disk=hdd:NoExecute --overwrite</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看结果，kubectl get pods -o wide，POD 不能容忍新的污点，结果被驱逐</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NAME                           READY   STATUS    RESTARTS   AGE   IP       NODE     NOMINATED NODE   READINESS GATES</span><br><span class="line">myapp-deploy-97578cf74-84bfz   0/1     Pending   0          6s    &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">myapp-deploy-97578cf74-fxk2d   0/1     Pending   0          5s    &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">myapp-deploy-97578cf74-jp99j   0/1     Pending   0          6s    &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</span><br><span class="line">myapp-deploy-97578cf74-vdkbx   0/1     Pending   0          6s    &lt;none&gt;   &lt;none&gt;   &lt;none&gt;           &lt;none&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="cordon-停止调度"><a href="#cordon-停止调度" class="headerlink" title="cordon 停止调度"></a>cordon 停止调度</h2><p>cordon 停止调度，这节点不会再被调度新的任务，旧的 POD 不会受到影响</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl cordon node1     <span class="comment"># 标记为不可调度</span></span><br><span class="line">kubectl uncordon node1   <span class="comment"># 标记为可以调度</span></span><br></pre></td></tr></table></figure>
+<h2 id="drain-驱逐节点"><a href="#drain-驱逐节点" class="headerlink" title="drain 驱逐节点"></a>drain 驱逐节点</h2><p>drain 维护一个节点，将所有的 POD 驱逐</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl drain node1       <span class="comment"># 标记为不可调度，并且驱逐上面的 POD</span></span><br><span class="line">kubectl drain k8s-master  --delete-local-data --force --ignore-daemonsets</span><br><span class="line"></span><br><span class="line">kubectl uncordon node1    <span class="comment"># 标记为可以调度</span></span><br></pre></td></tr></table></figure>
+<h1 id="容器资源限制"><a href="#容器资源限制" class="headerlink" title="容器资源限制"></a>容器资源限制</h1><p>起始值 requests 最低保障</p>
+<p>终结值 limits 硬限制</p>
+<ul>
+<li>CPU</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1 颗 CPU = 1000 millicores</span><br><span class="line">0.5 颗 CPU = 500 m</span><br></pre></td></tr></table></figure>
+<ul>
+<li>内存</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Ei、Pi、Ti、Gi、Mi、Ki</span><br></pre></td></tr></table></figure>
+<h2 id="资源限制"><a href="#资源限制" class="headerlink" title="资源限制"></a>资源限制</h2><ul>
+<li>清单格式，详见：kubectl explain pods.spec.containers.resources</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">resources</span>      <span class="string">&lt;Object&gt;</span>               <span class="comment"># 资源限制</span></span><br><span class="line">  <span class="string">limits</span>       <span class="string">&lt;map[string]string&gt;</span>    <span class="comment"># 资源最高限制</span></span><br><span class="line">    <span class="string">cpu</span>        <span class="string">&lt;string&gt;</span>               <span class="comment"># 单位 m</span></span><br><span class="line">    <span class="string">memory</span>     <span class="string">&lt;string&gt;</span>               <span class="comment"># 单位 Gi、Mi</span></span><br><span class="line">  <span class="string">requests</span>     <span class="string">&lt;map[string]string&gt;</span>    <span class="comment"># 资源最低要求</span></span><br><span class="line">    <span class="string">cpu</span>        <span class="string">&lt;string&gt;</span>               <span class="comment"># 单位 m</span></span><br><span class="line">    <span class="string">memory</span>     <span class="string">&lt;string&gt;</span>               <span class="comment"># 单位 Gi、Mi</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>清单示例，node 节点的 CPU 为 12 核心，cpu limits 设置为 1000m 也就是允许</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-resources-demo</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">ikubernetes/stress-ng</span></span><br><span class="line">    <span class="attr">command:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"/usr/bin/stress-ng"</span></span><br><span class="line">    <span class="comment">#- "-m 1"                       # 以单线程压测内存</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"-c 1"</span>                        <span class="comment"># 以单线程压测CPU</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">"--metrics-brief"</span></span><br><span class="line">    <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">      <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">https</span></span><br><span class="line">      <span class="attr">containerPort:</span> <span class="number">443</span></span><br><span class="line">    <span class="attr">resources:</span></span><br><span class="line">      <span class="attr">requests:</span></span><br><span class="line">        <span class="attr">cpu:</span> <span class="string">1000m</span>                 <span class="comment"># 它决定在预选阶段淘汰哪些主机</span></span><br><span class="line">        <span class="attr">memory:</span> <span class="string">512Mi</span></span><br><span class="line">      <span class="attr">limits:</span></span><br><span class="line">        <span class="attr">cpu:</span> <span class="string">1000m</span>                 <span class="comment"># 表示限制容器使用 node 节点的一颗 CPU，无论多少进程，它们最多只能占用 node 节点的可 CPU</span></span><br><span class="line">        <span class="attr">memory:</span> <span class="string">512Mi</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看结果</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">Mem:</span> <span class="string">855392K</span> <span class="string">used,</span> <span class="string">139916K</span> <span class="string">free,</span> <span class="string">10188K</span> <span class="string">shrd,</span> <span class="string">796K</span> <span class="string">buff,</span> <span class="string">350368K</span> <span class="string">cached</span></span><br><span class="line"><span class="attr">CPU0:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU1:</span> <span class="number">100</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>   <span class="number">0</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span>         <span class="comment"># 占满了一颗 CPU</span></span><br><span class="line"><span class="attr">CPU2:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU3:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU4:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU5:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU6:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU7:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU8:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU9:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU10:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">CPU11:</span>   <span class="number">0</span><span class="string">%</span> <span class="string">usr</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sys</span>   <span class="number">0</span><span class="string">%</span> <span class="string">nic</span>  <span class="number">99</span><span class="string">%</span> <span class="string">idle</span>   <span class="number">0</span><span class="string">%</span> <span class="string">io</span>   <span class="number">0</span><span class="string">%</span> <span class="string">irq</span>   <span class="number">0</span><span class="string">%</span> <span class="string">sirq</span></span><br><span class="line"><span class="attr">Load average:</span> <span class="number">0.84</span> <span class="number">0.50</span> <span class="number">0.40</span> <span class="number">3</span><span class="string">/485</span> <span class="number">11</span></span><br><span class="line">  <span class="string">PID</span>  <span class="string">PPID</span> <span class="string">USER</span>     <span class="string">STAT</span>   <span class="string">VSZ</span> <span class="string">%VSZ</span> <span class="string">CPU</span> <span class="string">%CPU</span> <span class="string">COMMAND</span></span><br><span class="line">    <span class="number">6</span>     <span class="number">1</span> <span class="string">root</span>     <span class="string">R</span>     <span class="number">6888</span>   <span class="number">1</span><span class="string">%</span>   <span class="number">1</span>   <span class="number">8</span><span class="string">%</span> <span class="string">&#123;stress-ng-cpu&#125;</span> <span class="string">/usr/bin/stress-ng</span> <span class="string">-c</span> <span class="number">1</span> <span class="string">--metrics-brief</span></span><br><span class="line">    <span class="number">1</span>     <span class="number">0</span> <span class="string">root</span>     <span class="string">S</span>     <span class="number">6244</span>   <span class="number">1</span><span class="string">%</span>  <span class="number">10</span>   <span class="number">0</span><span class="string">%</span> <span class="string">/usr/bin/stress-ng</span> <span class="string">-c</span> <span class="number">1</span> <span class="string">--metrics-brief</span></span><br><span class="line">    <span class="number">7</span>     <span class="number">0</span> <span class="string">root</span>     <span class="string">R</span>     <span class="number">1504</span>   <span class="number">0</span><span class="string">%</span>  <span class="number">11</span>   <span class="number">0</span><span class="string">%</span> <span class="string">top</span></span><br></pre></td></tr></table></figure>
+<h2 id="qos-质量管理"><a href="#qos-质量管理" class="headerlink" title="qos 质量管理"></a>qos 质量管理</h2><ul>
+<li>GuranteedW</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">每个容器同时设置了 CPU 和内存的 requests 和 limits，而且</span><br><span class="line">    cpu.limits = cpu.requests</span><br><span class="line">    memory.limits = memory.requests</span><br><span class="line">那么它将优先被调度</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Burstable</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">至少有一个容器设置 CPU 或内存资源的 requests 属性</span><br><span class="line"></span><br><span class="line">那么它将具有中等优先级</span><br></pre></td></tr></table></figure>
+<ul>
+<li>BestEffort</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">没有任何一个容器设置了 requests 或 limits 属性</span><br><span class="line"></span><br><span class="line">那么它将只有最低优先级，当资源不够用的时候，这个容器可能最先被终止，以腾出资源来，为 Burstable 和 Guranteed</span><br></pre></td></tr></table></figure>
+<ul>
+<li>oom 策略</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">最先杀死占用量和需求量的比例大的</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/12/kubernetes/5.configmap和secret/" rel="next" title="configmap 和 secret">
+                <i class="fa fa-chevron-left"></i> configmap 和 secret
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/13/kubernetes/7.POD控制器/" rel="prev" title="POD 控制器">
+                POD 控制器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#调度策略"><span class="nav-number">1.</span> <span class="nav-text">调度策略</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#POD创建流程"><span class="nav-number">1.1.</span> <span class="nav-text">POD创建流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service创建过程"><span class="nav-number">1.2.</span> <span class="nav-text">Service创建过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#资源限制维度"><span class="nav-number">1.3.</span> <span class="nav-text">资源限制维度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scheduler-调度过程"><span class="nav-number">1.4.</span> <span class="nav-text">Scheduler 调度过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#预选因素"><span class="nav-number">1.5.</span> <span class="nav-text">预选因素</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优选函数"><span class="nav-number">1.6.</span> <span class="nav-text">优选函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#选择函数"><span class="nav-number">1.7.</span> <span class="nav-text">选择函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#高级调度设置"><span class="nav-number">2.</span> <span class="nav-text">高级调度设置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#节点选择器"><span class="nav-number">2.1.</span> <span class="nav-text">节点选择器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对节点的亲和性"><span class="nav-number">2.2.</span> <span class="nav-text">对节点的亲和性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对-POD-的亲和性"><span class="nav-number">2.3.</span> <span class="nav-text">对 POD 的亲和性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对-POD-的反亲和性"><span class="nav-number">2.4.</span> <span class="nav-text">对 POD 的反亲和性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#taint-污点"><span class="nav-number">2.5.</span> <span class="nav-text">taint 污点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#POD-污点容忍"><span class="nav-number">2.6.</span> <span class="nav-text">POD 污点容忍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cordon-停止调度"><span class="nav-number">2.7.</span> <span class="nav-text">cordon 停止调度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#drain-驱逐节点"><span class="nav-number">2.8.</span> <span class="nav-text">drain 驱逐节点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#容器资源限制"><span class="nav-number">3.</span> <span class="nav-text">容器资源限制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#资源限制"><span class="nav-number">3.1.</span> <span class="nav-text">资源限制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#qos-质量管理"><span class="nav-number">3.2.</span> <span class="nav-text">qos 质量管理</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

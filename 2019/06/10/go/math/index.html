@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="常量const (	E   = 2.71828182845904523536028747135266249775724709369995957496696763	Pi  = 3.14159265358979323846264338327950288419716939937510582097494459	Phi = 1.6180339887498948482045868343656381177203">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go 标准库之 math">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/06/10/go/math/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="常量const (	E   = 2.71828182845904523536028747135266249775724709369995957496696763	Pi  = 3.14159265358979323846264338327950288419716939937510582097494459	Phi = 1.6180339887498948482045868343656381177203">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-10-22T04:04:10.663Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="go 标准库之 math">
+<meta name="twitter:description" content="常量const (	E   = 2.71828182845904523536028747135266249775724709369995957496696763	Pi  = 3.14159265358979323846264338327950288419716939937510582097494459	Phi = 1.6180339887498948482045868343656381177203">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/06/10/go/math/">
+
+
+
+
+
+  <title>go 标准库之 math | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/06/10/go/math/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">go 标准库之 math</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-10T00:00:00+08:00">
+                2019-06-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/golang/" itemprop="url" rel="index">
+                    <span itemprop="name">golang</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="常量"><a href="#常量" class="headerlink" title="常量"></a>常量</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	E   = <span class="number">2.71828182845904523536028747135266249775724709369995957496696763</span></span><br><span class="line">	Pi  = <span class="number">3.14159265358979323846264338327950288419716939937510582097494459</span></span><br><span class="line">	Phi = <span class="number">1.61803398874989484820458683436563811772030917980576286213544862</span></span><br><span class="line"></span><br><span class="line">	Sqrt2   = <span class="number">1.41421356237309504880168872420969807856967187537694807317667974</span></span><br><span class="line">	SqrtE   = <span class="number">1.64872127070012814684865078781416357165377610071014801157507931</span></span><br><span class="line">	SqrtPi  = <span class="number">1.77245385090551602729816748334114518279754945612238712821380779</span></span><br><span class="line">	SqrtPhi = <span class="number">1.27201964951406896425242246173749149171560804184009624861664038</span></span><br><span class="line"></span><br><span class="line">	Ln2    = <span class="number">0.693147180559945309417232121458176568075500134360255254120680009</span></span><br><span class="line">	Log2E  = <span class="number">1</span> / Ln2</span><br><span class="line">	Ln10   = <span class="number">2.30258509299404568401799145468436420760110148862877297603332790</span></span><br><span class="line">	Log10E = <span class="number">1</span> / Ln10</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	MaxFloat32             = <span class="number">3.40282346638528859811704183484516925440e+38</span></span><br><span class="line">	SmallestNonzeroFloat32 = <span class="number">1.401298464324817070923729583289916131280e-45</span></span><br><span class="line"></span><br><span class="line">	MaxFloat64             = <span class="number">1.797693134862315708145274237317043567981e+308</span></span><br><span class="line">	SmallestNonzeroFloat64 = <span class="number">4.940656458412465441765687928682213723651e-324</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	MaxInt8   = <span class="number">127</span></span><br><span class="line">	MinInt8   = <span class="number">-128</span></span><br><span class="line">	MaxInt16  = <span class="number">32767</span></span><br><span class="line">	MinInt16  = <span class="number">-32768</span></span><br><span class="line">	MaxInt32  = <span class="number">2147483647</span></span><br><span class="line">	MinInt32  = <span class="number">-2147483648</span></span><br><span class="line">	MaxInt64  = <span class="number">9223372036854775807</span></span><br><span class="line">	MinInt64  = <span class="number">-9223372036854775808</span></span><br><span class="line">	MaxUint8  = <span class="number">255</span></span><br><span class="line">	MaxUint16 = <span class="number">65535</span></span><br><span class="line">	MaxUint32 = <span class="number">4294967295</span></span><br><span class="line">	MaxUint64 = <span class="number">9223372036854775808</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h2 id="Floor向下取整舍掉小数"><a href="#Floor向下取整舍掉小数" class="headerlink" title="Floor向下取整舍掉小数"></a>Floor向下取整舍掉小数</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(math.Floor(<span class="number">-3.141592</span>))</span><br><span class="line">	fmt.Println(math.Floor(<span class="number">-3.500000</span>))</span><br><span class="line">	fmt.Println(math.Floor(<span class="number">3.141592</span>))</span><br><span class="line">	fmt.Println(math.Floor(<span class="number">3.141592</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-4</span><br><span class="line">-4</span><br><span class="line">3</span><br><span class="line">3</span><br></pre></td></tr></table></figure>
+<h2 id="Ceil向上取整"><a href="#Ceil向上取整" class="headerlink" title="Ceil向上取整"></a>Ceil向上取整</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(math.Ceil(<span class="number">-3.141592</span>))</span><br><span class="line">	fmt.Println(math.Ceil(<span class="number">-3.500000</span>))</span><br><span class="line">	fmt.Println(math.Ceil(<span class="number">3.141592</span>))</span><br><span class="line">	fmt.Println(math.Ceil(<span class="number">3.141592</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-3</span><br><span class="line">-3</span><br><span class="line">4</span><br><span class="line">4</span><br></pre></td></tr></table></figure>
+<h2 id="Abs绝对值"><a href="#Abs绝对值" class="headerlink" title="Abs绝对值"></a>Abs绝对值</h2><p>正数的绝对值是它本身，负数的绝对值是其相反数，零的绝对值是零，绝对值具有非负性，绝对值总是大于或等于零。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(math.Abs(<span class="number">-3.141592</span>))</span><br><span class="line">	fmt.Println(math.Abs(<span class="number">3.141592</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">3.141592</span><br><span class="line">3.141592</span><br></pre></td></tr></table></figure>
+<h2 id="Modf分解浮点数为整数和小数"><a href="#Modf分解浮点数为整数和小数" class="headerlink" title="Modf分解浮点数为整数和小数"></a>Modf分解浮点数为整数和小数</h2><p>注意：分解浮点数时候，可能会出现精度问题。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(math.Modf(<span class="number">-12.4</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-12 -0.40000000000000036</span><br></pre></td></tr></table></figure>
+<h2 id="Max、min、取大值、取小值"><a href="#Max、min、取大值、取小值" class="headerlink" title="Max、min、取大值、取小值"></a>Max、min、取大值、取小值</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(math.Max(<span class="number">331232</span>, <span class="number">334324</span>))</span><br><span class="line">	fmt.Println(math.Min(<span class="number">331232</span>, <span class="number">334324</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">334324</span><br><span class="line">331232</span><br></pre></td></tr></table></figure>
+<h2 id="Pow次方、三次方根"><a href="#Pow次方、三次方根" class="headerlink" title="Pow次方、三次方根"></a>Pow次方、三次方根</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(math.Pow(<span class="number">8</span>, <span class="number">3</span>))</span><br><span class="line">	fmt.Println(math.Cbrt(<span class="number">512</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">8</span><br></pre></td></tr></table></figure>
+<h2 id="Sqrt平方、平方根（开方）"><a href="#Sqrt平方、平方根（开方）" class="headerlink" title="Sqrt平方、平方根（开方）"></a>Sqrt平方、平方根（开方）</h2><ul>
+<li>开方为平方的逆运算，也可以通过 0.5 幂算出</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(math.Pow(<span class="number">93</span>, <span class="number">2</span>))</span><br><span class="line">	fmt.Println(math.Pow(<span class="number">8649</span>, <span class="number">0.5</span>))</span><br><span class="line">	fmt.Println(math.Sqrt(<span class="number">8649</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">8649</span><br><span class="line">93</span><br><span class="line">93</span><br></pre></td></tr></table></figure>
+<h2 id="Log2、Log10对数"><a href="#Log2、Log10对数" class="headerlink" title="Log2、Log10对数"></a>Log2、Log10对数</h2><p>对数是求幂的逆运算，</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(math.Pow(<span class="number">2</span>, <span class="number">7</span>))</span><br><span class="line">	fmt.Println(math.Pow(<span class="number">10</span>, <span class="number">2</span>))</span><br><span class="line">	fmt.Println(math.Log2(<span class="number">128</span>))</span><br><span class="line">	fmt.Println(math.Log10(<span class="number">100</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Round四舍五入"><a href="#Round四舍五入" class="headerlink" title="Round四舍五入"></a>Round四舍五入</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(math.Round(<span class="number">3.1415926</span>))</span><br><span class="line">	fmt.Println(math.Round(<span class="number">3.5415926</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">3</span><br><span class="line">4</span><br></pre></td></tr></table></figure>
+<h2 id="rand随机数包"><a href="#rand随机数包" class="headerlink" title="rand随机数包"></a>rand随机数包</h2><p>math/rand 实现了伪随机数生成器，在 Go 语言中随机数需要设置种子，如果不设置种子，每次运行结果都相同，默认种子为：1，且相同种子产生的随机数是相同的。</p>
+<ul>
+<li>设置种子并生成随机数字</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	rand.Seed(time.Now().UnixNano())</span><br><span class="line">	fmt.Println(rand.Int63n(<span class="number">19</span>))</span><br><span class="line">	fmt.Println(rand.Intn(<span class="number">29</span>))</span><br><span class="line">	fmt.Println(rand.Float64())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>随机字母</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> r *rand.Rand</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">init</span><span class="params">()</span></span> &#123;</span><br><span class="line">	r = rand.New(rand.NewSource(time.Now().Unix()))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">RandString</span><span class="params">(<span class="built_in">len</span> <span class="keyword">int</span>)</span> <span class="title">string</span></span> &#123;</span><br><span class="line">	bytes := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="built_in">len</span>)</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="built_in">len</span>; i++ &#123;</span><br><span class="line">		b := r.Intn(<span class="number">26</span>) + <span class="number">65</span></span><br><span class="line">		bytes[i] = <span class="keyword">byte</span>(b)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">string</span>(bytes)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(RandString(<span class="number">20</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/09/go/strings/" rel="next" title="go 标准库之 strings">
+                <i class="fa fa-chevron-left"></i> go 标准库之 strings
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/11/go/1.基本数据结构/" rel="prev" title="基础数据结构和语法">
+                基础数据结构和语法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#常量"><span class="nav-number">1.</span> <span class="nav-text">常量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Floor向下取整舍掉小数"><span class="nav-number">2.</span> <span class="nav-text">Floor向下取整舍掉小数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Ceil向上取整"><span class="nav-number">3.</span> <span class="nav-text">Ceil向上取整</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Abs绝对值"><span class="nav-number">4.</span> <span class="nav-text">Abs绝对值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Modf分解浮点数为整数和小数"><span class="nav-number">5.</span> <span class="nav-text">Modf分解浮点数为整数和小数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Max、min、取大值、取小值"><span class="nav-number">6.</span> <span class="nav-text">Max、min、取大值、取小值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pow次方、三次方根"><span class="nav-number">7.</span> <span class="nav-text">Pow次方、三次方根</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sqrt平方、平方根（开方）"><span class="nav-number">8.</span> <span class="nav-text">Sqrt平方、平方根（开方）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Log2、Log10对数"><span class="nav-number">9.</span> <span class="nav-text">Log2、Log10对数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Round四舍五入"><span class="nav-number">10.</span> <span class="nav-text">Round四舍五入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rand随机数包"><span class="nav-number">11.</span> <span class="nav-text">rand随机数包</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

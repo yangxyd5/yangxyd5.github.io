@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="WSGI WSGI (Web 服务器网关接口) 是 python 中所定义的 Web 服务器和 Web 应用程序之间或框架之间的接口标准 WSGI 接口规范的目的就是规范 Web 服务器与 Web 应用之间的交互，在协议之间进行转换 WSGI 将 Web 组件分成三类：Web 服务器、Web中间件、Web应用程序 服务器：指的是实现了调用应用的部分 中间件：处于服务器和应用两侧，起粘合作用，具体包">
+<meta property="og:type" content="article">
+<meta property="og:title" content="web框架原理之wsgiref和webob">
+<meta property="og:url" content="https://yangjinheng.github.io/2017/10/05/python/26.wsgiref/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="WSGI WSGI (Web 服务器网关接口) 是 python 中所定义的 Web 服务器和 Web 应用程序之间或框架之间的接口标准 WSGI 接口规范的目的就是规范 Web 服务器与 Web 应用之间的交互，在协议之间进行转换 WSGI 将 Web 组件分成三类：Web 服务器、Web中间件、Web应用程序 服务器：指的是实现了调用应用的部分 中间件：处于服务器和应用两侧，起粘合作用，具体包">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-09T10:58:57.410Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="web框架原理之wsgiref和webob">
+<meta name="twitter:description" content="WSGI WSGI (Web 服务器网关接口) 是 python 中所定义的 Web 服务器和 Web 应用程序之间或框架之间的接口标准 WSGI 接口规范的目的就是规范 Web 服务器与 Web 应用之间的交互，在协议之间进行转换 WSGI 将 Web 组件分成三类：Web 服务器、Web中间件、Web应用程序 服务器：指的是实现了调用应用的部分 中间件：处于服务器和应用两侧，起粘合作用，具体包">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2017/10/05/python/26.wsgiref/">
+
+
+
+
+
+  <title>web框架原理之wsgiref和webob | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2017/10/05/python/26.wsgiref/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">web框架原理之wsgiref和webob</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-05T00:00:00+08:00">
+                2017-10-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="WSGI"><a href="#WSGI" class="headerlink" title="WSGI"></a>WSGI</h2><ol>
+<li>WSGI (Web 服务器网关接口) 是 python 中所定义的 Web 服务器和 Web 应用程序之间或框架之间的接口标准</li>
+<li>WSGI 接口规范的目的就是规范 Web 服务器与 Web 应用之间的交互，在协议之间进行转换</li>
+<li>WSGI 将 Web 组件分成三类：Web 服务器、Web中间件、Web应用程序<ul>
+<li>服务器：指的是实现了调用应用的部分</li>
+<li>中间件：处于服务器和应用两侧，起粘合作用，具体包括：请求处理、environ 处理</li>
+<li>应用：是一个可调用对象，一般指的是包含一个 __call__ 方法的对象</li>
+</ul>
+</li>
+</ol>
+<h2 id="wsgiref"><a href="#wsgiref" class="headerlink" title="wsgiref"></a>wsgiref</h2><p>wsgiref 是 WSGI 细则的一个参考实现，用于给web服务器和框架提供 WSGI 支持。它提供了下面几个子类：</p>
+<table>
+<thead>
+<tr>
+<th>字类</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>wsgiref.util</code></td>
+<td><code>WSGI</code> 环境工具</td>
+</tr>
+<tr>
+<td><code>wsgiref.headers</code></td>
+<td><code>WSGI response</code> 头工具</td>
+</tr>
+<tr>
+<td><code>wsgiref.handlers</code></td>
+<td><code>WSGI</code> 服务器基类</td>
+</tr>
+<tr>
+<td><code>wsgiref.simple_server</code></td>
+<td>一个简单的 <code>WSGI HTTP</code> 服务器</td>
+</tr>
+<tr>
+<td><code>wsgiref.validate</code></td>
+<td>检测WSGI服务器是否和 <code>WSGI PEP 3333细则</code> 一致的检查器</td>
+</tr>
+</tbody>
+</table>
+<h3 id="wsgiref-simple-server"><a href="#wsgiref-simple-server" class="headerlink" title="wsgiref.simple_server"></a>wsgiref.simple_server</h3><p>​    本模块实现了一个简单HTTP服务器，可以为 WSGI 应用提供服务，每个服务器实例在给定的主机和端口上服务一个 WSGI 应用程序，如果你想在单个主机和端口上提供多个 WSGI 应用程序，则应该创建一个 WSGI 应用程序，并且解析 PATH_INFO（客户端请求的地址），以为每个请求分配不同的应用程序，例如：使用来自 <code>wsgiref.util</code> 的 <code>shift_path_info()</code> 函数。</p>
+<ul>
+<li>创建服务器</li>
+</ul>
+<p><code>make_server(host,port,app,server_class=WSGIServer,handle_class=WSGIRequestHandler)</code></p>
+<p>创建一个新的监听在 <code>host</code> + <code>port</code> 的 WSGI 服务器，为 <code>app</code> 接受新的连接，返回值是 <code>server_class</code> 的实例，并使用 <code>handle_class</code> 处理请求，其中 <code>app</code> 必须是 PEP 3333 定义的 WSGI 应用程序对象。</p>
+<ul>
+<li>一个 WSGI 应用 demo</li>
+</ul>
+<p><code>demo_app(environ, start_response)</code></p>
+<p>这个函数是个小而完整的 WSGI 应用，它能返回 <code>hello world</code> 和 <code>environ</code> 字典内容 组成的文本页面。</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="comment">#from wsgiref.simple_server import demo_app     # 为直观展示下面已经将源代码复制出来了</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">demo_app</span><span class="params">(environ,start_response)</span>:</span></span><br><span class="line">    <span class="keyword">from</span> io <span class="keyword">import</span> StringIO</span><br><span class="line">    stdout = StringIO()</span><br><span class="line">    print(<span class="string">"Hello world!"</span>, file=stdout)</span><br><span class="line">    print(file=stdout)</span><br><span class="line">    h = sorted(environ.items())</span><br><span class="line">    <span class="keyword">for</span> k,v <span class="keyword">in</span> h:</span><br><span class="line">        print(k,<span class="string">'='</span>,repr(v), file=stdout)</span><br><span class="line">    start_response(<span class="string">"200 OK"</span>, [(<span class="string">'Content-Type'</span>,<span class="string">'text/plain; charset=utf-8'</span>)])</span><br><span class="line">    <span class="keyword">return</span> [stdout.getvalue().encode(<span class="string">"utf-8"</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    server = make_server(<span class="string">'0.0.0.0'</span>,<span class="number">80</span>,demo_app)</span><br><span class="line">    server.serve_forever()</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>启动服务，在浏览器访问本机的IP，就可以看到由 demo_app 返回的页面</p>
+</blockquote>
+<ul>
+<li>细节</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">WSGI 服务器：</span><br><span class="line">	1. 监听在指定的IP和PORT</span><br><span class="line">	2. 接受浏览器的HTTP请求，解析请求封装为 environ 环境数据</span><br><span class="line">	3. 负责调用 WSGI应用程序(app) 并把 environ 和 start_response方法 传给 app</span><br><span class="line">	4. 将 WSGI应用(app) 返回的列表，封装为HTTP响应报文返回给浏览器</span><br><span class="line"></span><br><span class="line">WSGI 应用：</span><br><span class="line">	1. 遵从 WSGI 协议</span><br><span class="line">	2. 必须是一个可调用的对象，或实现了 __call__ 方法的对象</span><br><span class="line">	3. 这个可调用对象应该接受来自WSGI服务器传来的两个参数：environ(请求)、start_response（响应方法）</span><br><span class="line">	4. 必须调用 start_response 以向客户端返回响应包的头部信息</span><br><span class="line">	5. 必须以可迭代对象的形式返回(return) 响应包的正文信息</span><br></pre></td></tr></table></figure>
+<ul>
+<li>请求信息</li>
+</ul>
+<p><code>environ</code> 是一个包含了HTTP请求信息的字典，下面列举一些信息</p>
+<table>
+<thead>
+<tr>
+<th>键</th>
+<th>值含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>REQUEST_METHOD</td>
+<td>客户端的请求方法</td>
+</tr>
+<tr>
+<td>PATH_INFO</td>
+<td>请求的URL地址的后半部分</td>
+</tr>
+<tr>
+<td>QUERY_STRING</td>
+<td>查询字符串，即 <code>?</code> 后的内容</td>
+</tr>
+<tr>
+<td>SERVER_NAME</td>
+<td>服务器主机名</td>
+</tr>
+<tr>
+<td>SERVER_PORT</td>
+<td>服务器的端口</td>
+</tr>
+<tr>
+<td>HTTP_HOST</td>
+<td>客户端请求头的 HOST 字段</td>
+</tr>
+<tr>
+<td>SERVER_PROTOCOL</td>
+<td>客户端发送请求所使用的协议版本</td>
+</tr>
+<tr>
+<td>CONTENT_TYPE</td>
+<td>HTTP 请求中任何 Content-Type 域的内容，可能为空或不存在。</td>
+</tr>
+<tr>
+<td>HTTP_USER_AGENT</td>
+<td>客户端所使用的浏览器信息</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>响应头</li>
+</ul>
+<p><code>start_response(status, headers, exc_info=None)</code></p>
+<p>start_response，是返回给客户端的响应头部信息，这是一个可调用对象，必须在 WSGI 应用（app）返回前调用，它接受3个参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>status</code></td>
+<td>响应的状态码，例如：”200 OK”</td>
+</tr>
+<tr>
+<td><code>headers</code></td>
+<td>响应包的HTTP首部信息，每个首部信息的K/V组成一个二元组，放入一个列表中，见：demo_app</td>
+</tr>
+<tr>
+<td><code>exc_info</code></td>
+<td>处理错误的时候使用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="解析environ"><a href="#解析environ" class="headerlink" title="解析environ"></a>解析environ</h3><p>通过解析：<code>environ[&#39;PATH_INFO]</code>，就可以判断用户访问的地址，而使用不同的函数处理响应。</p>
+<ul>
+<li>方法1，在APP内处理URL和页面的对应关系</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_index</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> [<span class="string">'&lt;h1&gt;Hello Index&lt;/h1&gt;'</span>.encode(<span class="string">"utf-8"</span>)]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hanle_date</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">return</span> [<span class="string">'&lt;h1&gt;Hello Date&lt;/h1&gt;'</span>.encode(<span class="string">"utf-8"</span>)]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">demo_app</span><span class="params">(environ,start_response)</span>:</span></span><br><span class="line">    start_response(<span class="string">"200 OK"</span>, [(<span class="string">'Content-Type'</span>,<span class="string">'text/plain; charset=utf-8'</span>)])</span><br><span class="line"></span><br><span class="line">    current_url = environ[<span class="string">'PATH_INFO'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> current_url == <span class="string">'/index'</span>:</span><br><span class="line">        <span class="keyword">return</span> handle_index()</span><br><span class="line">    <span class="keyword">elif</span> current_url == <span class="string">'/date'</span>:</span><br><span class="line">        <span class="keyword">return</span> hanle_date()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> [<span class="string">'&lt;h1&gt;404!&lt;/h1&gt;'</span>.encode(<span class="string">"utf-8"</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    server = make_server(<span class="string">'0.0.0.0'</span>,<span class="number">80</span>,demo_app)</span><br><span class="line">    server.serve_forever()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>方法2，在一个字典内部处理URL和页面的对应关系，使用 MVC 模式</li>
+</ul>
+<ol>
+<li>将处理的模块放入 <code>Controller</code> 目录的 <code>page.py</code>下</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">def handle_index():</span><br><span class="line">    # return [&apos;&lt;h1&gt;Hello Index&lt;/h1&gt;&apos;.encode(&quot;utf-8&quot;)]</span><br><span class="line">    f = open(&apos;View/index.html&apos;,mode=&apos;rb&apos;)      # 打开目录下的文件</span><br><span class="line">    data = f.read()</span><br><span class="line">    f.close()</span><br><span class="line">    return [data]               # 返回的正文来自 文件</span><br><span class="line"></span><br><span class="line">def hanle_date():</span><br><span class="line">    return [&apos;&lt;h1&gt;Hello Date&lt;/h1&gt;&apos;.encode(&quot;utf-8&quot;)]</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>将 page.py 需要的页面文件放入到 <code>View</code> 目录下的 <code>index.html</code></li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">    &lt;title&gt;Title&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;h1&gt;Hello, Index&lt;/h1&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>将 page.py 需要的数据库连接等代码 放在 <code>Model</code> 目录中</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">...........TODO</span><br></pre></td></tr></table></figure>
+<ol start="4">
+<li>主程序</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> Controller <span class="keyword">import</span> page          <span class="comment"># 导入 Controller 目录的 page.py</span></span><br><span class="line"></span><br><span class="line">url_dict = &#123;                         <span class="comment"># URL与返回报文的对应关系</span></span><br><span class="line">    <span class="string">'/index'</span>:handle_index,           <span class="comment"># 如果键是一个正则表达式对象，那么就可以处理匹配正则的这一类页面</span></span><br><span class="line">    <span class="string">'/date'</span>:hanle_date</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">handle_app</span><span class="params">(environ,start_response)</span>:</span></span><br><span class="line">    start_response(<span class="string">"200 OK"</span>, [(<span class="string">'Content-Type'</span>,<span class="string">'text/plain; charset=utf-8'</span>)])</span><br><span class="line"></span><br><span class="line">    current_url = environ[<span class="string">'PATH_INFO'</span>]</span><br><span class="line">    func = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> current_url <span class="keyword">in</span> url_dict:</span><br><span class="line">        func = url_dict[current_url]</span><br><span class="line">    <span class="keyword">if</span> func:</span><br><span class="line">        <span class="keyword">return</span> func()</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> [<span class="string">'&lt;h1&gt;404!&lt;/h1&gt;'</span>.encode(<span class="string">"utf-8"</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    server = make_server(<span class="string">'0.0.0.0'</span>,<span class="number">80</span>,handle_app)</span><br><span class="line">    server.serve_forever()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>MVC 和 MTV</li>
+</ul>
+<p>MVC模式</p>
+<p>将数据库的操作代码放在 Model 目录，将模板页面文件放在 View目录，将业务处理逻辑代码放在 Controller目录这样的分离结构组成整个业务系统即由：<code>Model、View、Controller</code> 组成就是MVC模式。</p>
+<p>MTV模式</p>
+<p>模式就是：<code>Model（数据库）、Template（模板文件）、View（业务处理）</code> django就是MTV的模式</p>
+<h2 id="webob"><a href="#webob" class="headerlink" title="webob"></a>webob</h2><p>Webob是一个Python库，它解析 WSGI environ 环境参数，并且封装为一个 request 对象，这个对象包含了大多数的 HTTP 请求的报文的分析结果。</p>
+<h3 id="Request"><a href="#Request" class="headerlink" title="Request"></a>Request</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Request</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">demo_app</span><span class="params">(environ,start_response)</span>:</span></span><br><span class="line">    <span class="keyword">from</span> io <span class="keyword">import</span> StringIO</span><br><span class="line">    stdout = StringIO()</span><br><span class="line">    print(<span class="string">"Hello world!"</span>, file=stdout)</span><br><span class="line">    request = Request(environ)</span><br><span class="line">    print(file=stdout)</span><br><span class="line">    data = [</span><br><span class="line">        request.method,</span><br><span class="line">        request.GET,</span><br><span class="line">        request.POST,</span><br><span class="line">        request.path,</span><br><span class="line">        request.params,</span><br><span class="line">        request.headers</span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> data:</span><br><span class="line">        print(i,type(i),file=stdout)</span><br><span class="line"></span><br><span class="line">    start_response(<span class="string">"200 OK"</span>, [(<span class="string">'Content-Type'</span>,<span class="string">'text/plain; charset=utf-8'</span>)])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> [stdout.getvalue().encode(<span class="string">'utf-8'</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    server = make_server(<span class="string">'0.0.0.0'</span>,<span class="number">80</span>,demo_app)</span><br><span class="line">    server.serve_forever()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动上面代码，使用下面的 URL 地址进行POST方法提交，并且定义一个表单数据 <code>&#39;post&#39;=&#39;is_a_post&#39;</code> </li>
+</ul>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://172.16.100.1/index.asp?id=5&amp;name=yangjinheng&amp;keyword=jinhengyang&amp;comment=1,a,c&amp;age=29&amp;age=18</span><br></pre></td></tr></table></figure>
+<ul>
+<li>从返回的结果可以看出 <code>webob.Request</code> 对 POST 和 URL 的解析，及解析结果的类型</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Hello world!</span><br><span class="line"></span><br><span class="line">POST &lt;class &apos;str&apos;&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">GET([(&apos;id&apos;, &apos;5&apos;), (&apos;name&apos;, &apos;yangjinheng&apos;), (&apos;keyword&apos;, &apos;jinhengyang&apos;), (&apos;comment&apos;, &apos;1,a,c&apos;), (&apos;age&apos;, &apos;29&apos;), (&apos;age&apos;, &apos;18&apos;)]) &lt;class &apos;webob.multidict.GetDict&apos;&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">MultiDict([(&apos;post&apos;, &apos;is_a_post&apos;)]) &lt;class &apos;webob.multidict.MultiDict&apos;&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">/index.asp &lt;class &apos;str&apos;&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">NestedMultiDict([(&apos;id&apos;, &apos;5&apos;), (&apos;name&apos;, &apos;yangjinheng&apos;), (&apos;keyword&apos;, &apos;jinhengyang&apos;), (&apos;comment&apos;, &apos;1,a,c&apos;), (&apos;age&apos;, &apos;29&apos;), (&apos;age&apos;, &apos;18&apos;), (&apos;post&apos;, &apos;is_a_post&apos;)]) &lt;class &apos;webob.multidict.NestedMultiDict&apos;&gt;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(&apos;Content-Length&apos;, &apos;168&apos;) &lt;class &apos;tuple&apos;&gt;</span><br><span class="line">(&apos;Content-Type&apos;, &apos;multipart/form-data; boundary=--------------------------998275222955574446129312&apos;) &lt;class &apos;tuple&apos;&gt;</span><br><span class="line">(&apos;Cache-Control&apos;, &apos;no-cache&apos;) &lt;class &apos;tuple&apos;&gt;</span><br><span class="line">(&apos;Postman-Token&apos;, &apos;fd052bd5-3454-44bb-9f5d-bbbbca3f3607&apos;) &lt;class &apos;tuple&apos;&gt;</span><br><span class="line">(&apos;User-Agent&apos;, &apos;PostmanRuntime/7.1.5&apos;) &lt;class &apos;tuple&apos;&gt;</span><br><span class="line">(&apos;Accept&apos;, &apos;*/*&apos;) &lt;class &apos;tuple&apos;&gt;</span><br><span class="line">(&apos;Host&apos;, &apos;172.16.100.1&apos;) &lt;class &apos;tuple&apos;&gt;</span><br><span class="line">(&apos;Accept-Encoding&apos;, &apos;gzip, deflate&apos;) &lt;class &apos;tuple&apos;&gt;</span><br><span class="line">(&apos;Connection&apos;, &apos;keep-alive&apos;) &lt;class &apos;tuple&apos;&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="MultiDict"><a href="#MultiDict" class="headerlink" title="MultiDict"></a>MultiDict</h3><p>MultiDict，允许一个 Key 保存好几个值</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> webob.multidict <span class="keyword">import</span> MultiDict</span><br><span class="line"></span><br><span class="line">md = MultiDict()</span><br><span class="line">md.add(<span class="number">1</span>,<span class="string">'yangjinheng'</span>)</span><br><span class="line">md.add(<span class="number">1</span>,<span class="string">'liying'</span>)</span><br><span class="line">md.add(<span class="number">2</span>,<span class="string">'Man'</span>)</span><br><span class="line">md.add(<span class="number">2</span>,<span class="string">'Female'</span>)</span><br><span class="line">md.add(<span class="string">'age'</span>,<span class="number">29</span>)</span><br><span class="line">md.add(<span class="string">'age'</span>,<span class="number">27</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">16</span>]: print(md.getall(<span class="number">2</span>))</span><br><span class="line">[<span class="string">'Man'</span>, <span class="string">'Female'</span>]</span><br><span class="line"></span><br><span class="line">In [<span class="number">17</span>]: print(md.getall(<span class="number">1</span>))</span><br><span class="line">[<span class="string">'yangjinheng'</span>, <span class="string">'liying'</span>]</span><br><span class="line"></span><br><span class="line">In [<span class="number">18</span>]: print(md.getall(<span class="number">2</span>))</span><br><span class="line">[<span class="string">'Man'</span>, <span class="string">'Female'</span>]</span><br><span class="line"></span><br><span class="line">In [<span class="number">19</span>]: print(md.getall(<span class="string">'age'</span>))</span><br><span class="line">[<span class="number">29</span>, <span class="number">27</span>]</span><br><span class="line"></span><br><span class="line">In [<span class="number">24</span>]: print(md.get(<span class="number">1</span>))</span><br><span class="line">liying</span><br><span class="line"></span><br><span class="line">In [<span class="number">25</span>]: print(md.get(<span class="number">2</span>))</span><br><span class="line">Female</span><br><span class="line"></span><br><span class="line">In [<span class="number">27</span>]: print(md[<span class="number">1</span>])</span><br><span class="line">liying</span><br><span class="line"></span><br><span class="line">In [<span class="number">28</span>]: print(md[<span class="number">2</span>])</span><br><span class="line">Female</span><br><span class="line"></span><br><span class="line">In [<span class="number">29</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> md.items():print(i)</span><br><span class="line">(<span class="number">1</span>, <span class="string">'yangjinheng'</span>)</span><br><span class="line">(<span class="number">1</span>, <span class="string">'liying'</span>)</span><br><span class="line">(<span class="number">2</span>, <span class="string">'Man'</span>)</span><br><span class="line">(<span class="number">2</span>, <span class="string">'Female'</span>)</span><br><span class="line">(<span class="string">'age'</span>, <span class="number">29</span>)</span><br><span class="line">(<span class="string">'age'</span>, <span class="number">27</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="Response"><a href="#Response" class="headerlink" title="Response"></a>Response</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Request,Response</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">demo_app</span><span class="params">(environ,start_response)</span>:</span></span><br><span class="line">    <span class="keyword">from</span> io <span class="keyword">import</span> StringIO</span><br><span class="line">    stdout = StringIO()</span><br><span class="line">    print(<span class="string">"Hello world!"</span>, file=stdout)</span><br><span class="line">    response = Response()</span><br><span class="line">    print(file=stdout)</span><br><span class="line">    data = [</span><br><span class="line">        response.status,            <span class="comment"># 响应码和原因短语</span></span><br><span class="line">        response.status_code,       <span class="comment"># 响应码</span></span><br><span class="line">        response.headers,           <span class="comment"># 响应报文的HTTP头信息</span></span><br><span class="line">        response.headerlist,        <span class="comment"># 相应报文的列表，由每个字段和值的二元组组成</span></span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> data:</span><br><span class="line">        print(i,type(i),file=stdout)</span><br><span class="line"></span><br><span class="line">    start_response(<span class="string">"200 OK"</span>, [(<span class="string">'Content-Type'</span>,<span class="string">'text/plain; charset=utf-8'</span>)])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> [stdout.getvalue().encode(<span class="string">'utf-8'</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    server = make_server(<span class="string">'0.0.0.0'</span>,<span class="number">80</span>,demo_app)</span><br><span class="line">    server.serve_forever()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动上面代码，使用下面的 URL 地址进行POST方法提交，并且定义一个表单数据 <code>&#39;post&#39;=&#39;is_a_post&#39;</code> </li>
+</ul>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://172.16.100.1/index.asp?id=5&amp;name=yangjinheng&amp;keyword=jinhengyang&amp;comment=1,a,c&amp;age=29&amp;age=18</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回结果，Response 包含了所有响应 WSGI Server所需要的变量</li>
+</ul>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">Hello world!</span><br><span class="line"></span><br><span class="line"><span class="number">200</span> OK &lt;<span class="class"><span class="keyword">class</span> '<span class="title">str</span>'&gt;</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">200 &lt;<span class="title">class</span> '<span class="title">int</span>'&gt;</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class"><span class="title">ResponseHeaders</span><span class="params">([<span class="params">(<span class="string">'Content-Type'</span>, <span class="string">'text/html; charset=UTF-8'</span>)</span>, <span class="params">(<span class="string">'Content-Length'</span>, <span class="string">'0'</span>)</span>])</span> &lt;<span class="title">class</span> '<span class="title">webob</span>.<span class="title">headers</span>.<span class="title">ResponseHeaders</span>'&gt;</span></span><br><span class="line"><span class="class"></span></span><br><span class="line">[('Content-Type', 'text/html; charset=UTF-8'), ('Content-Length', '0')] &lt;class 'list'&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Response 可以帮我们生成响应报文，从而更加简化编程</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Request,Response</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">demo_app</span><span class="params">(environ,start_response)</span>:</span></span><br><span class="line">    <span class="keyword">from</span> io <span class="keyword">import</span> StringIO</span><br><span class="line">    stdout = StringIO()</span><br><span class="line">    print(<span class="string">"Hello world!"</span>, file=stdout)</span><br><span class="line">    response = Response()</span><br><span class="line">    print(file=stdout)</span><br><span class="line">    data = [</span><br><span class="line">        response.status,            <span class="comment"># 响应码和原因短语</span></span><br><span class="line">        response.status_code,       <span class="comment"># 响应码</span></span><br><span class="line">        response.headers,           <span class="comment"># 响应报文的HTTP头信息</span></span><br><span class="line">        response.headerlist,        <span class="comment"># 相应报文的列表，由每个字段和值的二元组组成</span></span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> data:</span><br><span class="line">        print(i,type(i),file=stdout)</span><br><span class="line">    </span><br><span class="line">    response.status_code = <span class="number">200</span>     <span class="comment"># 修改响应码的值</span></span><br><span class="line">    response.body = stdout.getvalue().encode(<span class="string">'utf-8'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> response(environ,start_response)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    server = make_server(<span class="string">'0.0.0.0'</span>,<span class="number">80</span>,demo_app)</span><br><span class="line">    server.serve_forever()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回结果</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Hello world!</span><br><span class="line"></span><br><span class="line">200 OK &lt;class &apos;str&apos;&gt;</span><br><span class="line"></span><br><span class="line">200 &lt;class &apos;int&apos;&gt;</span><br><span class="line"></span><br><span class="line">ResponseHeaders([(&apos;Content-Type&apos;, &apos;text/html; charset=UTF-8&apos;), (&apos;Content-Length&apos;, &apos;0&apos;)])  &lt;class &apos;webob.headers.ResponseHeaders&apos;&gt;</span><br><span class="line"></span><br><span class="line">[(&apos;Content-Type&apos;, &apos;text/html; charset=UTF-8&apos;), (&apos;Content-Length&apos;, &apos;0&apos;)] &lt;class &apos;list&apos;&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="webob-dec"><a href="#webob-dec" class="headerlink" title="webob.dec"></a>webob.dec</h3><p><code>webob.dec</code> 更加简化 <code>response</code> 过程，无需再写 <code>response(environ,start_response)</code> 这个语句了。</p>
+<p>被 <code>wsgify</code> 装饰器装饰过的 <code>WSGI APP（可调用对象）</code>需要接收一个 <code>request</code> 对象，然后在函数内可以调用 <code>request</code> 对象写自己的业务逻辑，最后返回结果的时候无需再使用 <code>start_response</code>了，因为 <code>webob.dec</code> 内部的<code>Response</code> 已经替我们做了。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> wsgiref.simple_server <span class="keyword">import</span> make_server</span><br><span class="line"><span class="keyword">from</span> webob <span class="keyword">import</span> Request,Response</span><br><span class="line"><span class="keyword">from</span> webob.dec <span class="keyword">import</span> wsgify</span><br><span class="line"></span><br><span class="line"><span class="meta">@wsgify</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">demo_app</span><span class="params">(request)</span>:</span></span><br><span class="line">    <span class="keyword">from</span> io <span class="keyword">import</span> StringIO</span><br><span class="line">    stdout = StringIO()</span><br><span class="line">    print(<span class="string">"Hello world!"</span>, file=stdout)</span><br><span class="line">    print(file=stdout)</span><br><span class="line">    data = [</span><br><span class="line">        request.method,</span><br><span class="line">        request.GET,</span><br><span class="line">        request.POST,</span><br><span class="line">        request.path,</span><br><span class="line">        request.params,</span><br><span class="line">        request.headers,</span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> data:</span><br><span class="line">        print(i,file=stdout)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> Response(stdout.getvalue().encode(<span class="string">'utf-8'</span>))    <span class="comment"># 推荐使用 Response 实例方式返回响应</span></span><br><span class="line">    <span class="comment"># return bytes(stdout.getvalue(),encoding='utf-8')    # 也可以使用 bytes 对象</span></span><br><span class="line">    <span class="comment"># return stdout.getvalue()                            # 也可以是字符串对象</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    server = make_server(<span class="string">'0.0.0.0'</span>,<span class="number">80</span>,demo_app)</span><br><span class="line">    server.serve_forever()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">Hello world!</span><br><span class="line"></span><br><span class="line">POST</span><br><span class="line">GET([(<span class="string">'id'</span>, <span class="string">'5'</span>), (<span class="string">'name'</span>, <span class="string">'yangjinheng'</span>), (<span class="string">'keyword'</span>, <span class="string">'jinhengyang'</span>), (<span class="string">'comment'</span>, <span class="string">'1,a,c'</span>), (<span class="string">'age'</span>, <span class="string">'29'</span>), (<span class="string">'age'</span>, <span class="string">'18'</span>)])</span><br><span class="line">MultiDict([(<span class="string">'post'</span>, <span class="string">'is_a_post'</span>)])</span><br><span class="line">/index.asp</span><br><span class="line">NestedMultiDict([(<span class="string">'id'</span>, <span class="string">'5'</span>), (<span class="string">'name'</span>, <span class="string">'yangjinheng'</span>), (<span class="string">'keyword'</span>, <span class="string">'jinhengyang'</span>), (<span class="string">'comment'</span>, <span class="string">'1,a,c'</span>), (<span class="string">'age'</span>, <span class="string">'29'</span>), (<span class="string">'age'</span>, <span class="string">'18'</span>), (<span class="string">'post'</span>, <span class="string">'is_a_post'</span>)])</span><br><span class="line"></span><br><span class="line">&lt;webob.headers.EnvironHeaders object at <span class="number">0x0000020045F21D30</span>&gt;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/04/python/25.sqlalchemy/" rel="next" title="sqlalchey数据库ORM框架">
+                <i class="fa fa-chevron-left"></i> sqlalchey数据库ORM框架
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/06/python/27.Django笔记/" rel="prev" title="Django">
+                Django <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#WSGI"><span class="nav-number">1.</span> <span class="nav-text">WSGI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wsgiref"><span class="nav-number">2.</span> <span class="nav-text">wsgiref</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#wsgiref-simple-server"><span class="nav-number">2.1.</span> <span class="nav-text">wsgiref.simple_server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解析environ"><span class="nav-number">2.2.</span> <span class="nav-text">解析environ</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webob"><span class="nav-number">3.</span> <span class="nav-text">webob</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Request"><span class="nav-number">3.1.</span> <span class="nav-text">Request</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MultiDict"><span class="nav-number">3.2.</span> <span class="nav-text">MultiDict</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Response"><span class="nav-number">3.3.</span> <span class="nav-text">Response</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#webob-dec"><span class="nav-number">3.4.</span> <span class="nav-text">webob.dec</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

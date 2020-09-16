@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Connection Object 连接构造方法  def __init__(self, host=None, user=None, password=&quot;&quot;,                database=None, port=0, unix_socket=None,                charset=&apos;&apos;, sql_mode=None,                read_de">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pymysql">
+<meta property="og:url" content="https://yangjinheng.github.io/2017/10/03/python/24.pymysql/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="Connection Object 连接构造方法  def __init__(self, host=None, user=None, password=&quot;&quot;,                database=None, port=0, unix_socket=None,                charset=&apos;&apos;, sql_mode=None,                read_de">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-09T10:57:44.294Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Pymysql">
+<meta name="twitter:description" content="Connection Object 连接构造方法  def __init__(self, host=None, user=None, password=&quot;&quot;,                database=None, port=0, unix_socket=None,                charset=&apos;&apos;, sql_mode=None,                read_de">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2017/10/03/python/24.pymysql/">
+
+
+
+
+
+  <title>Pymysql | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2017/10/03/python/24.pymysql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Pymysql</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-03T00:00:00+08:00">
+                2017-10-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Connection-Object"><a href="#Connection-Object" class="headerlink" title="Connection Object"></a>Connection Object</h2><ul>
+<li>连接构造方法</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, host=None, user=None, password=<span class="string">""</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                database=None, port=<span class="number">0</span>, unix_socket=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                charset=<span class="string">''</span>, sql_mode=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                read_default_file=None, conv=None, use_unicode=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                client_flag=<span class="number">0</span>, cursorclass=Cursor, init_command=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                connect_timeout=<span class="number">10</span>, ssl=None, read_default_group=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                compress=None, named_pipe=None, no_delay=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                autocommit=False, db=None, passwd=None, local_infile=False,</span></span></span><br><span class="line"><span class="function"><span class="params">                max_allowed_packet=<span class="number">16</span>*<span class="number">1024</span>*<span class="number">1024</span>, defer_connect=False,</span></span></span><br><span class="line"><span class="function"><span class="params">                auth_plugin_map=&#123;&#125;, read_timeout=None, write_timeout=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                bind_address=None, binary_prefix=False)</span>:</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建数据库连接</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line">config = &#123;</span><br><span class="line">          <span class="string">'host'</span>:<span class="string">'172.16.100.252'</span>,</span><br><span class="line">          <span class="string">'port'</span>:<span class="number">3306</span>,</span><br><span class="line">          <span class="string">'user'</span>:<span class="string">'root'</span>,</span><br><span class="line">          <span class="string">'password'</span>:<span class="string">'Jinheng890821@'</span>,</span><br><span class="line">          <span class="string">'db'</span>:<span class="string">'hellodb'</span>,                              <span class="comment">#指定数据库</span></span><br><span class="line">          <span class="string">'charset'</span>:<span class="string">'utf8mb4'</span>,                         <span class="comment">#设定字符集</span></span><br><span class="line">          <span class="string">'cursorclass'</span>:pymysql.cursors.DictCursor,    <span class="comment">#指定游标类</span></span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">db = pymysql.Connect(**config)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>游标，相当于使用 <code>mysql</code> 命令刚进入数据库时候那个光标的位置</p>
+</blockquote>
+<ul>
+<li>类的方法</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.cursor()</code></td>
+<td>使用此连接并且返回连接游标</td>
+</tr>
+<tr>
+<td><code>.begin()</code></td>
+<td>开始事务</td>
+</tr>
+<tr>
+<td><code>.rollback()</code></td>
+<td>对事务进行回滚</td>
+</tr>
+<tr>
+<td><code>.commit()</code></td>
+<td>对事务进行提交</td>
+</tr>
+<tr>
+<td><code>.close()</code></td>
+<td>关闭连接，如果事务没有提交，则此操作包含了隐式回滚</td>
+</tr>
+<tr>
+<td><code>.select_db(db)</code></td>
+<td>选择数据库</td>
+</tr>
+</tbody>
+</table>
+<h2 id="err类"><a href="#err类" class="headerlink" title="err类"></a>err类</h2><table>
+<thead>
+<tr>
+<th>异常</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Warning</td>
+<td>当有严重警告时触发，例如插入数据是被截断等等。必须是 StandardError 的子类。</td>
+</tr>
+<tr>
+<td>Error</td>
+<td>警告以外所有其他错误类。必须是 StandardError 的子类。</td>
+</tr>
+<tr>
+<td>InterfaceError</td>
+<td>当有数据库接口模块本身的错误（而不是数据库的错误）发生时触发。 必须是Error的子类。</td>
+</tr>
+<tr>
+<td>DatabaseError</td>
+<td>和数据库有关的错误发生时触发。 必须是Error的子类。</td>
+</tr>
+<tr>
+<td>DataError</td>
+<td>当有数据处理时的错误发生时触发，例如：除零错误，数据超范围等等。 必须是DatabaseError的子类。</td>
+</tr>
+<tr>
+<td>OperationalError</td>
+<td>指非用户控制的，而是操作数据库时发生的错误。例如：连接意外断开、 数据库名未找到、事务处理失败、内存分配错误等等操作数据库是发生的错误。 必须是DatabaseError的子类。</td>
+</tr>
+<tr>
+<td>IntegrityError</td>
+<td>完整性相关的错误，例如外键检查失败等。必须是DatabaseError子类。</td>
+</tr>
+<tr>
+<td>InternalError</td>
+<td>数据库的内部错误，例如游标（cursor）失效了、事务同步失败等等。 必须是DatabaseError子类。</td>
+</tr>
+<tr>
+<td>ProgrammingError</td>
+<td>程序错误，例如数据表（table）没找到或已存在、SQL语句语法错误、 参数数量错误等等。必须是DatabaseError的子类。</td>
+</tr>
+<tr>
+<td>NotSupportedError</td>
+<td>不支持错误，指使用了数据库不支持的函数或API等。例如在连接对象上 使用.rollback()函数，然而数据库并不支持事务或者事务已关闭。 必须是DatabaseError的子类。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Cursor-Objects"><a href="#Cursor-Objects" class="headerlink" title="Cursor Objects"></a>Cursor Objects</h2><table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.callproc( procname [, parameters ] )</code></td>
+<td>调用存储过程并且传递参数，结果集可以通过 <code>.fetch*()</code> 得到</td>
+</tr>
+<tr>
+<td><code>.execute(operation [, parameters])</code></td>
+<td>执行数据库命令，<code>.execute(&#39;operation&#39;, (parameters))</code> 使用类似C风格的字符串格式化方法，可以防止SQL注入攻击</td>
+</tr>
+<tr>
+<td><code>.executemany( operation, seq_of_parameters )</code></td>
+<td>批量操作，<code>.execute(&#39;operation&#39;, (seq_of_parameters))</code> 这里的参数可以是可迭代对象组成的序列，这会调用 <code>operation</code> 对序列中的每个元素执行操作</td>
+</tr>
+<tr>
+<td><code>.fetchone()</code></td>
+<td>获取查询结果集的下一行，返回单个序列，或在没有更多数据可用时返回<code>None</code></td>
+</tr>
+<tr>
+<td><code>.fetchmany([ size = cursor.arraysize ])</code></td>
+<td>获取查询结果的下一组行，返回一系列序列（例如元组列表）。没有更多行可用时返回空序列。</td>
+</tr>
+<tr>
+<td><code>.fetchall()</code></td>
+<td>获取查询结果的所有（剩余）行，并将它们作为一系列序列（例如元组列表）返回。请注意，游标的arraysize属性可能会影响此操作的性能。</td>
+</tr>
+<tr>
+<td><code>.close()</code></td>
+<td>关闭游标。也可以直接关闭连接，从而关闭游标</td>
+</tr>
+<tr>
+<td><code>.nextset()</code></td>
+<td>此方法将使光标跳到下一个可用集合，丢弃当前集合中的任何剩余行</td>
+</tr>
+<tr>
+<td><code>.setinputsizes(sizes)</code></td>
+<td>这可以在调用 <code>.execute*()</code> 之前使用，以预定义操作参数的内存区域。</td>
+</tr>
+<tr>
+<td><code>.setoutputsize(size [，column ])</code></td>
+<td>为大列提取设置列缓冲区大小（例如，LONG s，BLOB s等），该列被指定为结果序列的索引。不指定列将为游标中的所有大型列设置默认大小</td>
+</tr>
+<tr>
+<td><code>.scroll(value [, mode=&#39;relative&#39; ])</code></td>
+<td>根据 <code>mode</code> 移动游标到新位置，默认 <code>mode =&#39;relative&#39;</code> 表示相对当前的偏移量，当为 <code>mode =&#39;absolute&#39;</code> 时移动到绝对位置</td>
+</tr>
+<tr>
+<td><code>next()</code></td>
+<td>返回下一行数据</td>
+</tr>
+<tr>
+<td><code>.mogrify(query,args=None)</code></td>
+<td>参数化查询，防止SQL注入攻击，通过调用 <code>execute()</code> 方法返回发送到数据库的确切字符串。</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.description</code></td>
+<td>游标结果的字段描述信息，包含了：字段名，字段类型代码，显示尺寸，内部大小，精确度，规模，是否允许空</td>
+</tr>
+<tr>
+<td><code>.rownumber</code></td>
+<td>显示游标所在行</td>
+</tr>
+<tr>
+<td><code>.rowcount</code></td>
+<td>这是一个只读属性，并返回执行 <code>execute()</code> 方法后影响的行数</td>
+</tr>
+<tr>
+<td><code>.arraysize</code></td>
+<td>此读取/写入属性指定一次使用 <code>.fetchmany()</code> 提取的行数。它默认为1</td>
+</tr>
+<tr>
+<td><code>.connection</code></td>
+<td>此只读属性返回创建光标的Connection对象的引用。</td>
+</tr>
+<tr>
+<td><code>.__iter__</code></td>
+<td>将游标转换为可迭代对象</td>
+</tr>
+<tr>
+<td><code>.lastrowid</code></td>
+<td>获取新创建数据的自增ID</td>
+</tr>
+</tbody>
+</table>
+<h3 id="查询操作"><a href="#查询操作" class="headerlink" title="查询操作"></a>查询操作</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line">config = &#123;</span><br><span class="line">          <span class="string">'host'</span>:<span class="string">'172.16.100.252'</span>,</span><br><span class="line">          <span class="string">'port'</span>:<span class="number">3306</span>,</span><br><span class="line">          <span class="string">'user'</span>:<span class="string">'root'</span>,</span><br><span class="line">          <span class="string">'password'</span>:<span class="string">'Jinheng890821@'</span>,</span><br><span class="line">          <span class="string">'db'</span>:<span class="string">'hellodb'</span>,</span><br><span class="line">          <span class="string">'charset'</span>:<span class="string">'utf8mb4'</span>,</span><br><span class="line">          <span class="string">'cursorclass'</span>:pymysql.cursors.DictCursor,</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">db = pymysql.Connect(**config)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置查询条件</span></span><br><span class="line">max_age = <span class="number">30</span></span><br><span class="line">mix_age = <span class="number">25</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 执行sql语句</span></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">with</span> db.cursor() <span class="keyword">as</span> cursor:</span><br><span class="line">        sql = <span class="string">'SELECT * FROM students WHERE Age BETWEEN %s AND %s'</span></span><br><span class="line">        cursor.execute(sql, (mix_age, max_age))</span><br><span class="line">        result = cursor.fetchone()</span><br><span class="line">        print(result)</span><br><span class="line">        result = cursor.fetchone()</span><br><span class="line">        print(result)</span><br><span class="line">    db.commit()    <span class="comment"># 没有设置默认自动提交，需要主动提交，以保存所执行的语句</span></span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    db.close()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查询结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;<span class="string">'StuID'</span>: <span class="number">5</span>, <span class="string">'Name'</span>: <span class="string">'Yu Yutong'</span>, <span class="string">'Age'</span>: <span class="number">26</span>, <span class="string">'Gender'</span>: <span class="string">'M'</span>, <span class="string">'ClassID'</span>: <span class="number">3</span>, <span class="string">'TeacherID'</span>: <span class="number">1</span>&#125;</span><br><span class="line">&#123;<span class="string">'StuID'</span>: <span class="number">17</span>, <span class="string">'Name'</span>: <span class="string">'Lin Chong'</span>, <span class="string">'Age'</span>: <span class="number">25</span>, <span class="string">'Gender'</span>: <span class="string">'M'</span>, <span class="string">'ClassID'</span>: <span class="number">4</span>, <span class="string">'TeacherID'</span>: <span class="literal">None</span>&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="插入操作"><a href="#插入操作" class="headerlink" title="插入操作"></a>插入操作</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql</span><br><span class="line"></span><br><span class="line">config = &#123;</span><br><span class="line">          <span class="string">'host'</span>:<span class="string">'172.16.100.252'</span>,</span><br><span class="line">          <span class="string">'port'</span>:<span class="number">3306</span>,</span><br><span class="line">          <span class="string">'user'</span>:<span class="string">'root'</span>,</span><br><span class="line">          <span class="string">'password'</span>:<span class="string">'Jinheng890821@'</span>,</span><br><span class="line">          <span class="string">'db'</span>:<span class="string">'hellodb'</span>,</span><br><span class="line">          <span class="string">'charset'</span>:<span class="string">'utf8mb4'</span>,</span><br><span class="line">          <span class="string">'cursorclass'</span>:pymysql.cursors.DictCursor,</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">db = pymysql.Connect(**config)</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">with</span> db.cursor() <span class="keyword">as</span> cursor:</span><br><span class="line">        sql = <span class="string">'INSERT INTO students VALUES (%s,%s,%s,%s,%s,%s)'</span></span><br><span class="line">        cursor.execute(sql, (NULL,<span class="string">'yangjinheng'</span>,<span class="string">'29'</span>,<span class="string">'M'</span>,<span class="number">10</span>,<span class="number">1</span>))</span><br><span class="line">    db.commit()    <span class="comment">#由于默认开启事务，所以需要自己提交，或者回滚</span></span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    db.close()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>官方示例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> pymysql.cursors</span><br><span class="line"></span><br><span class="line"><span class="comment"># Connect to the database</span></span><br><span class="line">connection = pymysql.connect(host=<span class="string">'localhost'</span>,</span><br><span class="line">                             user=<span class="string">'user'</span>,</span><br><span class="line">                             password=<span class="string">'passwd'</span>,</span><br><span class="line">                             db=<span class="string">'db'</span>,</span><br><span class="line">                             charset=<span class="string">'utf8mb4'</span>,</span><br><span class="line">                             cursorclass=pymysql.cursors.DictCursor)</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> cursor:</span><br><span class="line">        <span class="comment"># Create a new record</span></span><br><span class="line">        sql = <span class="string">"INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)"</span></span><br><span class="line">        cursor.execute(sql, (<span class="string">'webmaster@python.org'</span>, <span class="string">'very-secret'</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># connection is not autocommit by default. So you must commit to save</span></span><br><span class="line">    <span class="comment"># your changes.</span></span><br><span class="line">    connection.commit()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">with</span> connection.cursor() <span class="keyword">as</span> cursor:</span><br><span class="line">        <span class="comment"># Read a single record</span></span><br><span class="line">        sql = <span class="string">"SELECT `id`, `password` FROM `users` WHERE `email`=%s"</span></span><br><span class="line">        cursor.execute(sql, (<span class="string">'webmaster@python.org'</span>,))</span><br><span class="line">        result = cursor.fetchone()</span><br><span class="line">        print(result)</span><br><span class="line"><span class="keyword">finally</span>:</span><br><span class="line">    connection.close()</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/02/python/23.元编程/" rel="next" title="元编程">
+                <i class="fa fa-chevron-left"></i> 元编程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/04/python/25.sqlalchemy/" rel="prev" title="sqlalchey数据库ORM框架">
+                sqlalchey数据库ORM框架 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Connection-Object"><span class="nav-number">1.</span> <span class="nav-text">Connection Object</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#err类"><span class="nav-number">2.</span> <span class="nav-text">err类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Cursor-Objects"><span class="nav-number">3.</span> <span class="nav-text">Cursor Objects</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查询操作"><span class="nav-number">3.1.</span> <span class="nav-text">查询操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插入操作"><span class="nav-number">3.2.</span> <span class="nav-text">插入操作</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

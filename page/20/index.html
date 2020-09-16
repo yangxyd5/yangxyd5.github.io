@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="越努力越幸运">
+<meta property="og:type" content="website">
+<meta property="og:title" content="默默">
+<meta property="og:url" content="https://yangjinheng.github.io/page/20/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="越努力越幸运">
+<meta property="og:locale" content="zh-Hans">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="默默">
+<meta name="twitter:description" content="越努力越幸运">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/page/20/">
+
+
+
+
+
+  <title>默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left 
+  page-home">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+  <section id="posts" class="posts-expand">
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2018/09/09/python/B站视频整理脚本/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/09/09/python/B站视频整理脚本/" itemprop="url">B站视频整理脚本</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-09T20:10:50+08:00">
+                2018-09-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="Today"><a href="#Today" class="headerlink" title="Today"></a>Today</h3><p>我经常在 B 站看一些视频教程，有的时候遇到想要保存到本地的视频，就需要用 B 站的 UWP 客户端下载，可是下载的文件名字都是数字编号的，很是恼人，其实它自带有关于视频的元数据，但是手动修改很麻烦，于是我写了个脚本，估计没有比我还闲的人了，哈哈哈</p>
+<h3 id="USE"><a href="#USE" class="headerlink" title="USE"></a>USE</h3><ol>
+<li><p>首先下载 B 站的 UWP 客户端，然后配置客户端的下载目录为指定的目录，将脚本放在下载目录</p>
+</li>
+<li><p>下载自己想保存的视频，下载完毕后，命令行切换到 B 站的下载目录，执行本脚本：<code>python bilicache.py</code></p>
+</li>
+</ol>
+<h3 id="Script"><a href="#Script" class="headerlink" title="Script"></a>Script</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CacheMagage</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.cwd = Path(<span class="string">'.'</span>).absolute()</span><br><span class="line">        self.twd = self.cwd.joinpath(<span class="string">'videos'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">extract</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> dir <span class="keyword">in</span> list(self.cwd.iterdir()):</span><br><span class="line">            <span class="keyword">if</span> dir.is_dir():</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    dirmeta = list(dir.glob(<span class="string">'*.dvi'</span>))[<span class="number">0</span>]</span><br><span class="line">                    twd = self.twd.joinpath(self.get_value(dirmeta,<span class="string">'Title'</span>))</span><br><span class="line">                    twd.mkdir(parents=<span class="literal">True</span>)</span><br><span class="line">                <span class="keyword">except</span> IndexError:</span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                <span class="keyword">except</span> FileExistsError:</span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                <span class="keyword">for</span> video <span class="keyword">in</span> list(dir.iterdir()):</span><br><span class="line">                    <span class="keyword">try</span>:</span><br><span class="line">                        metafile = list(video.glob(<span class="string">'*.info'</span>))[<span class="number">0</span>]</span><br><span class="line">                        videofile = list(video.glob(<span class="string">'*.flv'</span>))[<span class="number">0</span>]</span><br><span class="line">                        filename = self.get_value(metafile,<span class="string">'PartName'</span>,<span class="string">'Title'</span>)</span><br><span class="line">                        newlocal = twd.joinpath(filename + <span class="string">'.flv'</span>)</span><br><span class="line">                        videofile.replace(newlocal)</span><br><span class="line">                    <span class="keyword">except</span> IndexError:</span><br><span class="line">                        <span class="keyword">continue</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_value</span><span class="params">(self,file,value,backupvalue=False)</span>:</span></span><br><span class="line">        json_data = json.load(open(file,<span class="string">'r'</span>,encoding=<span class="string">'UTF-8'</span>))</span><br><span class="line">        jsion_value = json_data[value] <span class="keyword">if</span> json_data[value] <span class="keyword">else</span> json_data[backupvalue]</span><br><span class="line">        <span class="keyword">return</span> jsion_value</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    CacheMagage().extract()</span><br></pre></td></tr></table></figure>
+<h3 id="SHOW"><a href="#SHOW" class="headerlink" title="SHOW"></a>SHOW</h3><ul>
+<li>整理前</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PS D:\迅雷下载&gt; tree /F</span><br><span class="line">文件夹 PATH 列表</span><br><span class="line">卷序列号为 3837-6B37</span><br><span class="line">D:.</span><br><span class="line">│  bilicache.py</span><br><span class="line">│</span><br><span class="line">├─31253028</span><br><span class="line">│  │  31253028.dvi</span><br><span class="line">│  │  cover.jpg</span><br><span class="line">│  │  desktop.ini</span><br><span class="line">│  │</span><br><span class="line">│  └─1</span><br><span class="line">│          31253028.info</span><br><span class="line">│          31253028_1.xml</span><br><span class="line">│          31253028_1_0.flv</span><br><span class="line">│</span><br><span class="line">├─31255742</span><br><span class="line">│  │  31255742.dvi</span><br><span class="line">│  │  cover.jpg</span><br><span class="line">│  │  desktop.ini</span><br><span class="line">│  │</span><br><span class="line">│  └─1</span><br><span class="line">│          31255742.info</span><br><span class="line">│          31255742_1.xml</span><br><span class="line">│          31255742_1_0.flv</span><br><span class="line">│</span><br><span class="line">└─31263933</span><br><span class="line">    │  31263933.dvi</span><br><span class="line">    │  cover.jpg</span><br><span class="line">    │  desktop.ini</span><br><span class="line">    │</span><br><span class="line">    └─1</span><br><span class="line">            31263933.info</span><br><span class="line">            31263933_1.xml</span><br><span class="line">            31263933_1_0.flv</span><br></pre></td></tr></table></figure>
+<ul>
+<li>整理后，统一放在 videos 目录下了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PS D:\迅雷下载&gt; tree /F</span><br><span class="line">文件夹 PATH 列表</span><br><span class="line">卷序列号为 3837-6B37</span><br><span class="line">D:.</span><br><span class="line">│  bilicache.py</span><br><span class="line">│</span><br><span class="line">├─31253028</span><br><span class="line">│  │  31253028.dvi</span><br><span class="line">│  │  cover.jpg</span><br><span class="line">│  │  desktop.ini</span><br><span class="line">│  │</span><br><span class="line">│  └─1</span><br><span class="line">│          31253028.info</span><br><span class="line">│          31253028_1.xml</span><br><span class="line">│</span><br><span class="line">├─31255742</span><br><span class="line">│  │  31255742.dvi</span><br><span class="line">│  │  cover.jpg</span><br><span class="line">│  │  desktop.ini</span><br><span class="line">│  │</span><br><span class="line">│  └─1</span><br><span class="line">│          31255742.info</span><br><span class="line">│          31255742_1.xml</span><br><span class="line">│</span><br><span class="line">├─31263933</span><br><span class="line">│  │  31263933.dvi</span><br><span class="line">│  │  cover.jpg</span><br><span class="line">│  │  desktop.ini</span><br><span class="line">│  │</span><br><span class="line">│  └─1</span><br><span class="line">│          31263933.info</span><br><span class="line">│          31263933_1.xml</span><br><span class="line">│</span><br><span class="line">└─videos</span><br><span class="line">    ├─【Natsu夏日】Produce48 - Rumor 【有什么方法能让吊带袜不掉】</span><br><span class="line">    │      【Natsu夏日】Produce48 - Rumor 【有什么方法能让吊带袜不掉】.flv</span><br><span class="line">    │</span><br><span class="line">    ├─【Takarai宝井颜】【生日作】China-X❤性感旗袍娘颜总上线！</span><br><span class="line">    │      【Takarai宝井颜】【生日作】China-X❤性感旗袍娘颜总上线！.flv</span><br><span class="line">    │</span><br><span class="line">    └─【阿稀稀】一分一秒翻跳 10cm细高跟初尝试 黑丝</span><br><span class="line">            【阿稀稀】一分一秒翻跳 10cm细高跟初尝试 黑丝.flv</span><br></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2018/08/19/personal/Typora/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/08/19/personal/Typora/" itemprop="url">Typora编辑页面调整</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T20:01:55+08:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/个人日志/" itemprop="url" rel="index">
+                    <span itemprop="name">个人日志</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>我一直在使用 Typora 来写博客，但是官方展示的效果有很多不尽人意的地方，例如：</p>
+<ol>
+<li>文章正文区域宽度</li>
+<li>查看源码时的正文区域宽度</li>
+<li>另存为 PDF 时页面的大小</li>
+</ol>
+<p>所以我对 Typora 的样式做了一些修改，以适应普遍的大屏幕显示，优化显示步骤为：</p>
+<p>首先打开偏好设置 -&gt; 打开主题文件夹 -&gt; 新建 github.user.css 文件，填入如下内容。</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 调整视图正文宽度 */</span></span><br><span class="line"><span class="selector-id">#write</span>&#123;</span><br><span class="line">    <span class="attribute">max-width</span>: <span class="number">90%</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 调整源码正文宽度 */</span></span><br><span class="line"><span class="selector-id">#typora-source</span> <span class="selector-class">.CodeMirror-lines</span> &#123;</span><br><span class="line">    <span class="attribute">max-width</span>: <span class="number">90%</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 调整输出 PDF 文件宽度 */</span></span><br><span class="line"><span class="keyword">@media</span> print &#123;</span><br><span class="line">    <span class="selector-id">#write</span>&#123;</span><br><span class="line">        <span class="attribute">max-width</span>: <span class="number">95%</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">@page</span> &#123;</span><br><span class="line">        <span class="attribute">size</span>: A3;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 调整正文字体,字体需单独下载 */</span></span><br><span class="line"><span class="selector-tag">body</span> &#123;</span><br><span class="line">    <span class="attribute">font-family</span>: IBM Plex Sans;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+  </section>
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/19/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/19/">19</a><span class="page-number current">20</span><a class="page-number" href="/page/21/">21</a><span class="space">&hellip;</span><a class="page-number" href="/page/43/">43</a><a class="extend next" rel="next" href="/page/21/"><i class="fa fa-angle-right"></i></a>
+  </nav>
+
+
+
+          </div>
+          
+
+
+          
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

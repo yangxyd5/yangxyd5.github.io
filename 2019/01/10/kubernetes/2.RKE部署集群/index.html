@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="RKE 部署集群RKE 是一种快速，通用的 Kubernetes 安装程序，可用于在 Linux 主机上部署生产可用的 Kubernetes 集群。  RKE 官方地址  https://www.rancher.cn/docs/rke/latest/cn/installation/ 部署架构规划 资源最低需求，是 kubernetes 官方要求的最低配置  最低资源需求：2C、4G  部署架构，可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rke 部署 k8s 集群">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/01/10/kubernetes/2.RKE部署集群/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="RKE 部署集群RKE 是一种快速，通用的 Kubernetes 安装程序，可用于在 Linux 主机上部署生产可用的 Kubernetes 集群。  RKE 官方地址  https://www.rancher.cn/docs/rke/latest/cn/installation/ 部署架构规划 资源最低需求，是 kubernetes 官方要求的最低配置  最低资源需求：2C、4G  部署架构，可">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-02-28T08:04:06.848Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="rke 部署 k8s 集群">
+<meta name="twitter:description" content="RKE 部署集群RKE 是一种快速，通用的 Kubernetes 安装程序，可用于在 Linux 主机上部署生产可用的 Kubernetes 集群。  RKE 官方地址  https://www.rancher.cn/docs/rke/latest/cn/installation/ 部署架构规划 资源最低需求，是 kubernetes 官方要求的最低配置  最低资源需求：2C、4G  部署架构，可">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/01/10/kubernetes/2.RKE部署集群/">
+
+
+
+
+
+  <title>rke 部署 k8s 集群 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/01/10/kubernetes/2.RKE部署集群/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">rke 部署 k8s 集群</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-10T00:00:00+08:00">
+                2019-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="RKE-部署集群"><a href="#RKE-部署集群" class="headerlink" title="RKE 部署集群"></a>RKE 部署集群</h1><p>RKE 是一种快速，通用的 Kubernetes 安装程序，可用于在 Linux 主机上部署生产可用的 Kubernetes 集群。</p>
+<ul>
+<li>RKE 官方地址</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https://www.rancher.cn/docs/rke/latest/cn/installation/</span><br></pre></td></tr></table></figure>
+<h2 id="部署架构规划"><a href="#部署架构规划" class="headerlink" title="部署架构规划"></a>部署架构规划</h2><ul>
+<li>资源最低需求，是 kubernetes 官方要求的最低配置</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">最低资源需求：2C、4G</span><br></pre></td></tr></table></figure>
+<ul>
+<li>部署架构，可以自行调整 master 和 node 节点的数量，例如：1 个 master 2 个 worker。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>角色</th>
+<th>IP地址</th>
+<th>准备工作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>master、KRE</td>
+<td>172.16.100.11</td>
+<td>安装 Docker、RKE、能够免密访问到 master、worker 节点的 docker 用户</td>
+</tr>
+<tr>
+<td>worker</td>
+<td>172.16.100.12</td>
+<td>安装 Docker、ipvs</td>
+</tr>
+<tr>
+<td>worker</td>
+<td>172.16.100.13</td>
+<td>安装 Docker、ipvs</td>
+</tr>
+</tbody>
+</table>
+<h1 id="集群准备工作"><a href="#集群准备工作" class="headerlink" title="集群准备工作"></a>集群准备工作</h1><ol>
+<li><p>所有节点关闭 firewalld 和 selinux</p>
+</li>
+<li><p>所有节点安装 docker、启用 ipvs 内核模块</p>
+</li>
+<li>所有节点创建 docker 用户，用于 rke 节点免密连接到该节点执行部署</li>
+</ol>
+<h2 id="关闭-firewalld-和-selinux"><a href="#关闭-firewalld-和-selinux" class="headerlink" title="关闭 firewalld 和 selinux"></a>关闭 firewalld 和 selinux</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">setenforce 0</span><br><span class="line">sed -i <span class="string">'/^SELINUX=/cSELINUX=disabled'</span> /etc/selinux/config</span><br><span class="line"></span><br><span class="line">systemctl stopfirewalld</span><br><span class="line">systemctl <span class="built_in">disable</span> firewalld</span><br></pre></td></tr></table></figure>
+<h2 id="安装-docker"><a href="#安装-docker" class="headerlink" title="安装 docker"></a>安装 docker</h2><ul>
+<li>安装 docker 源</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl -o /etc/yum.repos.d/docker-ce.repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装 docker-ce</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum install -y docker-ce</span><br><span class="line">systemctl start docker</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置镜像加速</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cat &gt;/etc/docker/daemon.json&lt;&lt;EOF</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"registry-mirrors"</span>: [</span><br><span class="line">    <span class="string">"http://f1361db2.m.daocloud.io"</span>,</span><br><span class="line">    <span class="string">"https://dockerhub.azk8s.cn"</span>,</span><br><span class="line">    <span class="string">"https://reg-mirror.qiniu.com"</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动 docker 并设置开机启动</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">systemctl restart docker</span><br><span class="line">systemctl enable docker</span><br></pre></td></tr></table></figure>
+<h2 id="启动-ipvs-支持"><a href="#启动-ipvs-支持" class="headerlink" title="启动 ipvs 支持"></a>启动 ipvs 支持</h2><ul>
+<li>安装 IPVS 模块</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y ipvsadm ipset sysstat conntrack libseccomp</span><br></pre></td></tr></table></figure>
+<ul>
+<li>立即加载内核模块</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">modprobe ip_vs_dh</span><br><span class="line">modprobe ip_vs_ftp</span><br><span class="line">modprobe ip_vs</span><br><span class="line">modprobe ip_vs_lblc</span><br><span class="line">modprobe ip_vs_lblcr</span><br><span class="line">modprobe ip_vs_lc</span><br><span class="line">modprobe ip_vs_nq</span><br><span class="line">modprobe ip_vs_pe_sip</span><br><span class="line">modprobe ip_vs_rr</span><br><span class="line">modprobe ip_vs_sed</span><br><span class="line">modprobe ip_vs_sh</span><br><span class="line">modprobe ip_vs_wlc</span><br><span class="line">modprobe ip_vs_wrr</span><br><span class="line">modprobe nf_conntrack_ipv4</span><br></pre></td></tr></table></figure>
+<ul>
+<li>检查内核模块是否加载</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">lsmod | grep -e ip_vs -e nf_conntrack_ipv4</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置开机内核模块加载的配置文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cat &gt;&gt;/etc/modules-load.d/ipvs.conf&lt;&lt;EOF</span><br><span class="line">ip_vs_dh</span><br><span class="line">ip_vs_ftp</span><br><span class="line">ip_vs</span><br><span class="line">ip_vs_lblc</span><br><span class="line">ip_vs_lblcr</span><br><span class="line">ip_vs_lc</span><br><span class="line">ip_vs_nq</span><br><span class="line">ip_vs_pe_sip</span><br><span class="line">ip_vs_rr</span><br><span class="line">ip_vs_sed</span><br><span class="line">ip_vs_sh</span><br><span class="line">ip_vs_wlc</span><br><span class="line">ip_vs_wrr</span><br><span class="line">nf_conntrack_ipv4</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">systemctl <span class="built_in">enable</span> systemd-modules-load.service</span><br></pre></td></tr></table></figure>
+<h2 id="设置-rke-密钥连接"><a href="#设置-rke-密钥连接" class="headerlink" title="设置 rke 密钥连接"></a>设置 rke 密钥连接</h2><ul>
+<li>在每台主机上创建 docker 用户，并修改 docker 用户密码</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">useradd -g docker docker</span><br><span class="line"><span class="built_in">echo</span> 123456 | passwd --stdin docker</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 RKE 程序所在主机上生成密钥，并发送到各个节点的 authorized_keys 文件，保证 RKE 主机可以免密连接到每个主机的 docker 用户</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -q -P <span class="string">''</span> -f ~/.ssh/id_rsa</span><br><span class="line"></span><br><span class="line">node=(</span><br><span class="line">    172.16.100.11</span><br><span class="line">    172.16.100.12</span><br><span class="line">    172.16.100.13</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="variable">$&#123;node[*]&#125;</span>; <span class="keyword">do</span></span><br><span class="line">    ssh-copy-id docker@<span class="variable">$i</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>  必须保证能够 ssh docker@&lt;IP地址&gt; 能够连接</p>
+</blockquote>
+<h1 id="开始部署集群"><a href="#开始部署集群" class="headerlink" title="开始部署集群"></a>开始部署集群</h1><blockquote>
+<p>  在 rke 程序所在节点进行</p>
+</blockquote>
+<h2 id="下载安装-RKE"><a href="#下载安装-RKE" class="headerlink" title="下载安装 RKE"></a>下载安装 RKE</h2><ul>
+<li>官方发行版地址，根据自己的架构下载</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https://github.com/rancher/rke/releases/latest</span><br></pre></td></tr></table></figure>
+<ul>
+<li>官方帮助文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https://rancher.com/docs/rke/latest/en/</span><br></pre></td></tr></table></figure>
+<ul>
+<li>下载安装 RKE 到本机</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://github.com/rancher/rke/releases/download/v0.2.4/rke_linux-amd64 -O /usr/<span class="built_in">local</span>/bin/rke</span><br><span class="line">chmod +x /usr/<span class="built_in">local</span>/bin/rke</span><br></pre></td></tr></table></figure>
+<h2 id="创建集群配置"><a href="#创建集群配置" class="headerlink" title="创建集群配置"></a>创建集群配置</h2><ul>
+<li>可以直接使用下面的 RKE 配置文件 (cluster.yaml) 来部署集群</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">nodes:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">address:</span> <span class="number">172.16</span><span class="number">.100</span><span class="number">.11</span></span><br><span class="line">  <span class="attr">role:</span> <span class="string">[controlplane,</span> <span class="string">etcd]</span></span><br><span class="line">  <span class="attr">user:</span> <span class="string">docker</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">address:</span> <span class="number">172.16</span><span class="number">.100</span><span class="number">.12</span></span><br><span class="line">  <span class="attr">role:</span> <span class="string">[worker]</span></span><br><span class="line">  <span class="attr">user:</span> <span class="string">docker</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">address:</span> <span class="number">172.16</span><span class="number">.100</span><span class="number">.13</span></span><br><span class="line">  <span class="attr">role:</span> <span class="string">[worker]</span></span><br><span class="line">  <span class="attr">user:</span> <span class="string">docker</span></span><br><span class="line"></span><br><span class="line"><span class="attr">network:</span></span><br><span class="line">  <span class="attr">plugin:</span> <span class="string">canal</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置私有仓库</span></span><br><span class="line"><span class="comment"># private_registries:</span></span><br><span class="line"><span class="comment"># - url: registry.com</span></span><br><span class="line"><span class="comment">#   user: Username</span></span><br><span class="line"><span class="comment">#   password: password</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 自定义 pod 和 service 网络</span></span><br><span class="line"><span class="comment"># services:</span></span><br><span class="line"><span class="comment">#   kube-api:</span></span><br><span class="line"><span class="comment">#     service_cluster_ip_range: 10.53.0.0/16</span></span><br><span class="line"><span class="comment">#   kube-controller:</span></span><br><span class="line"><span class="comment">#     cluster_cidr: 10.52.0.0/16</span></span><br><span class="line"><span class="comment">#     service_cluster_ip_range: 10.53.0.0/16</span></span><br><span class="line"><span class="comment">#   kubelet:</span></span><br><span class="line"><span class="comment">#     cluster_dns_server: 10.53.0.10</span></span><br><span class="line"></span><br><span class="line"><span class="attr">system_images:</span></span><br><span class="line">  <span class="attr">etcd:</span> <span class="string">rancher/coreos-etcd:v3.3.15-rancher1</span></span><br><span class="line">  <span class="attr">alpine:</span> <span class="string">rancher/rke-tools:v0.1.51</span></span><br><span class="line">  <span class="attr">nginx_proxy:</span> <span class="string">rancher/rke-tools:v0.1.51</span></span><br><span class="line">  <span class="attr">cert_downloader:</span> <span class="string">rancher/rke-tools:v0.1.51</span></span><br><span class="line">  <span class="attr">kubernetes_services_sidecar:</span> <span class="string">rancher/rke-tools:v0.1.51</span></span><br><span class="line">  <span class="attr">kubedns:</span> <span class="string">rancher/k8s-dns-kube-dns:1.15.0</span></span><br><span class="line">  <span class="attr">dnsmasq:</span> <span class="string">rancher/k8s-dns-dnsmasq-nanny:1.15.0</span></span><br><span class="line">  <span class="attr">kubedns_sidecar:</span> <span class="string">rancher/k8s-dns-sidecar:1.15.0</span></span><br><span class="line">  <span class="attr">kubedns_autoscaler:</span> <span class="string">rancher/cluster-proportional-autoscaler:1.7.1</span></span><br><span class="line">  <span class="attr">coredns:</span> <span class="string">rancher/coredns-coredns:1.6.2</span></span><br><span class="line">  <span class="attr">coredns_autoscaler:</span> <span class="string">rancher/cluster-proportional-autoscaler:1.7.1</span></span><br><span class="line">  <span class="attr">kubernetes:</span> <span class="string">rancher/hyperkube:v1.16.3-rancher1</span></span><br><span class="line">  <span class="attr">flannel:</span> <span class="string">rancher/coreos-flannel:v0.11.0-rancher1</span></span><br><span class="line">  <span class="attr">flannel_cni:</span> <span class="string">rancher/flannel-cni:v0.3.0-rancher5</span></span><br><span class="line">  <span class="attr">calico_node:</span> <span class="string">rancher/calico-node:v3.8.1</span></span><br><span class="line">  <span class="attr">calico_cni:</span> <span class="string">rancher/calico-cni:v3.8.1</span></span><br><span class="line">  <span class="attr">calico_controllers:</span> <span class="string">rancher/calico-kube-controllers:v3.8.1</span></span><br><span class="line">  <span class="attr">calico_ctl:</span> <span class="string">""</span></span><br><span class="line">  <span class="attr">calico_flexvol:</span> <span class="string">rancher/calico-pod2daemon-flexvol:v3.8.1</span></span><br><span class="line">  <span class="attr">canal_node:</span> <span class="string">rancher/calico-node:v3.8.1</span></span><br><span class="line">  <span class="attr">canal_cni:</span> <span class="string">rancher/calico-cni:v3.8.1</span></span><br><span class="line">  <span class="attr">canal_flannel:</span> <span class="string">rancher/coreos-flannel:v0.11.0</span></span><br><span class="line">  <span class="attr">canal_flexvol:</span> <span class="string">rancher/calico-pod2daemon-flexvol:v3.8.1</span></span><br><span class="line">  <span class="attr">weave_node:</span> <span class="string">weaveworks/weave-kube:2.5.2</span></span><br><span class="line">  <span class="attr">weave_cni:</span> <span class="string">weaveworks/weave-npc:2.5.2</span></span><br><span class="line">  <span class="attr">pod_infra_container:</span> <span class="string">rancher/pause:3.1</span></span><br><span class="line">  <span class="attr">ingress:</span> <span class="string">rancher/nginx-ingress-controller:nginx-0.25.1-rancher1</span></span><br><span class="line">  <span class="attr">ingress_backend:</span> <span class="string">rancher/nginx-ingress-controller-defaultbackend:1.5-rancher1</span></span><br><span class="line">  <span class="attr">metrics_server:</span> <span class="string">rancher/metrics-server:v0.3.4</span></span><br><span class="line">  <span class="attr">windows_pod_infra_container:</span> <span class="string">rancher/kubelet-pause:v0.1.3</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>也可以通过 rke config 命令生成配置文件 ，下面的网址可选部署的版本</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">https://hub.docker.com/r/rancher/hyperkube/tags    <span class="comment"># 例如：rancher/hyperkube:v1.15.0-rancher1</span></span><br></pre></td></tr></table></figure>
+<h2 id="拉取所需镜像"><a href="#拉取所需镜像" class="headerlink" title="拉取所需镜像"></a>拉取所需镜像</h2><p><strong>网速很快的小伙伴不需要进行这一步！</strong></p>
+<p>由于部署 K8S 集群所需要的 Docker 镜像体积较大，数量较多，为了防止因为镜像而影响部署过程，我们可以提前在 Master 节点拉取这些镜像，然后打包在其他节点上导入，这样也能省去在其它节点下载镜像所需的时间，下面我给出了脚本自动完成这个步骤。</p>
+<ul>
+<li>在 cluster.yaml 内声明了 K8S 集群所需要的镜像，拉取这些镜像</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">awk</span> <span class="string">'$0~/.+:.+:/&#123;system("docker pull "$2"")&#125;'</span> <span class="string">cluster.yaml</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>将下载好的所有 docker 镜像导出到一个文件，并拷贝到每个节点，在节点导入</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">awk <span class="string">'$0~/.+:.+:/&#123;print $2&#125;'</span> cluster.yaml | xargs docker image save -o all-image.tar.gz</span><br><span class="line"></span><br><span class="line">nodes=(</span><br><span class="line">    172.16.100.12</span><br><span class="line">    172.16.100.13</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> node <span class="keyword">in</span> <span class="variable">$&#123;nodes[*]&#125;</span> ;<span class="keyword">do</span></span><br><span class="line">    scp all-image.tar.gz <span class="variable">$&#123;node&#125;</span>:/tmp/</span><br><span class="line">    ssh root@<span class="variable">$&#123;node&#125;</span> <span class="string">'docker image load -i /tmp/all-image.tar.gz ; rm -rf /tmp/all-image.tar.gz'</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<h2 id="RKE部署集群"><a href="#RKE部署集群" class="headerlink" title="RKE部署集群"></a>RKE部署集群</h2><ul>
+<li>部署集群</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rke up --config cluster.yaml</span><br></pre></td></tr></table></figure>
+<ul>
+<li>部署过程遇到问题，可以删除已经做的改动</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">rke remove --config cluster.yaml</span><br></pre></td></tr></table></figure>
+<ul>
+<li>保存重要凭证</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cluster.yaml                # RKE 集群配置文件</span><br><span class="line">kube_config_cluster.yaml    # 群集的 Kubeconfig 文件，此文件包含完全访问群集的凭据</span><br><span class="line">cluster.rkestate            # Kubernetes 群集状态文件，此文件包含完全访问群集的凭据</span><br></pre></td></tr></table></figure>
+<h2 id="访问K8S集群"><a href="#访问K8S集群" class="headerlink" title="访问K8S集群"></a>访问K8S集群</h2><ul>
+<li>下载安装 kubectl（翻墙）</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.16.3/bin/linux/amd64/kubectl</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl</span><br></pre></td></tr></table></figure>
+<ul>
+<li>配置集群访问凭证</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mkdir -p ~/.kube</span><br><span class="line">cp kube_config_cluster.yaml ~/.kube/config</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看集群配置</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ kubectl get nodes</span><br><span class="line">NAME             STATUS    ROLES               AGE       VERSION</span><br><span class="line">172.16.100.11   Ready     controlplane,etcd   99m       v1.13.5</span><br><span class="line">172.16.100.12   Ready     worker              99m       v1.13.5</span><br><span class="line">172.16.100.13   Ready     worker              99m       v1.13.5</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/02/web/CSS/" rel="next" title="CSS学习笔记">
+                <i class="fa fa-chevron-left"></i> CSS学习笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/10/kubernetes/1.简介和基础/" rel="prev" title="Kubernetes简介和基础">
+                Kubernetes简介和基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RKE-部署集群"><span class="nav-number">1.</span> <span class="nav-text">RKE 部署集群</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#部署架构规划"><span class="nav-number">1.1.</span> <span class="nav-text">部署架构规划</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#集群准备工作"><span class="nav-number">2.</span> <span class="nav-text">集群准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关闭-firewalld-和-selinux"><span class="nav-number">2.1.</span> <span class="nav-text">关闭 firewalld 和 selinux</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-docker"><span class="nav-number">2.2.</span> <span class="nav-text">安装 docker</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#启动-ipvs-支持"><span class="nav-number">2.3.</span> <span class="nav-text">启动 ipvs 支持</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置-rke-密钥连接"><span class="nav-number">2.4.</span> <span class="nav-text">设置 rke 密钥连接</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#开始部署集群"><span class="nav-number">3.</span> <span class="nav-text">开始部署集群</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#下载安装-RKE"><span class="nav-number">3.1.</span> <span class="nav-text">下载安装 RKE</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#创建集群配置"><span class="nav-number">3.2.</span> <span class="nav-text">创建集群配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拉取所需镜像"><span class="nav-number">3.3.</span> <span class="nav-text">拉取所需镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RKE部署集群"><span class="nav-number">3.4.</span> <span class="nav-text">RKE部署集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问K8S集群"><span class="nav-number">3.5.</span> <span class="nav-text">访问K8S集群</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

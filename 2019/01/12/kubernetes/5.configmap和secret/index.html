@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="配置信息容器化k8s 提供了 configMap、secret 这两种特殊类型的存储卷，多数情况下不是为 POD 提供存储空间，而是为用户提供了从集群外部到 POD 内部注入配置信息的方式。  配置信息容器化有哪些方式   自定义命令行参数，例如：command、args，根据 args 传递不同的参数来将容器运行为不同的特性 直接把配置信息制作为 image 中，但是这种方式非常不灵活，这个镜像">
+<meta property="og:type" content="article">
+<meta property="og:title" content="configmap 和 secret">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/01/12/kubernetes/5.configmap和secret/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="配置信息容器化k8s 提供了 configMap、secret 这两种特殊类型的存储卷，多数情况下不是为 POD 提供存储空间，而是为用户提供了从集群外部到 POD 内部注入配置信息的方式。  配置信息容器化有哪些方式   自定义命令行参数，例如：command、args，根据 args 传递不同的参数来将容器运行为不同的特性 直接把配置信息制作为 image 中，但是这种方式非常不灵活，这个镜像">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-02-28T08:05:27.049Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="configmap 和 secret">
+<meta name="twitter:description" content="配置信息容器化k8s 提供了 configMap、secret 这两种特殊类型的存储卷，多数情况下不是为 POD 提供存储空间，而是为用户提供了从集群外部到 POD 内部注入配置信息的方式。  配置信息容器化有哪些方式   自定义命令行参数，例如：command、args，根据 args 传递不同的参数来将容器运行为不同的特性 直接把配置信息制作为 image 中，但是这种方式非常不灵活，这个镜像">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/01/12/kubernetes/5.configmap和secret/">
+
+
+
+
+
+  <title>configmap 和 secret | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/01/12/kubernetes/5.configmap和secret/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">configmap 和 secret</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-12T00:00:00+08:00">
+                2019-01-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="配置信息容器化"><a href="#配置信息容器化" class="headerlink" title="配置信息容器化"></a>配置信息容器化</h1><p>k8s 提供了 configMap、secret 这两种特殊类型的存储卷，多数情况下不是为 POD 提供存储空间，而是为用户提供了从集群外部到 POD 内部注入配置信息的方式。</p>
+<ul>
+<li>配置信息容器化有哪些方式</li>
+</ul>
+<ol>
+<li>自定义命令行参数，例如：command、args，根据 args 传递不同的参数来将容器运行为不同的特性</li>
+<li>直接把配置信息制作为 image 中，但是这种方式非常不灵活，这个镜像只能适用于一种使用场景，过度耦合</li>
+<li>环境变量，Cloud Native 支持通过环境变量来加载配置，或者使用 ENTRYPOINT 脚本来预处理环境变量为配置信息</li>
+<li>存储卷，在容器启动时候挂载一个存储卷，或者专用的配置存储卷，挂载到应用程序的配置文件目录</li>
+</ol>
+<ul>
+<li>Secret与ConfigMap对比</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">相同点：</span><br><span class="line">-   key / value 的形式 </span><br><span class="line">-   属于某个特定的 namespace </span><br><span class="line">-   可以导出到环境变量 </span><br><span class="line">-   可以通过目录/文件形式挂载(支持挂载所有key和部分key)</span><br><span class="line"></span><br><span class="line">不同点：</span><br><span class="line">-   Secret 可以被 ServerAccount 关联(使用) </span><br><span class="line">-   Secret 可以存储 register 的鉴权信息，用在 ImagePullSecret 参数中，用于拉取私有仓库的镜像 </span><br><span class="line">-   Secret 支持 Base64 加密 </span><br><span class="line">-   Secret 分为 kubernetes.io/Service Account，kubernetes.io/dockerconfigjson，Opaque三种类型, Configmap 不区分类型 </span><br><span class="line">-   Secret 文件存储在tmpfs文件系统中，Pod 删除后 Secret文件也会对应的删除。</span><br></pre></td></tr></table></figure>
+<h2 id="POD-获取环境变量"><a href="#POD-获取环境变量" class="headerlink" title="POD 获取环境变量"></a>POD 获取环境变量</h2><ul>
+<li>env，详见：kubectl explain pods.spec.containers.env</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">name</span>              <span class="string">&lt;string&gt;</span>  <span class="comment"># 变量名称</span></span><br><span class="line"><span class="string">value</span>	          <span class="string">&lt;string&gt;</span>  <span class="comment"># 变量的值</span></span><br><span class="line"><span class="string">valueFrom</span>         <span class="string">&lt;Object&gt;</span>  <span class="comment"># 引用值，如：configMap 的某个键、POD 定义中的字段名，如：metadata.labels</span></span><br><span class="line"><span class="string">resourceFieldRef</span>  <span class="string">&lt;Object&gt;</span>  <span class="comment"># 引用资源限制中的值</span></span><br><span class="line"><span class="string">secretKeyRef</span>      <span class="string">&lt;Object&gt;</span>  <span class="comment"># 引用 secretKey</span></span><br></pre></td></tr></table></figure>
+<h2 id="configMap"><a href="#configMap" class="headerlink" title="configMap"></a>configMap</h2><p>假如我们现在要启动一个 POD ，这个 POD 启动时候，需要读取不同的配置信息，那么我们有两种方式：</p>
+<ol>
+<li>可以将 configMap 资源关联到当前 POD 上，POD 从 configMap 读取一个数据，传递给 POD 内部容器的一个变量，变量被注入后，可以重启容器。</li>
+<li>可以将 configMap 资源挂载到当前 POD 上，作为一个文件系统的路径，这个目录正好是应用程序读取配置文件的路径，容器就可以读取到配置信息了，当 configMap 修改了，那么就会通知 POD ，POD 可以进行重载配置。</li>
+</ol>
+<p>在每个 configMap 中所有的配置信息都保存为键值的配置形式。</p>
+<ul>
+<li>清单格式，详见：kubectl explain configMap</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">apiVersion	&lt;string&gt;              <span class="comment"># 版本号</span></span><br><span class="line">binaryData	&lt;map[string]string&gt;   <span class="comment"># 二进制的数据</span></span><br><span class="line">data	    &lt;map[string]string&gt;   <span class="comment"># 键值对的数据</span></span><br><span class="line">kind	    &lt;string&gt;              <span class="comment"># 对象类型</span></span><br><span class="line">metadata	&lt;Object&gt;              <span class="comment"># 对象元数据</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>命令行方式创建</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 创建名为 my-config 的 configMap，它的数据来自目录中的文件，键为文件名，值为文件内容</span></span><br><span class="line">kubectl create configmap my-config --from-file=path/to/dir</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建名为 my-config 的 configMap，它的数据来自文件中的键值对</span></span><br><span class="line">kubectl create configmap my-config --from-file=path/to/file</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建名为 my-config 的 configMap，也可以手动指定键的名称</span></span><br><span class="line">kubectl create configmap my-config --from-file=key1=/path/to/bar/file1.txt --from-file=key2=/path/to/bar/file2.txt</span><br><span class="line"></span><br><span class="line"><span class="comment"># 从字面量中创建</span></span><br><span class="line">kubectl create configmap my-config --from-literal=key1=config1 --from-literal=key2=config2</span><br><span class="line"></span><br><span class="line"><span class="comment"># 从env文件中命名 my-config</span></span><br><span class="line">kubectl create configmap my-config --from-env-file=path/to/bar.env</span><br></pre></td></tr></table></figure>
+<h3 id="注入-POD-ENV"><a href="#注入-POD-ENV" class="headerlink" title="注入 POD ENV"></a>注入 POD ENV</h3><ul>
+<li>创建 ConfigMap 并在 POD ENV 中使用</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span>                                        <span class="comment"># 创建 ConfigMap 对象</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-config</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="attr">data:</span></span><br><span class="line">  <span class="attr">server_name:</span> <span class="string">myapp.jinheng.com</span>                       <span class="comment"># 键值对数据</span></span><br><span class="line">  <span class="attr">nginx_port:</span> <span class="string">|</span>                                        <span class="comment"># 键值对数据，此处为 nginx 配置文件，需要注意换行的写法</span></span><br><span class="line">    <span class="string">server</span> <span class="string">&#123;</span></span><br><span class="line">        <span class="string">server_name</span>  <span class="string">myapp.jinheng.com;</span></span><br><span class="line">        <span class="string">listen</span>  <span class="number">80</span><span class="string">;</span></span><br><span class="line">        <span class="string">root</span>  <span class="string">/data/web/html;</span></span><br><span class="line">    <span class="string">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-configmap-demo</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">jinheng.com/created-by:</span> <span class="string">"cluster amdin"</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">      <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">          <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">      <span class="attr">env:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">NGINX_SERVER_PORT</span>          <span class="comment"># 定义容器内变量的名字，容器需要在启动的时候使用 ENTRYPOINT 脚本将环境变量转换为应用的配置文件</span></span><br><span class="line">          <span class="attr">valueFrom:</span>                       <span class="comment"># 值来自于 configMap 对象中</span></span><br><span class="line">            <span class="attr">configMapKeyRef:</span>               <span class="comment"># 引用 configMap 对象</span></span><br><span class="line">              <span class="attr">name:</span> <span class="string">nginx-config</span>           <span class="comment"># configMap 对象的名字</span></span><br><span class="line">              <span class="attr">key:</span> <span class="string">nginx_port</span>              <span class="comment"># 引用 configMap 中的哪个 key</span></span><br><span class="line">              <span class="attr">optional:</span> <span class="literal">true</span>               <span class="comment"># 相对 POD 启动是否为可选，如果 configMap 中不存在这个值，true 则不阻塞 POD 启动</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">NGINX_SERVER_NAME</span>          <span class="comment"># 定义容器内变量的名字，使用 exec 进入容器会发现变量已经在启动容器前注入容器内部了。</span></span><br><span class="line">          <span class="attr">valueFrom:</span></span><br><span class="line">            <span class="attr">configMapKeyRef:</span></span><br><span class="line">              <span class="attr">name:</span> <span class="string">nginx-config</span></span><br><span class="line">              <span class="attr">key:</span> <span class="string">server_name</span></span><br></pre></td></tr></table></figure>
+<h3 id="挂载为-POD-卷"><a href="#挂载为-POD-卷" class="headerlink" title="挂载为 POD 卷"></a>挂载为 POD 卷</h3><ul>
+<li>configMap 中的数据可以在容器内挂载为文件，并且当 configMap 中的数据发生变动的时候，容器内的文件相应也会发生变动，但不会重载容器内的进程。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ConfigMap</span>                                     <span class="comment"># 创建 ConfigMap</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">nginx-config-volumes</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="attr">data:</span>                                               <span class="comment"># ConfigMap 中保存了两个数据，</span></span><br><span class="line">  <span class="attr">index:</span> <span class="string">|</span>                                          <span class="comment"># 数据1，它可以在 container 中使用 ENV 注入环境变量，也可以在 container 中使用 volumeMounts 挂载成为文件</span></span><br><span class="line">    <span class="string">&lt;h1&gt;this</span> <span class="string">is</span> <span class="string">a</span> <span class="string">test</span> <span class="string">page&lt;h1&gt;</span></span><br><span class="line">  <span class="attr">vhost:</span> <span class="string">|</span>                                          <span class="comment"># 数据2，它可以在 container 中使用 ENV 注入环境变量，也可以在 container 中使用 volumeMounts 挂载成为文件</span></span><br><span class="line">    <span class="string">server</span> <span class="string">&#123;</span>                                                                                                                                  </span><br><span class="line">        <span class="string">listen</span>       <span class="number">80</span><span class="string">;</span>                                                                                                                      </span><br><span class="line">        <span class="string">server_name</span>  <span class="string">localhost;</span>                                                                                                               </span><br><span class="line">                                                                                                                                              </span><br><span class="line">        <span class="string">location</span> <span class="string">/</span> <span class="string">&#123;</span>                                                                                                                          </span><br><span class="line">            <span class="string">root</span>   <span class="string">/usr/share/nginx/html;</span>                                                                                                     </span><br><span class="line">            <span class="string">index</span>  <span class="string">index.html</span> <span class="string">index.htm;</span>                                                                                                      </span><br><span class="line">        <span class="string">&#125;</span>                                                                                                                                     </span><br><span class="line">                                                                                                                                              </span><br><span class="line">        <span class="string">error_page</span>   <span class="number">500</span> <span class="number">502</span> <span class="number">503</span> <span class="number">504</span>  <span class="string">/50x.html;</span>                                                                                              </span><br><span class="line">        <span class="string">location</span> <span class="string">=</span> <span class="string">/50x.html</span> <span class="string">&#123;</span>                                                                                                                </span><br><span class="line">            <span class="string">root</span>   <span class="string">/usr/share/nginx/html;</span>                                                                                                     </span><br><span class="line">        <span class="string">&#125;</span>                                                                                                                                     </span><br><span class="line">                                                                                                                                              </span><br><span class="line">        <span class="string">location</span> <span class="string">=</span> <span class="string">/hostname.html</span> <span class="string">&#123;</span>                                                                                                           </span><br><span class="line">            <span class="string">alias</span> <span class="string">/etc/hostname;</span>                                                                                                              </span><br><span class="line">        <span class="string">&#125;</span>                                                                                                                                     </span><br><span class="line">    <span class="string">&#125;</span> </span><br><span class="line">    <span class="string">server</span> <span class="string">&#123;</span></span><br><span class="line">        <span class="string">server_name</span>  <span class="string">myapp.jinheng.com;</span></span><br><span class="line">        <span class="string">listen</span>  <span class="number">80</span><span class="string">;</span></span><br><span class="line">        <span class="string">root</span>  <span class="string">/data/web/html;</span></span><br><span class="line">    <span class="string">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">---</span></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-configmap-volumes-demo</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">jinheng.com/created-by:</span> <span class="string">"cluster amdin"</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">      <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">          <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">      <span class="attr">volumeMounts:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx-conf</span></span><br><span class="line">          <span class="attr">mountPath:</span> <span class="string">/etc/nginx/conf.d</span></span><br><span class="line">          <span class="attr">readOnly:</span> <span class="literal">true</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx-page</span></span><br><span class="line">          <span class="attr">mountPath:</span> <span class="string">/data/web/html/</span></span><br><span class="line">          <span class="attr">readOnly:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">volumes:</span>                                               <span class="comment"># 定义卷</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx-conf</span>                                   <span class="comment"># 定义卷的名字</span></span><br><span class="line">      <span class="attr">configMap:</span>                                         <span class="comment"># 该卷的类型为 configMap</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">nginx-config-volumes</span>                       <span class="comment"># 从命名空间中读取哪个名字的 configMap</span></span><br><span class="line">        <span class="attr">items:</span>                                           <span class="comment"># 定义 configMap 数据到文件的映射，如果不定义则使用 configMap 中的键为文件名称，值为文件内容</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">vhost</span>                                   <span class="comment"># 使用 configMap 哪个键</span></span><br><span class="line">            <span class="attr">path:</span> <span class="string">www.conf</span>                               <span class="comment"># 将 configMap 中的数据，映射为容器内哪个文件名称</span></span><br><span class="line">            <span class="attr">mode:</span> <span class="number">644</span>                                    <span class="comment"># 指明文件的权限</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx-page</span></span><br><span class="line">      <span class="attr">configMap:</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">nginx-config-volumes</span></span><br><span class="line">        <span class="attr">items:</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">index</span></span><br><span class="line">            <span class="attr">path:</span> <span class="string">index.html</span></span><br><span class="line">            <span class="attr">mode:</span> <span class="number">644</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动后进入容器查看文件是否正常挂载</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl <span class="built_in">exec</span> -it pod-configmap-volumes-demo -c myapp -- /bin/sh</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 curl 命令验证，是否能够正常使用</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ curl 10.244.2.104</span><br><span class="line">Hello MyApp | Version: v1 | &lt;a href=<span class="string">"hostname.html"</span>&gt;Pod Name&lt;/a&gt;</span><br><span class="line"></span><br><span class="line">$ curl -H <span class="string">"Host:myapp.jinheng.com"</span> 10.244.2.104</span><br><span class="line">&lt;h1&gt;this is a <span class="built_in">test</span> page&lt;h1&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="secret"><a href="#secret" class="headerlink" title="secret"></a>secret</h2><p>configMap 是明文存储数据的，如果需要存储敏感数据，则需要使用 secret ，secret 与 configMap 的作用基本一致，且 secret 中的数据不是明文存放的，而是 base64 编码保存的。</p>
+<ul>
+<li>secret 类型</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker-registry    <span class="comment"># 创建一个 Docker registry 使用的 secret</span></span><br><span class="line">generic            <span class="comment"># 从本地文件，目录或字面值创建一个 secret</span></span><br><span class="line">tls                <span class="comment"># 创建一个 TLS  secret</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>清单格式，详见：kubectl explain secret</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">apiVersion	&lt;string&gt;               <span class="comment"># API 版本</span></span><br><span class="line">data	    &lt;map[string]string&gt;    <span class="comment"># 以键值对列出数据，值需要经过 base64 加密</span></span><br><span class="line">kind	    &lt;string&gt;               <span class="comment"># 对象类型</span></span><br><span class="line">metadata	&lt;Object&gt;               <span class="comment"># 元数据</span></span><br><span class="line">stringData	&lt;map[string]string&gt;    <span class="comment"># 明文的数据</span></span><br><span class="line"><span class="built_in">type</span>	    &lt;string&gt;               <span class="comment"># 数据类型</span></span><br></pre></td></tr></table></figure>
+<h3 id="私有仓库认证1"><a href="#私有仓库认证1" class="headerlink" title="私有仓库认证1"></a>私有仓库认证1</h3><ul>
+<li>首先通过命令行创建出来 secret</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl create secret docker-registry regsecret --docker-server=registry-vpc.cn-hangzhou.aliyuncs.com --docker-username=admin --docker-password=123456 --docker-email=420123641@qq.com</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果想保存为文件可以</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl get secret regsecret -o yaml</span><br></pre></td></tr></table></figure>
+<ul>
+<li>POD 创建时候，从 docker hub 拉取镜像使用的用户名密码，kubectl explain pods.spec 的 imagePullSecrets 字段</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">secret-file-pod</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">mypod</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">redis</span></span><br><span class="line">  <span class="attr">imagePullSecrets:</span>                         <span class="comment"># 获取镜像需要的用户名密码</span></span><br><span class="line">   <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">regsecret</span>                        <span class="comment"># secret 对象</span></span><br></pre></td></tr></table></figure>
+<h3 id="私有仓库认证2"><a href="#私有仓库认证2" class="headerlink" title="私有仓库认证2"></a>私有仓库认证2</h3><ul>
+<li>首先通过命令行创建出来 secret</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl create secret docker-registry regsecret --docker-server=registry-vpc.cn-hangzhou.aliyuncs.com --docker-username=admin --docker-password=123456 --docker-email=420123641@qq.com</span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建自定义的 serviceaccount 对象，在 serviceaccount 对象上定义 image pull secrets</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">ServiceAccount</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">admin</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line"><span class="attr">imagePullSecrets:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">regsecret</span>                       <span class="comment"># 指定 secret</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>创建 POD 使用指定的 serviceaccount 对象</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-serviceaccount-demo</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">      <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">          <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">  <span class="attr">serviceAccountName:</span> <span class="string">admin</span>                          <span class="comment"># 使用 serviceaccount 进行拉取镜像的认证，这样更加安全</span></span><br></pre></td></tr></table></figure>
+<h3 id="创建-TLS-证书"><a href="#创建-TLS-证书" class="headerlink" title="创建 TLS 证书"></a>创建 TLS 证书</h3><ul>
+<li>首先通过命令行创建出来</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">kubectl create secret tls nginx-secret --cert=tls.crt --key=tls.key</span><br></pre></td></tr></table></figure>
+<ul>
+<li>secret 中的数据可以在容器内挂载为文件，然后在 nginx 容器内使用证书文件</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">pod-configmap-volumes-demo</span></span><br><span class="line">  <span class="attr">namespace:</span> <span class="string">default</span></span><br><span class="line">  <span class="attr">labels:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">myapp</span></span><br><span class="line">    <span class="attr">tier:</span> <span class="string">frontend</span></span><br><span class="line">  <span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">jinheng.com/created-by:</span> <span class="string">"cluster amdin"</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">myapp</span></span><br><span class="line">      <span class="attr">image:</span> <span class="string">ikubernetes/myapp:v1</span></span><br><span class="line">      <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">http</span></span><br><span class="line">          <span class="attr">containerPort:</span> <span class="number">80</span></span><br><span class="line">      <span class="attr">volumeMounts:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx-conf</span></span><br><span class="line">          <span class="attr">mountPath:</span> <span class="string">/etc/nginx/secret</span></span><br><span class="line">          <span class="attr">readOnly:</span> <span class="literal">true</span></span><br><span class="line">  <span class="attr">volumes:</span>                                               <span class="comment"># 定义卷</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx-conf</span>                                   <span class="comment"># 定义卷的名字</span></span><br><span class="line">      <span class="attr">configMap:</span>                                         <span class="comment"># 该卷的类型为 secret</span></span><br><span class="line">        <span class="attr">name:</span> <span class="string">nginx-secret</span>                               <span class="comment"># 从命名空间中读取哪个名字的 secret</span></span><br><span class="line">        <span class="attr">items:</span>                                           <span class="comment"># 定义 secret 数据到文件的映射，如果不定义则使用 secret 中的键为文件名称，值为文件内容</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">tls.key</span>                                 <span class="comment"># 使用 secret 哪个键</span></span><br><span class="line">            <span class="attr">path:</span> <span class="string">www.conf</span>                               <span class="comment"># 将 secret 中的数据，映射为容器内哪个文件名称</span></span><br><span class="line">            <span class="attr">mode:</span> <span class="number">644</span>                                    <span class="comment"># 指明文件的权限</span></span><br><span class="line">          <span class="bullet">-</span> <span class="attr">key:</span> <span class="string">tls.crt</span></span><br><span class="line">            <span class="attr">path:</span> <span class="string">index.html</span></span><br><span class="line">            <span class="attr">mode:</span> <span class="number">644</span></span><br></pre></td></tr></table></figure>
+<h3 id="设置secret为环境变量"><a href="#设置secret为环境变量" class="headerlink" title="设置secret为环境变量"></a>设置secret为环境变量</h3><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Pod</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">secret-env-pod</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">containers:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">mycontainer</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">redis</span></span><br><span class="line">    <span class="attr">env:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">SECRET_USERNAME</span></span><br><span class="line">        <span class="attr">valueFrom:</span></span><br><span class="line">          <span class="attr">secretKeyRef:</span></span><br><span class="line">            <span class="attr">name:</span> <span class="string">mysecret</span></span><br><span class="line">            <span class="attr">key:</span> <span class="string">username</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">SECRET_PASSWORD</span></span><br><span class="line">        <span class="attr">valueFrom:</span></span><br><span class="line">          <span class="attr">secretKeyRef:</span></span><br><span class="line">            <span class="attr">name:</span> <span class="string">mysecret</span></span><br><span class="line">            <span class="attr">key:</span> <span class="string">password</span></span><br><span class="line">  <span class="attr">restartPolicy:</span> <span class="string">Never</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/12/kubernetes/4.存储卷/" rel="next" title="存储卷">
+                <i class="fa fa-chevron-left"></i> 存储卷
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/13/kubernetes/6.调度策略/" rel="prev" title="调度策略">
+                调度策略 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#配置信息容器化"><span class="nav-number">1.</span> <span class="nav-text">配置信息容器化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#POD-获取环境变量"><span class="nav-number">1.1.</span> <span class="nav-text">POD 获取环境变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configMap"><span class="nav-number">1.2.</span> <span class="nav-text">configMap</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#注入-POD-ENV"><span class="nav-number">1.2.1.</span> <span class="nav-text">注入 POD ENV</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#挂载为-POD-卷"><span class="nav-number">1.2.2.</span> <span class="nav-text">挂载为 POD 卷</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#secret"><span class="nav-number">1.3.</span> <span class="nav-text">secret</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#私有仓库认证1"><span class="nav-number">1.3.1.</span> <span class="nav-text">私有仓库认证1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#私有仓库认证2"><span class="nav-number">1.3.2.</span> <span class="nav-text">私有仓库认证2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建-TLS-证书"><span class="nav-number">1.3.3.</span> <span class="nav-text">创建 TLS 证书</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设置secret为环境变量"><span class="nav-number">1.3.4.</span> <span class="nav-text">设置secret为环境变量</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

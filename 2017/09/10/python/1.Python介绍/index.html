@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Python简介Python 的设计具有很强的可读性，相比其他语言经常使用英文关键字，其他语言的一些标点符号，它具有比其他语言更有特色语法结构。  Python 是一种解释型语言：这意味着开发过程中没有了编译这个环节。类似于PHP和Perl语言。 Python 是交互式语言：这意味着，您可以在一个Python提示符，直接互动执行写你的程序。 Python 是面向对象语言: 这意味着Python支持">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python介绍和环境">
+<meta property="og:url" content="https://yangjinheng.github.io/2017/09/10/python/1.Python介绍/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="Python简介Python 的设计具有很强的可读性，相比其他语言经常使用英文关键字，其他语言的一些标点符号，它具有比其他语言更有特色语法结构。  Python 是一种解释型语言：这意味着开发过程中没有了编译这个环节。类似于PHP和Perl语言。 Python 是交互式语言：这意味着，您可以在一个Python提示符，直接互动执行写你的程序。 Python 是面向对象语言: 这意味着Python支持">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-11-26T07:25:04.475Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python介绍和环境">
+<meta name="twitter:description" content="Python简介Python 的设计具有很强的可读性，相比其他语言经常使用英文关键字，其他语言的一些标点符号，它具有比其他语言更有特色语法结构。  Python 是一种解释型语言：这意味着开发过程中没有了编译这个环节。类似于PHP和Perl语言。 Python 是交互式语言：这意味着，您可以在一个Python提示符，直接互动执行写你的程序。 Python 是面向对象语言: 这意味着Python支持">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2017/09/10/python/1.Python介绍/">
+
+
+
+
+
+  <title>Python介绍和环境 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2017/09/10/python/1.Python介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python介绍和环境</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-10T00:00:00+08:00">
+                2017-09-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Python简介"><a href="#Python简介" class="headerlink" title="Python简介"></a>Python简介</h1><p>Python 的设计具有很强的可读性，相比其他语言经常使用英文关键字，其他语言的一些标点符号，它具有比其他语言更有特色语法结构。</p>
+<ul>
+<li>Python 是一种解释型语言：这意味着开发过程中没有了编译这个环节。类似于PHP和Perl语言。</li>
+<li>Python 是交互式语言：这意味着，您可以在一个Python提示符，直接互动执行写你的程序。</li>
+<li>Python 是面向对象语言: 这意味着Python支持面向对象的风格或代码封装在对象的编程技术。</li>
+<li>Python 是动态、强类型语言：这意味着不用给变量指定数据类型，它会在第一次赋值给变量时在内部将数据类型记录下来。</li>
+</ul>
+<h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>Python使用引用计数方式来进行垃圾回收的，当一个对象引用计数小于1的时候将被使用标记清除的方法从内存中清除，标记清除就是将对象标记为空白，这种算法的缺点是会产生内存碎片。</p>
+<h2 id="基础语法"><a href="#基础语法" class="headerlink" title="基础语法"></a>基础语法</h2><ol>
+<li>转义序列：\,\t,\r,\n,\’,\”，具体见：man ascii，前缀r/R会让转义序列失效。</li>
+<li>缩进：Python使用缩进的层级来表示代码层次关系。</li>
+<li>代码续行：在行尾使用\，来表示一行未完成，下一行将继续，如果使用括号，认为括号内是一个整体。</li>
+<li>python 的变量名自定义函数名，只能包括字母数字下划线，且数字不能开头。</li>
+<li>不能使用 python 内部的关键字，例如：def，class，等。</li>
+</ol>
+<h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><p>Python的对象从概念上大致分为四类：</p>
+<p>数值对象（Math）：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Float（浮点数）、int（整数）、Complex（复数）</span><br></pre></td></tr></table></figure>
+<p>容纳其他对象的集合对象（Contaniner）</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">List（列表）、Dict（字典）、String（字符串）、Tuple（元组）</span><br></pre></td></tr></table></figure>
+<p>表示程序结构的对象（Composition）</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Class（类）、Method（方法）、Fuction（函数）、Module（模块）、File（文件）</span><br></pre></td></tr></table></figure>
+<p>Python内部对象（Internal）</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Buffer（二进制对象）、Type、Frame、Cell、Code</span><br></pre></td></tr></table></figure>
+<h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2><ol>
+<li>列表：Python关键字标记为 list，用来表示“顺序的数据”</li>
+<li>元祖：Python关键字标记为 tuple，用来表示“不可修改的顺序数据”</li>
+<li>字典：Python关键字标记为 dict，用来表示“有别名的数据”</li>
+<li>集合：Python关键字标记为 set，用来表示“没有顺序的数据”</li>
+</ol>
+<h2 id="非内置数据结构"><a href="#非内置数据结构" class="headerlink" title="非内置数据结构"></a>非内置数据结构</h2><ol>
+<li>堆：通常是由完全二叉树实现，可以看作一棵树的数组对象，堆是应用程序在运行的时候请求操作系统分配给自己内存，一般是申请/给予的过程，需要注意的是堆是在程序运行时，而不是在程序编译时。</li>
+<li>栈：正好与队列相反，它实现了后进先出(LOFO)，对于堆栈的所有数据操作，都是在栈的顶部完成的，只可以查看栈顶部的数据，只能够向顶部压入数据，也只能在顶部弹出数据，这个结构主要用于递归。</li>
+<li>队列：用来表示“先进先出”的数据(FIFO)，形象的比喻就像“毛毛虫”，它是先吃的东西，先消化拉出去。在开发中常用的消息处理，就是先来的消息，先“消化”，最后来的最后“消化”。</li>
+<li>链表：链表是在非连续的内存单元中保存数据，并且通过指针将各内存单元相链接在一起，链表不需要事先申请固定大小的内存空间，对于大数据检索等比较常用。</li>
+<li>二叉树：表示父子关系的数据，就更加抽象了，暂不了解。</li>
+</ol>
+<h1 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h1><h2 id="pip"><a href="#pip" class="headerlink" title="pip"></a>pip</h2><ul>
+<li>配置 Pip 源为国内</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mkdir .pip</span><br><span class="line">echo &apos;[global]</span><br><span class="line">trusted-host =  mirrors.aliyun.com</span><br><span class="line">index-url = http://mirrors.aliyun.com/pypi/simple&apos; &gt;~/.pip/pip.conf</span><br><span class="line"></span><br><span class="line">cat &gt;~/.pip/pip.conf&lt;&lt;EOF</span><br><span class="line">[global]</span><br><span class="line">index-url = http://pypi.douban.com/simple</span><br><span class="line">[install]</span><br><span class="line">trusted-host=pypi.douban.com</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line">cat &gt;~/.pip/pip.conf&lt;&lt;EOF</span><br><span class="line">[global]</span><br><span class="line">index-url=http://mirrors.aliyun.com/pypi/simple/</span><br><span class="line">[install]</span><br><span class="line">trusted-host=mirrors.aliyun.com</span><br><span class="line">EOF</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Freeze 功能，备份当前 pip 包到一个名单，然后到另外的环境恢复</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip freeze &gt; /tmp/list              # 冻结配置且备份为文件</span><br><span class="line">pip install -r /tmp/list            # 进入另外的 pyenv 虚拟环境内恢复</span><br></pre></td></tr></table></figure>
+<h2 id="pyenv"><a href="#pyenv" class="headerlink" title="pyenv"></a>pyenv</h2><ul>
+<li>Github 地址</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https://github.com/pyenv/pyenv</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装依赖</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum -y install gcc make git patch gdbm-devel openssl-devel sqlite-devel readline-devel zlib-devel bzip2-devel</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装脚本</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">curl -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置用户环境变量</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">export PATH=&quot;/home/python/.pyenv/bin:$PATH&quot;</span><br><span class="line">eval &quot;$(pyenv init -)&quot;</span><br><span class="line">eval &quot;$(pyenv virtualenv-init -)&quot;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看帮助</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pyenv help                          # 查看命令帮助 </span><br><span class="line">pyenv version                       # 查看当前版本 </span><br><span class="line">pyenv versions                      # 查看所有版本 </span><br><span class="line">pyenv install -l                    # 查看可安装版本</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装python</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pyenv install --list                # 查看可以安装的 Python 版本</span><br><span class="line">pyenv uninstall &lt;version&gt;           # 指定安装某版本 Python</span><br><span class="line">pyenv uninstall &lt;version&gt;           # 指定卸载某个版本 Python</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置环境</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pyenv global 3.5.3                  # 设置全局 Python 版本</span><br><span class="line">pyenv shell 3.5.3                   # 设置会话 Python 版本</span><br><span class="line">pyenv local 3.5.3                   # 设置目录 Python 版本</span><br><span class="line">pyenv local system                  # 恢复系统 Python 版本</span><br></pre></td></tr></table></figure>
+<ul>
+<li>虚拟环境，虚拟环境之间的包是互相隔离的</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pyenv virtualenv 3.5.3 dev          # 创建虚拟环境</span><br><span class="line">pyenv local dev                     # 设置虚拟环境</span><br></pre></td></tr></table></figure>
+<h2 id="virtualenv"><a href="#virtualenv" class="headerlink" title="virtualenv"></a>virtualenv</h2><ul>
+<li>安装 Python</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ ./configure --prefix=/usr/<span class="built_in">local</span>/python3.7 --<span class="built_in">enable</span>-optimizations --<span class="built_in">enable</span>-shared LDFLAGS=-Wl,-rpath=/usr/<span class="built_in">local</span>/python3.7/lib</span><br><span class="line"></span><br><span class="line">$ make &amp;&amp; make altinstall</span><br><span class="line"></span><br><span class="line">$ ln -svf /usr/<span class="built_in">local</span>/python3.7/bin/python3.7 /usr/<span class="built_in">local</span>/bin/</span><br><span class="line">$ ln -svf /usr/<span class="built_in">local</span>/python3.7/bin/python3.7 /usr/<span class="built_in">local</span>/bin/python3</span><br><span class="line">$ ln -svf /usr/<span class="built_in">local</span>/python3.7/bin/pip3.7 /usr/<span class="built_in">local</span>/bin/</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用虚拟环境并进入</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ python3 -m venv tutorial-env                <span class="comment"># 创建虚拟环境</span></span><br><span class="line">$ <span class="built_in">source</span> tutorial-env/bin/activate            <span class="comment"># 激活虚拟环境，使用 deactivate 退出</span></span><br><span class="line">$ pip install novas                           <span class="comment"># 在虚拟环境中安装包</span></span><br><span class="line">$ pip freeze &gt; requirements.txt               <span class="comment"># 生成依赖文件</span></span><br></pre></td></tr></table></figure>
+<h2 id="Jupyter"><a href="#Jupyter" class="headerlink" title="Jupyter"></a>Jupyter</h2><ul>
+<li>安装 Jupyter，Ipython 作为依赖组件也会被安装</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip install jupyter</span><br></pre></td></tr></table></figure>
+<ul>
+<li>修改 Jupyter 密码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">jupyter notebook password</span><br></pre></td></tr></table></figure>
+<ul>
+<li>启动 Jupyter，之后就可以在网页查看了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">jupyter notebook --ip=0.0.0.0 --port=80 --allow-root</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/21/Linux/git/" rel="next" title="GIT">
+                <i class="fa fa-chevron-left"></i> GIT
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/11/python/2.运算符和数据类型/" rel="prev" title="运算符和数据类型">
+                运算符和数据类型 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Python简介"><span class="nav-number">1.</span> <span class="nav-text">Python简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#垃圾回收"><span class="nav-number">1.1.</span> <span class="nav-text">垃圾回收</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础语法"><span class="nav-number">1.2.</span> <span class="nav-text">基础语法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据类型"><span class="nav-number">1.3.</span> <span class="nav-text">数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据结构"><span class="nav-number">1.4.</span> <span class="nav-text">数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非内置数据结构"><span class="nav-number">1.5.</span> <span class="nav-text">非内置数据结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#开发环境"><span class="nav-number">2.</span> <span class="nav-text">开发环境</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pip"><span class="nav-number">2.1.</span> <span class="nav-text">pip</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pyenv"><span class="nav-number">2.2.</span> <span class="nav-text">pyenv</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virtualenv"><span class="nav-number">2.3.</span> <span class="nav-text">virtualenv</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Jupyter"><span class="nav-number">2.4.</span> <span class="nav-text">Jupyter</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

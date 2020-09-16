@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="安装软件压测软件 cpuburn  计算圆周率 echo &amp;quot;scale=10000; 4*a(1)&amp;quot; | bc -l -q CPU测试 https://patrickmn.com/projects/cpuburn/  memtester  内存测试 http://pyropus.ca/software/memtester/  硬盘测试  硬盘写入：time dd if=/dev">
+<meta property="og:type" content="article">
+<meta property="og:title" content="常用监控软件整理">
+<meta property="og:url" content="https://yangjinheng.github.io/2018/10/29/Linux/系统监控/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="安装软件压测软件 cpuburn  计算圆周率 echo &amp;quot;scale=10000; 4*a(1)&amp;quot; | bc -l -q CPU测试 https://patrickmn.com/projects/cpuburn/  memtester  内存测试 http://pyropus.ca/software/memtester/  硬盘测试  硬盘写入：time dd if=/dev">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-07T14:40:58.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="常用监控软件整理">
+<meta name="twitter:description" content="安装软件压测软件 cpuburn  计算圆周率 echo &amp;quot;scale=10000; 4*a(1)&amp;quot; | bc -l -q CPU测试 https://patrickmn.com/projects/cpuburn/  memtester  内存测试 http://pyropus.ca/software/memtester/  硬盘测试  硬盘写入：time dd if=/dev">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2018/10/29/Linux/系统监控/">
+
+
+
+
+
+  <title>常用监控软件整理 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2018/10/29/Linux/系统监控/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">常用监控软件整理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-10-29T00:00:00+08:00">
+                2018-10-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/运维笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">运维笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="安装软件"><a href="#安装软件" class="headerlink" title="安装软件"></a>安装软件</h1><h2 id="压测软件"><a href="#压测软件" class="headerlink" title="压测软件"></a>压测软件</h2><ul>
+<li>cpuburn</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">计算圆周率 echo &quot;scale=10000; 4*a(1)&quot; | bc -l -q</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">CPU测试 https://patrickmn.com/projects/cpuburn/</span><br></pre></td></tr></table></figure>
+<ul>
+<li>memtester</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">内存测试 http://pyropus.ca/software/memtester/</span><br></pre></td></tr></table></figure>
+<ul>
+<li>硬盘测试</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">硬盘写入：time dd if=/dev/zero of=test.data bs=100M count=2，time dd if=/dev/zero of=test.data bs=4k count=100000</span><br><span class="line">硬盘读取：time dd if=/dev/sda of=/dev/null bs=4k</span><br></pre></td></tr></table></figure>
+<h2 id="相关命令"><a href="#相关命令" class="headerlink" title="相关命令"></a>相关命令</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum install -y sysstat bind-utils iotop nload bwm-ng nethogs iftop</span><br></pre></td></tr></table></figure>
+<h1 id="进程相关"><a href="#进程相关" class="headerlink" title="进程相关"></a>进程相关</h1><h2 id="pidof-通过名称查找pid"><a href="#pidof-通过名称查找pid" class="headerlink" title="pidof 通过名称查找pid"></a>pidof 通过名称查找pid</h2><ul>
+<li>作用</li>
+</ul>
+<p>通过精确的进程名称查找进程的pid</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@yangjinheng data]# pidof ssh</span><br><span class="line">[root@yangjinheng data]# pidof sshd</span><br><span class="line">13119 730</span><br></pre></td></tr></table></figure>
+<h2 id="pgrep-通过名称模糊查找pid"><a href="#pgrep-通过名称模糊查找pid" class="headerlink" title="pgrep 通过名称模糊查找pid"></a>pgrep 通过名称模糊查找pid</h2><ul>
+<li>作用</li>
+</ul>
+<p>通过模糊的进程名称查找进程的 pid</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@yangjinheng data]# pgrep sshd</span><br><span class="line">730</span><br><span class="line">13119</span><br><span class="line">13342</span><br><span class="line">13343</span><br><span class="line">[root@yangjinheng data]# pgrep ssh</span><br><span class="line">730</span><br><span class="line">13119</span><br></pre></td></tr></table></figure>
+<h1 id="CPU内存"><a href="#CPU内存" class="headerlink" title="CPU内存"></a>CPU内存</h1><h2 id="lscpu-CPU信息"><a href="#lscpu-CPU信息" class="headerlink" title="lscpu CPU信息"></a>lscpu CPU信息</h2><ul>
+<li>作用</li>
+</ul>
+<p>查看 CPU 信息</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# lscpu </span><br><span class="line">Architecture:          x86_64</span><br><span class="line">CPU op-mode(s):        32-bit, 64-bit</span><br><span class="line">Byte Order:            Little Endian</span><br><span class="line">CPU(s):                8</span><br><span class="line">On-line CPU(s) list:   0-7</span><br><span class="line">Thread(s) per core:    1</span><br><span class="line">Core(s) per socket:    8</span><br><span class="line">Socket(s):             1</span><br><span class="line">NUMA node(s):          1</span><br><span class="line">Vendor ID:             GenuineIntel</span><br><span class="line">CPU family:            6</span><br><span class="line">Model:                 60</span><br><span class="line">Model name:            Intel(R) Core(TM) i7-4712MQ CPU @ 2.30GHz</span><br><span class="line">Stepping:              3</span><br><span class="line">CPU MHz:               2301.000</span><br><span class="line">BogoMIPS:              4602.00</span><br><span class="line">Hypervisor vendor:     VMware</span><br><span class="line">Virtualization type:   full</span><br><span class="line">L1d cache:             32K</span><br><span class="line">L1i cache:             32K</span><br><span class="line">L2 cache:              256K</span><br><span class="line">L3 cache:              6144K</span><br><span class="line">NUMA node0 CPU(s):     0-7</span><br><span class="line">Flags:                 fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc arch_perfmon nopl xtopology tsc_reliable nonstop_tsc eagerfpu pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm ibrs ibpb stibp fsgsbase tsc_adjust bmi1 avx2 smep bmi2 invpcid xsaveopt arat spec_ctrl intel_stibp arch_capabilities</span><br></pre></td></tr></table></figure>
+<h2 id="uptime-系统负载"><a href="#uptime-系统负载" class="headerlink" title="uptime 系统负载"></a>uptime 系统负载</h2><ul>
+<li>作用</li>
+</ul>
+<p>显示系统正常运行的时间，当前多少用户登陆终端，过去的1分钟、5分钟、15分钟系统平均负载，与 <code>w、top</code> 命令结果的第一行相同。</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@www ~]<span class="comment"># uptime</span></span><br><span class="line"> 11:38:02 up 10 min,  4 users,  load average: 3.56, 1.63, 0.68</span><br></pre></td></tr></table></figure>
+<ul>
+<li>负载平均值含义</li>
+</ul>
+<p>系统负载平均值是处于可运行或不可中断状态的平均进程数，处于可运行状态的进程要么正在使用 CPU ，要么等待使用 CPU ，处于不可中断状态的进程正在等待某些 I/O 访问，例如等待磁盘 I/O 完成，负载平均值不是一个标准化的值，它与系统中 CPU 的数量相关，如：对于单颗 CPU 平均负载为 1 表示系统满负荷工作，而对于 4 颗 CPU 则表示系统的 75% 时间处于空闲状态。</p>
+<h2 id="w-用户负载"><a href="#w-用户负载" class="headerlink" title="w 用户负载"></a>w 用户负载</h2><ul>
+<li>作用</li>
+</ul>
+<p>查询登录当前系统的用户信息，以及这些用户目前正在做什么操作，它的第一行与 uptime 是一样的</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# w</span><br><span class="line"> 10:01:13 up 23 min,  1 user,  load average: 0.00, 0.01, 0.01</span><br><span class="line">USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT</span><br><span class="line">root     pts/0    172.16.100.2     09:37    1.00s  0.19s  0.00s w</span><br></pre></td></tr></table></figure>
+<ul>
+<li>字段含义</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>USER</td>
+<td>登陆用户名</td>
+</tr>
+<tr>
+<td>TTY</td>
+<td>虚拟终端号</td>
+</tr>
+<tr>
+<td>FROM</td>
+<td>来自哪个 IP 地址</td>
+</tr>
+<tr>
+<td>LOGIN@</td>
+<td>什么时间登陆的</td>
+</tr>
+<tr>
+<td>JCPU</td>
+<td>JCPU 时间是隶属于 tty 的所有进程使用的时间，它不包括过去的后台作业，但包含当前运行的后台作业。</td>
+</tr>
+<tr>
+<td>PCPU</td>
+<td>PCPU 时间是当前进程使用的时间。</td>
+</tr>
+<tr>
+<td>WHAT</td>
+<td>当前运行的程序名称是什么。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="top-进程信息"><a href="#top-进程信息" class="headerlink" title="top 进程信息"></a>top 进程信息</h2><ul>
+<li>作用</li>
+</ul>
+<p>持续显示 Linux 进程信息</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">top - 15:29:25 up  2:45,  2 users,  load average: 0.49, 0.99, 0.86</span><br><span class="line">Tasks: 201 total,   3 running, 198 sleeping,   0 stopped,   0 zombie</span><br><span class="line">%Cpu(s): 12.6 us,  0.2 sy,  0.0 ni, 87.2 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st</span><br><span class="line">KiB Mem :   481232 total,     5880 free,   417856 used,    57496 buff/cache</span><br><span class="line">KiB Swap:   524284 total,   481608 free,    42676 used.    16724 avail Mem </span><br><span class="line"></span><br><span class="line">   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND                                 </span><br><span class="line">  6385 root      20   0  362628 358492      0 R 100.0 74.5   0:05.44 memtester                               </span><br><span class="line">  6386 root      20   0  161968   1876   1128 R   1.7  0.4   0:00.26 top                                     </span><br><span class="line">     1 root      20   0  191248    528      4 S   0.0  0.1   0:02.40 systemd                                 </span><br><span class="line">     2 root      20   0       0      0      0 S   0.0  0.0   0:00.08 kthreadd                                </span><br><span class="line">     3 root      20   0       0      0      0 S   0.0  0.0   0:00.03 ksoftirqd/0                             </span><br><span class="line">     5 root       0 -20       0      0      0 S   0.0  0.0   0:00.00 kworker/0:0H                            </span><br><span class="line">     7 root      rt   0       0      0      0 S   0.0  0.0   0:00.28 migration/0                             </span><br><span class="line">     8 root      20   0       0      0      0 S   0.0  0.0   0:00.00 rcu_bh                                  </span><br><span class="line">     9 root      20   0       0      0      0 S   0.0  0.0   0:01.67 rcu_sched</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Tasks 行含义</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>total</td>
+<td>总任务数</td>
+</tr>
+<tr>
+<td>running</td>
+<td>处于运行状态的任务数</td>
+</tr>
+<tr>
+<td>sleeping</td>
+<td>处于睡眠状态的任务数</td>
+</tr>
+<tr>
+<td>stopped</td>
+<td>处于停止状态的任务数</td>
+</tr>
+<tr>
+<td>zombie</td>
+<td>处于僵尸状态的任务树</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>%Cpu(s) 行含义</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>us</td>
+<td>所有进程用户态消耗CPU的时间百分比，较高时，说明进程用户态消耗的CPU时间多，如果长期大于50%，需要考虑优化应用程序。</td>
+</tr>
+<tr>
+<td>sy</td>
+<td>所有进程内核态消耗CPU的时间百分比。较高时，说明进程内核态消耗的CPU时间多；如果us+sy超过80%，就表明CPU资源存在不足。</td>
+</tr>
+<tr>
+<td>ni</td>
+<td>用做nice加权的进程分配的用户态cpu时间百分比。</td>
+</tr>
+<tr>
+<td>id</td>
+<td>CPU处在空闲状态的时间百分比。</td>
+</tr>
+<tr>
+<td>wa</td>
+<td>进程IO等待所占CPU时间百分比，wa 值越高，说明IO等待越严重。如果wa值超过20%，说明IO等待严重。</td>
+</tr>
+<tr>
+<td>hi</td>
+<td>硬中断消耗CPU时间百分比</td>
+</tr>
+<tr>
+<td>si</td>
+<td>软中断消耗CPU时间百分比</td>
+</tr>
+<tr>
+<td>st</td>
+<td>虚拟机使用CPU时间百分比</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>KiB Mem</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>total</td>
+<td>总内存大小</td>
+</tr>
+<tr>
+<td>free</td>
+<td>空闲内存大小</td>
+</tr>
+<tr>
+<td>used</td>
+<td>已使用内存大小</td>
+</tr>
+<tr>
+<td>buff/cache</td>
+<td>已缓冲、缓存内存大小</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>KiB Swap</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>total</td>
+<td>总交换分区大小</td>
+</tr>
+<tr>
+<td>free</td>
+<td>空闲交换分区大小</td>
+</tr>
+<tr>
+<td>used</td>
+<td>已使用交换分区大小</td>
+</tr>
+<tr>
+<td>avail Mem</td>
+<td>可用于进程下一次分配的<strong>物理内存数量</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>字段含义</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PID</td>
+<td>进程 ID</td>
+</tr>
+<tr>
+<td>USER</td>
+<td>进程用户</td>
+</tr>
+<tr>
+<td>PR</td>
+<td>进程的邮件级别，动态优先级，是内核展示给用户看的。</td>
+</tr>
+<tr>
+<td>NI</td>
+<td>Nice 值，静态优先级，这个值越小，表示进程 ”优先级” 越高，可用过 nice 命令调整。</td>
+</tr>
+<tr>
+<td>VIRT</td>
+<td>Virtual Memory Usage 虚拟内存，表示进程需要的内存量，单位KB。</td>
+</tr>
+<tr>
+<td>RES</td>
+<td>Resident Memory Usage 常驻内存，单位KB，表示进程实际占用的内存量，单位KB。</td>
+</tr>
+<tr>
+<td>SHR</td>
+<td>Shared Memory 共享内存，单位KB，进程虽然使用了某个共享库的一个函数，但会显示整个库占用内存量。</td>
+</tr>
+<tr>
+<td>S</td>
+<td>进程状态，有：（R=运行）,（D=不可中断的睡眠状态）,（S=睡眠）,（T=跟踪/停止）,（Z=僵尸进程）</td>
+</tr>
+<tr>
+<td>%CPU</td>
+<td>进程占用 CPU 百分比，例如；一个进程以多线程运行在 8 核 CPU 上，可能达到 800</td>
+</tr>
+<tr>
+<td>%MEM</td>
+<td>进程占用总内存百分比。</td>
+</tr>
+<tr>
+<td>TIME+</td>
+<td>进程运行时间</td>
+</tr>
+<tr>
+<td>COMMAND</td>
+<td>进程名称</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>使用技巧</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>大写A</code></td>
+<td>分类显示各种资源占用最高的进程，快速定位进程</td>
+</tr>
+<tr>
+<td><code>大写 P</code></td>
+<td>按 CPU 使用排序</td>
+</tr>
+<tr>
+<td><code>大写M</code></td>
+<td>按 内存 使用排序</td>
+</tr>
+<tr>
+<td><code>大写H</code></td>
+<td>查看每个线程</td>
+</tr>
+<tr>
+<td><code>x、z</code></td>
+<td>高亮显示，能快速定位正在运行的程序</td>
+</tr>
+<tr>
+<td><code>f</code></td>
+<td>定制显示格式</td>
+</tr>
+<tr>
+<td><code>c</code></td>
+<td>显示完整的COMMAND</td>
+</tr>
+</tbody>
+</table>
+<h2 id="vmstat-虚拟内存统计"><a href="#vmstat-虚拟内存统计" class="headerlink" title="vmstat 虚拟内存统计"></a>vmstat 虚拟内存统计</h2><ul>
+<li>作用</li>
+</ul>
+<p>报告虚拟内存统计信息</p>
+<ul>
+<li>选项</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-a：显示活动内页；</span><br><span class="line">-f：显示启动后创建的进程总数；</span><br><span class="line">-m：显示slab信息；</span><br><span class="line">-n：头信息仅显示一次；</span><br><span class="line">-s：以表格方式显示事件计数器和内存状态；</span><br><span class="line">-d：报告磁盘状态；</span><br><span class="line">-p：显示指定的硬盘分区状态；</span><br><span class="line">-S：输出信息的单位。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----</span><br><span class="line"> r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st</span><br><span class="line">26  0  43244 316700     28  88092    0    0     0     0 8061  954 100  0  0  0  0</span><br><span class="line">24  0  43244 316700     28  88092    0    0     0     0 7701  970 100  0  0  0  0</span><br><span class="line">24  0  43244 316604     28  88172    0    0     0     0 7966  974 100  0  0  0  0</span><br><span class="line">24  0  43244 316604     28  88172    0    0     0     0 8059  964 100  0  0  0  0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>vmstat 字段含义</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r</td>
+<td>表示有多少个任务在运行，一秒钟之内平均有多少进程在使用CPU，排队或者计算。</td>
+</tr>
+<tr>
+<td>b</td>
+<td>等待磁盘IO或者IO调用的完成而被阻塞进程数量。</td>
+</tr>
+<tr>
+<td>swpd</td>
+<td>使用 swap 分区的大小，值大并且不断变化，则内存溢出或者有问题。</td>
+</tr>
+<tr>
+<td>free</td>
+<td>空闲物理内存大小，如果free很少，但是si和so也很少（大多时候是0），那么不用担心，系统性能这时不会受到影响的。</td>
+</tr>
+<tr>
+<td>buff</td>
+<td>用作缓冲的内存大小。</td>
+</tr>
+<tr>
+<td>cache</td>
+<td>用作缓存的内存大小，cache 值大的时候，说明cache处的文件数多，如果频繁访问到的文件都能被cache处，那么磁盘的读IO bi会非常小。</td>
+</tr>
+<tr>
+<td>si</td>
+<td>每秒从交换区写到内存的大小，由磁盘调入内存。</td>
+</tr>
+<tr>
+<td>so</td>
+<td>每秒写入交换区的内存大小，由内存调入磁盘，如果si so长期大于0时，系统性能会受到影响，磁盘IO和CPU资源都会被消耗。</td>
+</tr>
+<tr>
+<td>bi</td>
+<td>每秒读取的块数</td>
+</tr>
+<tr>
+<td>bo</td>
+<td>每秒写入的块数，随机磁盘读写的时候，这2个值越大（如超出1024k)，能看到CPU在IO等待的值也会越大。</td>
+</tr>
+<tr>
+<td>in</td>
+<td>每秒中断数，包括时钟中断。</td>
+</tr>
+<tr>
+<td>cs</td>
+<td>每秒上下文切换数。这2个值越大，会看到由内核消耗的CPU时间会越大。</td>
+</tr>
+<tr>
+<td>us</td>
+<td>所有进程用户态消耗CPU的时间百分比，较高时，说明进程用户态消耗的CPU时间多，如果长期大于50%，需要考虑优化应用程序。</td>
+</tr>
+<tr>
+<td>sy</td>
+<td>所有进程内核态消耗CPU的时间百分比。较高时，说明进程内核态消耗的CPU时间多；如果us+sy超过80%，就表明CPU资源存在不足。</td>
+</tr>
+<tr>
+<td>id</td>
+<td>CPU处在空闲状态的时间百分比。</td>
+</tr>
+<tr>
+<td>wa</td>
+<td>进程IO等待所占CPU时间百分比，wa 值越高，说明IO等待越严重。如果wa值超过20%，说明IO等待严重。</td>
+</tr>
+<tr>
+<td>st</td>
+<td>虚拟机使用CPU时间百分比</td>
+</tr>
+</tbody>
+</table>
+<h2 id="sar-系统历史报告"><a href="#sar-系统历史报告" class="headerlink" title="sar 系统历史报告"></a>sar 系统历史报告</h2><ul>
+<li>作用</li>
+</ul>
+<p>收集，报告，保存系统活动信息。</p>
+<h3 id="整体CPU统计"><a href="#整体CPU统计" class="headerlink" title="整体CPU统计"></a>整体CPU统计</h3><p><code>sar -u</code>，显示负载，默认显示每十分钟的采样的历史信息</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">05:30:02 PM     CPU     %user     %nice   %system   %iowait    %steal     %idle</span><br><span class="line">05:40:01 PM     all      0.01      0.00      0.03      0.00      0.00     99.96</span><br><span class="line">05:50:01 PM     all      0.00      0.00      0.02      0.00      0.00     99.98</span><br><span class="line">06:00:01 PM     all      0.00      0.00      0.02      0.00      0.00     99.98</span><br><span class="line">06:10:01 PM     all      0.00      0.00      0.02      0.00      0.00     99.98</span><br><span class="line">06:20:01 PM     all      0.00      0.00      0.02      0.00      0.00     99.98</span><br><span class="line">06:30:01 PM     all      0.01      0.00      0.04      0.00      0.00     99.94</span><br><span class="line">06:40:01 PM     all     82.56      0.00      0.06      0.00      0.00     17.38</span><br><span class="line">Average:        all     11.99      0.18      0.67      0.06      0.00     87.10</span><br></pre></td></tr></table></figure>
+<h3 id="内存使用"><a href="#内存使用" class="headerlink" title="内存使用"></a>内存使用</h3><ul>
+<li><code>sar -r</code>，显示内存，默认显示每十分钟的采样的历史信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">12:50:01 PM kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact   kbdirty</span><br><span class="line">05:30:02 PM    316476    164756     34.24        28     45020    215940     21.48      5692     45632         0</span><br><span class="line">05:40:01 PM    313176    168056     34.92        28     46376    215860     21.47      6856     46108         0</span><br><span class="line">05:50:01 PM    304360    176872     36.75        28     54044    215888     21.47      8516     53472         0</span><br><span class="line">06:00:01 PM    304352    176880     36.76        28     54136    215936     21.48      8476     53576         0</span><br><span class="line">06:10:01 PM    303344    177888     36.97        28     54736    215928     21.47      8492     54204         0</span><br><span class="line">06:20:01 PM    302964    178268     37.04        28     54764    215900     21.47      8596     54232         0</span><br><span class="line">06:30:01 PM    302684    178548     37.10        28     55040    215936     21.48      8748     54260         0</span><br><span class="line">06:40:01 PM    300564    180668     37.54        28     55364    251628     25.02      9724     54464         0</span><br><span class="line">Average:       222359    258873     53.79       709     61087    293767     29.22     37414     57209         2</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">kbmemfree：这个值和free命令中的free值基本一致,所以它不包括buffer和cache的空间.</span><br><span class="line">kbmemused：这个值和free命令中的used值基本一致,所以它包括buffer和cache的空间.</span><br><span class="line">%memused：物理内存使用率，这个值是kbmemused和内存总量(不包括swap)的一个百分比.</span><br><span class="line">kbbuffers和kbcached：这两个值就是free命令中的buffer和cache.</span><br><span class="line">kbcommit：保证当前系统所需要的内存,即为了确保不溢出而需要的内存(RAM+swap).</span><br><span class="line">%commit：这个值是kbcommit与内存总量(包括swap)的一个百分比.</span><br></pre></td></tr></table></figure>
+<h3 id="整体I-O"><a href="#整体I-O" class="headerlink" title="整体I/O"></a>整体I/O</h3><ul>
+<li><code>sar -b</code>，显示 I / O 和传输速率，默认显示每十分钟的采样的历史信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">12:50:01 PM       tps      rtps      wtps   bread/s   bwrtn/s</span><br><span class="line">05:30:02 PM    164.67    134.61     30.05  12152.04   9761.30</span><br><span class="line">05:40:01 PM      0.12      0.06      0.06      3.59      0.66</span><br><span class="line">05:50:01 PM      0.21      0.16      0.05     29.92      0.56</span><br><span class="line">06:00:01 PM      0.03      0.01      0.02      0.05      0.22</span><br><span class="line">06:10:01 PM      0.12      0.06      0.05      2.65      0.60</span><br><span class="line">06:20:01 PM      0.04      0.00      0.04      0.04      0.36</span><br><span class="line">06:30:01 PM      0.07      0.03      0.04      1.16      0.37</span><br><span class="line">06:40:01 PM      0.06      0.03      0.03      1.37      0.46</span><br><span class="line">Average:        33.90     27.52      6.38   3253.29   2420.23</span><br></pre></td></tr></table></figure>
+<h3 id="系统负载"><a href="#系统负载" class="headerlink" title="系统负载"></a>系统负载</h3><ul>
+<li><code>sar -q</code>，进程队列长度和平均负载状态，默认显示每十分钟的采样的历史信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">05:30:02 PM   runq-sz  plist-sz   ldavg-1   ldavg-5  ldavg-15   blocked</span><br><span class="line">05:40:01 PM         0       214      0.00      0.34      1.26         0</span><br><span class="line">05:50:01 PM         0       214      0.00      0.05      0.66         0</span><br><span class="line">06:00:01 PM         0       213      0.00      0.01      0.35         0</span><br><span class="line">06:10:01 PM         0       214      0.00      0.01      0.19         0</span><br><span class="line">06:20:01 PM         0       214      0.00      0.01      0.10         0</span><br><span class="line">06:30:01 PM         0       214      0.00      0.01      0.05         0</span><br><span class="line">06:40:01 PM         9       224      8.00      6.59      3.43         0</span><br><span class="line">06:50:01 PM         9       225      8.60      8.15      5.75         0</span><br><span class="line">Average:            1       215      1.23      1.35      1.23         0</span><br></pre></td></tr></table></figure>
+<h3 id="网络流量"><a href="#网络流量" class="headerlink" title="网络流量"></a>网络流量</h3><ul>
+<li><code>sar -n DEV</code>，显示网络接口信息，默认显示每十分钟的采样的历史信息，<code>sar -n DEV 1 10</code>，表示每 1 秒采样一次，共采样十次。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# sar -n DEV 1 3</span><br><span class="line">Linux 3.10.0-862.11.6.el7.x86_64 (www.node.com) 	09/23/2018 	_x86_64_	(8 CPU)</span><br><span class="line"></span><br><span class="line">10:07:31 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s</span><br><span class="line">10:07:32 PM     ens34      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">10:07:32 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">10:07:32 PM     ens33      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">10:07:32 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s</span><br><span class="line">10:07:33 PM     ens34      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">10:07:33 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">10:07:33 PM     ens33      3.00      1.00      0.28      0.48      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">10:07:33 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s</span><br><span class="line">10:07:34 PM     ens34      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">10:07:34 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">10:07:34 PM     ens33      2.00      1.00      0.17      0.48      0.00      0.00      0.00</span><br><span class="line"></span><br><span class="line">Average:        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s</span><br><span class="line">Average:        ens34      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00</span><br><span class="line">Average:        ens33      1.66      0.66      0.15      0.32      0.00      0.00      0.00</span><br></pre></td></tr></table></figure>
+<h3 id="磁盘IO"><a href="#磁盘IO" class="headerlink" title="磁盘IO"></a>磁盘IO</h3><ul>
+<li><code>sar -d -p</code>，显示各个磁盘的统计信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# sar -d -p 1 3</span><br><span class="line">Linux 3.10.0-862.11.6.el7.x86_64 (www.node.com) 	09/23/2018 	_x86_64_	(8 CPU)</span><br><span class="line"></span><br><span class="line">10:20:34 PM       DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util</span><br><span class="line">10:20:35 PM       sda    336.00      0.00 344064.00   1024.00      0.44      1.32      0.91     30.70</span><br><span class="line"></span><br><span class="line">10:20:35 PM       DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util</span><br><span class="line">10:20:36 PM       sda    336.00      0.00 344064.00   1024.00      0.52      1.54      0.92     30.80</span><br><span class="line"></span><br><span class="line">10:20:36 PM       DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util</span><br><span class="line">10:20:37 PM       sda    343.00      0.00 351232.00   1024.00      0.56      1.65      0.89     30.40</span><br><span class="line"></span><br><span class="line">Average:          DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util</span><br><span class="line">Average:          sda    338.33      0.00 346453.33   1024.00      0.51      1.50      0.91     30.63</span><br></pre></td></tr></table></figure>
+<h2 id="pidstat-进程资源占用"><a href="#pidstat-进程资源占用" class="headerlink" title="pidstat 进程资源占用"></a>pidstat 进程资源占用</h2><ul>
+<li>作用</li>
+</ul>
+<p>用于监控全部或指定进程的 cpu、内存、线程、设备IO等系统资源的占用情况。</p>
+<p>pidstat 首次运行时显示自系统启动开始的各项统计信息，之后运行pidstat将显示自上次运行该命令以后的统计信息。用户可以通过指定统计的次数和时间来获得所需的统计信息。</p>
+<ul>
+<li>选项</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pidstat [ 选项 ] [ &lt;时间间隔&gt; ] [ &lt;次数&gt; ]</span><br><span class="line"></span><br><span class="line">选项：</span><br><span class="line">	-u 默认参数，显示各个进程的cpu使用统计</span><br><span class="line">	-w 显示每个进程的上下文切换情况</span><br><span class="line">	-r 显示各个进程的内存使用统计</span><br><span class="line">	-d 显示各个进程的IO使用情况</span><br><span class="line">	-p 指定进程号</span><br><span class="line">	-t 显示选择任务的线程的统计信息外的额外信息</span><br></pre></td></tr></table></figure>
+<ul>
+<li>进程 CPU 使用查看</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">%usr 进程在用户空间占用cpu的百分比</span><br><span class="line">%system 进程在内核空间占用cpu的百分比</span><br><span class="line">%guest 进程在虚拟机占用cpu的百分比</span><br><span class="line">%CPU 进程占用cpu的百分比</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[wenba@fudao_service-account_002 ~]$ pidstat </span><br><span class="line">Linux 2.6.32-431.11.25.el6.ucloud.x86_64 (fudao_service-account_002) 	10/28/2018 	_x86_64_	(16 CPU)</span><br><span class="line"></span><br><span class="line">10:07:53 AM       PID    %usr %system  %guest    %CPU   CPU  Command</span><br><span class="line">10:07:53 AM         1    0.00    0.00    0.00    0.00     6  init</span><br><span class="line">10:07:53 AM         2    0.00    0.00    0.00    0.00     0  kthreadd</span><br><span class="line">10:07:53 AM         3    0.00    0.00    0.00    0.00     0  migration/0</span><br><span class="line">10:07:53 AM         4    0.00    0.00    0.00    0.00     0  ksoftirqd/0</span><br><span class="line">10:07:53 AM         6    0.00    0.00    0.00    0.00     0  watchdog/0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>进程内存查看</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Minflt/s:任务每秒发生的次要错误，不需要从磁盘中加载页</span><br><span class="line">Majflt/s:任务每秒发生的主要错误，需要从磁盘中加载页</span><br><span class="line"></span><br><span class="line">VSZ：虚拟内存大小，表示进程申请需要的内存大小</span><br><span class="line">RSS：常驻内存，表示进程实际占用的内存大小</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[wenba@fudao_service-account_002 ~]$ pidstat -r</span><br><span class="line">Linux 2.6.32-431.11.25.el6.ucloud.x86_64 (fudao_service-account_002) 	10/28/2018 	_x86_64_	(16 CPU)</span><br><span class="line"></span><br><span class="line">09:59:34 AM       PID  minflt/s  majflt/s     VSZ    RSS   %MEM  Command</span><br><span class="line">09:59:34 AM         1      0.01      0.00   19232   1496   0.01  init</span><br><span class="line">09:59:34 AM       642      0.01      0.00   11012   1060   0.01  udevd</span><br><span class="line">09:59:34 AM       966      0.01      0.00   97908   3876   0.02  sshd</span><br><span class="line">09:59:34 AM       968      0.00      0.00   97908   1772   0.01  sshd</span><br><span class="line">09:59:34 AM       969      0.01      0.00  108324   1964   0.01  bash</span><br><span class="line">09:59:34 AM      1251      0.00      0.00  250000   2664   0.02  rsyslogd</span><br><span class="line">09:59:34 AM      1266      0.00      0.00   21432    904   0.01  dbus-daemon</span><br><span class="line">09:59:34 AM      1279      0.00      0.00    4080    652   0.00  acpid</span><br><span class="line">09:59:34 AM      1336      0.11      0.00  116876   1272   0.01  crond</span><br><span class="line">09:59:34 AM      1371      0.81      0.00  283168  26508   0.16  php-fpm</span><br><span class="line">09:59:34 AM      1372      0.66      0.00  284200  25696   0.16  php-fpm</span><br><span class="line">09:59:34 AM      1384      0.76      0.00  284728  26260   0.16  php-fpm</span><br><span class="line">09:59:34 AM      1444      0.49      0.00  265104  20108   0.12  php-fpm</span><br><span class="line">09:59:34 AM      1456      0.28      0.00  283496  25104   0.15  php-fpm</span><br><span class="line">09:59:34 AM      1468      0.30      0.00  283500  25044   0.15  php-fpm</span><br><span class="line">09:59:34 AM      1469      0.29      0.00  283408  26760   0.16  php-fpm</span><br><span class="line">09:59:34 AM      1484      0.22      0.00  283204  24752   0.15  php-fpm</span><br><span class="line">09:59:34 AM      1512      0.08      0.00  299296  51792   0.32  php-fpm</span><br></pre></td></tr></table></figure>
+<ul>
+<li>进程上下文切换</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Cswch/s 每秒主动任务上下文切换数量</span><br><span class="line">Nvcswch/s 每秒被动任务上下文切换数量</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[wenba@fudao_service-account_002 ~]$ pidstat -w</span><br><span class="line">Linux 2.6.32-431.11.25.el6.ucloud.x86_64 (fudao_service-account_002) 	10/28/2018 	_x86_64_	(16 CPU)</span><br><span class="line"></span><br><span class="line">10:04:40 AM       PID   cswch/s nvcswch/s  Command</span><br><span class="line">10:04:40 AM         1      0.00      0.00  init</span><br><span class="line">10:04:40 AM         2      0.00      0.00  kthreadd</span><br><span class="line">10:04:40 AM         3      0.01      0.00  migration/0</span><br><span class="line">10:04:40 AM         4      0.39      0.00  ksoftirqd/0</span><br><span class="line">10:04:40 AM         5      0.00      0.00  migration/0</span><br></pre></td></tr></table></figure>
+<h1 id="文件磁盘"><a href="#文件磁盘" class="headerlink" title="文件磁盘"></a>文件磁盘</h1><h2 id="iotop-进程IO统计"><a href="#iotop-进程IO统计" class="headerlink" title="iotop 进程IO统计"></a>iotop 进程IO统计</h2><ul>
+<li>作用</li>
+</ul>
+<p>监视Linux内核输出的I / O使用信息（需要2.6.20或更高版本）并显示一个表，系统上进程或线程的当前I / O使用情况。</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Total DISK READ :	0.00 B/s | Total DISK WRITE :             0.00 B/s</span><br><span class="line">Actual DISK READ:	0.00 B/s | Actual DISK WRITE:             0.00 B/s</span><br><span class="line">   TID  PRIO  USER     DISK READ  DISK WRITE  SWAPIN     IO&gt;    COMMAND                                                        </span><br><span class="line">     1 be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % systemd --switched-root --system --deserialize 22</span><br><span class="line">     2 be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [kthreadd]</span><br><span class="line">     3 be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [ksoftirqd/0]</span><br><span class="line">     5 be/0 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [kworker/0:0H]</span><br><span class="line">     7 rt/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [migration/0]</span><br><span class="line">     8 be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [rcu_bh]</span><br><span class="line">     9 be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [rcu_sched]</span><br><span class="line">    10 be/0 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [lru-add-drain]</span><br><span class="line">    11 rt/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [watchdog/0]</span><br><span class="line">    12 rt/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [watchdog/1]</span><br><span class="line">    13 rt/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [migration/1]</span><br><span class="line">    14 be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [ksoftirqd/1]</span><br><span class="line">    16 be/0 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [kworker/1:0H]</span><br><span class="line">    17 rt/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [watchdog/2]</span><br><span class="line">    18 rt/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [migration/2]</span><br><span class="line">    19 be/4 root        0.00 B/s    0.00 B/s  0.00 %  0.00 % [ksoftirqd/2]</span><br></pre></td></tr></table></figure>
+<h2 id="iostat-磁盘总-I-O"><a href="#iostat-磁盘总-I-O" class="headerlink" title="iostat 磁盘总 I/O"></a>iostat 磁盘总 I/O</h2><ul>
+<li>作用</li>
+</ul>
+<p>显示磁盘的总 I/O 使用情况</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# iostat</span><br><span class="line">Linux 3.10.0-862.11.6.el7.x86_64 (www.node.com) 	09/23/2018 	_x86_64_	(8 CPU)</span><br><span class="line"></span><br><span class="line">avg-cpu:  %user   %nice %system %iowait  %steal   %idle</span><br><span class="line">           9.31    0.10    0.47    0.04    0.00   90.09</span><br><span class="line"></span><br><span class="line">Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn</span><br><span class="line">sda              20.87       936.99      1336.76   34467913   49174178</span><br></pre></td></tr></table></figure>
+<h2 id="lsof-打开文件查看"><a href="#lsof-打开文件查看" class="headerlink" title="lsof 打开文件查看"></a>lsof 打开文件查看</h2><ul>
+<li>作用</li>
+</ul>
+<p>列出进程打开的文件，在 Linux 系统中一切皆文件，所以文件包含：磁盘文件，网络套接字，管道，设备和进程，有时候用于排查木马打开的文件，或者文件删除磁盘未释放的情况。</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# lsof -p 1</span><br><span class="line">COMMAND PID USER   FD      TYPE             DEVICE SIZE/OFF       NODE NAME</span><br><span class="line">systemd   1 root  cwd       DIR                8,4      242         64 /</span><br><span class="line">systemd   1 root  rtd       DIR                8,4      242         64 /</span><br><span class="line">systemd   1 root  txt       REG                8,4  1612152   51294425 /usr/lib/systemd/systemd</span><br><span class="line">systemd   1 root  mem       REG                8,4    20112       2609 /usr/lib64/libuuid.so.1.3.0</span><br><span class="line">systemd   1 root  mem       REG                8,4   261488       2615 /usr/lib64/libblkid.so.1.1.0</span><br><span class="line">systemd   1 root  mem       REG                8,4    90664     103457 /usr/lib64/libz.so.1.2.7</span><br><span class="line">systemd   1 root  mem       REG                8,4   157424     103662 /usr/lib64/liblzma.so.5.2.2</span><br><span class="line">systemd   1 root  mem       REG                8,4    23968     103699 /usr/lib64/libcap-ng.so.0.0.0</span><br><span class="line">systemd   1 root  mem       REG                8,4    19896     103514 /usr/lib64/libattr.so.1.1.0</span><br><span class="line">systemd   1 root  mem       REG                8,4    19776      74552 /usr/lib64/libdl-2.17.so</span><br><span class="line">systemd   1 root  mem       REG                8,4   402384     103534 /usr/lib64/libpcre.so.1.2.0</span><br><span class="line">systemd   1 root  mem       REG                8,4  2173512      74546 /usr/lib64/libc-2.17.so</span><br><span class="line">systemd   1 root  mem       REG                8,4   144792      74572 /usr/lib64/libpthread-2.17.so</span><br><span class="line">systemd   1 root  mem       REG                8,4    88776       2594 /usr/lib64/libgcc_s-4.8.5-20150702.so.1</span><br><span class="line">systemd   1 root  mem       REG                8,4    44448      74576 /usr/lib64/librt-2.17.so</span><br><span class="line">systemd   1 root  mem       REG                8,4   273616       2619 /usr/lib64/libmount.so.1.1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>字段说明</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>COMMAND</td>
+<td>进程的名称</td>
+</tr>
+<tr>
+<td>PID</td>
+<td>进程标识符</td>
+</tr>
+<tr>
+<td>USER</td>
+<td>进程所有者</td>
+</tr>
+<tr>
+<td>FD</td>
+<td>文件描述符，应用程序通过文件描述符识别该文件</td>
+</tr>
+<tr>
+<td>TYPE</td>
+<td>文件类型，如DIR、REG等</td>
+</tr>
+<tr>
+<td>DEVICE</td>
+<td>指定磁盘的名称</td>
+</tr>
+<tr>
+<td>SIZE</td>
+<td>文件的大小</td>
+</tr>
+<tr>
+<td>NODE</td>
+<td>索引节点（文件在磁盘上的标识）</td>
+</tr>
+<tr>
+<td>NAME</td>
+<td>打开文件的确切名称</td>
+</tr>
+</tbody>
+</table>
+<p>FD文件描述符详细</p>
+<table>
+<thead>
+<tr>
+<th>FD类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cwd</td>
+<td>该进程的工作目录</td>
+</tr>
+<tr>
+<td>txt</td>
+<td>该进程的二进制程序代码文件</td>
+</tr>
+<tr>
+<td>rtd</td>
+<td>进程的根目录</td>
+</tr>
+<tr>
+<td>mem</td>
+<td>内存映射文件</td>
+</tr>
+<tr>
+<td>1uW 中的 1</td>
+<td>表示打开文件的描述符，0：表示标准输出，1：表示标准输入2：表示标准错误</td>
+</tr>
+<tr>
+<td>1uW 中的 u</td>
+<td>可以是u（读写模式）、r（只读）、w（只写）、空格（未知未锁）、-（未知已锁）</td>
+</tr>
+<tr>
+<td>1uW 中的 W</td>
+<td>W 对整个文件进行写锁定，其他类型的锁可以查帮助</td>
+</tr>
+<tr>
+<td>其他</td>
+<td>其他类型的 FD 自行查看帮助</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lsblk-分区查看"><a href="#lsblk-分区查看" class="headerlink" title="lsblk 分区查看"></a>lsblk 分区查看</h2><ul>
+<li>作用</li>
+</ul>
+<p>查看磁盘和分区信息</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# lsblk </span><br><span class="line">NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT</span><br><span class="line">sda      8:0    0   30G  0 disk </span><br><span class="line">├─sda1   8:1    0  200M  0 part /boot/efi</span><br><span class="line">├─sda2   8:2    0    1G  0 part /boot</span><br><span class="line">├─sda3   8:3    0  512M  0 part [SWAP]</span><br><span class="line">└─sda4   8:4    0 28.3G  0 part /</span><br></pre></td></tr></table></figure>
+<h1 id="网络相关"><a href="#网络相关" class="headerlink" title="网络相关"></a>网络相关</h1><h2 id="ethtool-获取或修改网卡信息"><a href="#ethtool-获取或修改网卡信息" class="headerlink" title="ethtool 获取或修改网卡信息"></a>ethtool 获取或修改网卡信息</h2><ul>
+<li>作用</li>
+</ul>
+<p>查询或控制网络驱动程序和硬件设置</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ethtool ens33</span><br></pre></td></tr></table></figure>
+<h2 id="nload-总流量统计"><a href="#nload-总流量统计" class="headerlink" title="nload 总流量统计"></a>nload 总流量统计</h2><ul>
+<li>作用</li>
+</ul>
+<p>实时查看网络接口的流入流出流量</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# nload ens33</span><br><span class="line">Device ens33 [172.16.100.253] (1/1):</span><br><span class="line">==============================================================================================================</span><br><span class="line">Incoming:</span><br><span class="line">                                                                           Curr: 1.79 kBit/s</span><br><span class="line">                                                                           Avg: 1.80 kBit/s</span><br><span class="line">                                                                           Min: 1.38 kBit/s</span><br><span class="line">                                                                           Max: 1.84 kBit/s</span><br><span class="line">                                                                           Ttl: 40.44 MByte</span><br><span class="line">Outgoing:</span><br><span class="line">                                                                           Curr: 8.23 kBit/s</span><br><span class="line">                                                                           Avg: 6.90 kBit/s</span><br><span class="line">                                                                           Min: 4.23 kBit/s</span><br><span class="line">                                                                           Max: 8.23 kBit/s</span><br><span class="line">                                                                           Ttl: 110.63 MByte</span><br></pre></td></tr></table></figure>
+<h2 id="bwm-ng-总流量统计"><a href="#bwm-ng-总流量统计" class="headerlink" title="bwm-ng 总流量统计"></a>bwm-ng 总流量统计</h2><ul>
+<li>作用</li>
+</ul>
+<p>另一款非常简单的实时网络负载监控工具，可以报告摘要信息，显示进出系统上所有可用网络接口的不同数据的传输速度。</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bwm-ng v0.6.1 (probing every 0.500s), press &apos;h&apos; for help</span><br><span class="line">input: /proc/net/dev type: rate</span><br><span class="line">/         iface                   Rx                   Tx                Total</span><br><span class="line">==============================================================================</span><br><span class="line">          ens34:           0.00 KB/s            0.00 KB/s            0.00 KB/s</span><br><span class="line">             lo:           0.00 KB/s            0.00 KB/s            0.00 KB/s</span><br><span class="line">          ens33:           0.64 KB/s            0.94 KB/s            1.58 KB/s</span><br><span class="line">------------------------------------------------------------------------------</span><br><span class="line">          total:           0.64 KB/s            0.94 KB/s            1.58 KB/s</span><br></pre></td></tr></table></figure>
+<h2 id="nethogs-进程流量"><a href="#nethogs-进程流量" class="headerlink" title="nethogs 进程流量"></a>nethogs 进程流量</h2><ul>
+<li>作用</li>
+</ul>
+<p>显示每个进程所使用的带宽，并对列表排序，将耗用带宽最多的进程排在最上面。</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">NetHogs version 0.8.5</span><br><span class="line"></span><br><span class="line">    PID USER     PROGRAM                                                                   DEV        SENT      RECEIVED       </span><br><span class="line">  14391 root     sshd: root@pts/0                                                          ens33       0.342	   0.023 82/sec</span><br><span class="line">      ? root     unknown TCP                                                                           0.000	   0.000 KB/sec</span><br><span class="line"></span><br><span class="line">  TOTAL                                                                                                0.342       0.082 KB/sec</span><br></pre></td></tr></table></figure>
+<h2 id="iftop-套接字流量"><a href="#iftop-套接字流量" class="headerlink" title="iftop 套接字流量"></a>iftop 套接字流量</h2><ul>
+<li>作用</li>
+</ul>
+<p>显示套接字的流量统计</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# iftop -n -i ens33</span><br><span class="line">                         12.5Kb                   25.0Kb                    37.5Kb                   50.0Kb		 62.5Kb</span><br><span class="line">------------------------------------------------------------------------------------------------------------------------------------</span><br><span class="line">172.16.100.253                                    =&gt; 172.16.100.2                                       3.98K3.68.70 5.65.60Kb</span><br><span class="line">                                                  &lt;=                                                     800b    810b   1.20Kb</span><br><span class="line">172.16.100.253                                    =&gt; 123.125.29.114                                      672b    670b    672b</span><br><span class="line">                                                  &lt;=                                                     672b    670b    672b</span><br><span class="line">172.16.100.253                                    =&gt; 123.125.115.110                                     672b    672b    672b</span><br><span class="line">                                                  &lt;=                                                     672b 60 571  554488b</span><br><span class="line">172.16.100.255                                    =&gt; 172.16.100.1                                          0b	   0b	   0b</span><br><span class="line">                                                  &lt;=                                                     40 72   780b    800b</span><br><span class="line">                                                  </span><br><span class="line">------------------------------------------------------------------------------------------------------------------------------------</span><br><span class="line">TX:             cum:   57.7KB   peak:   20.5Kb                                                 rates:   5.305.006.917.006.91Kb</span><br><span class="line">RX:                    29.2KB           5.45Kb                                                          2.482.673.73Kb  3.19Kb</span><br><span class="line">TOTAL:                 86.9KB           26.0Kb                                                          7.78K7.68.83Kb  10.1Kb</span><br><span class="line"></span><br><span class="line">interface: ens33</span><br><span class="line">IP address is: 172.16.100.253</span><br><span class="line">MAC address is: 00:0c:29:1a:1a:fb</span><br></pre></td></tr></table></figure>
+<h2 id="ip-地址计算器"><a href="#ip-地址计算器" class="headerlink" title="ip 地址计算器"></a>ip 地址计算器</h2><ul>
+<li>作用</li>
+</ul>
+<p>根据 IP 地址自动计算网络、掩码、广播地址等，这个命令是自带的。</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# ipcalc -pnbm 192.168.179.31 255.255.240.0</span><br><span class="line">NETMASK=255.255.240.0</span><br><span class="line">PREFIX=20</span><br><span class="line">BROADCAST=192.168.191.255</span><br><span class="line">NETWORK=192.168.176.0</span><br></pre></td></tr></table></figure>
+<p>查看 ARP 地址表</p>
+<ul>
+<li>查看ARP</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# cat /proc/net/arp </span><br><span class="line">IP address       HW type     Flags       HW address            Mask     Device</span><br><span class="line">172.16.100.2     0x1         0x2         ac:e0:10:b2:f5:1c     *        ens33</span><br><span class="line">172.16.100.1     0x1         0x2         7c:a1:77:c1:5e:4c     *        ens33</span><br></pre></td></tr></table></figure>
+<h2 id="nslookup-域名解析查询"><a href="#nslookup-域名解析查询" class="headerlink" title="nslookup 域名解析查询"></a>nslookup 域名解析查询</h2><ul>
+<li>作用</li>
+</ul>
+<p>以交互方式查询Internet名称服务器</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# nslookup www.baidu.com</span><br><span class="line">Server:		223.5.5.5</span><br><span class="line">Address:	223.5.5.5#53</span><br><span class="line"></span><br><span class="line">Non-authoritative answer:</span><br><span class="line">www.baidu.com	canonical name = www.a.shifen.com.</span><br><span class="line">Name:	www.a.shifen.com</span><br><span class="line">Address: 61.135.169.121</span><br><span class="line">Name:	www.a.shifen.com</span><br><span class="line">Address: 61.135.169.125</span><br></pre></td></tr></table></figure>
+<h2 id="dig-DNS解析工具"><a href="#dig-DNS解析工具" class="headerlink" title="dig DNS解析工具"></a>dig DNS解析工具</h2><ul>
+<li>作用</li>
+</ul>
+<p>一个用于查询DNS名称服务器的灵活工具。它执行DNS查找并显示从查询的名称服务器返回的答案。</p>
+<ul>
+<li>使用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">dig -t A www.baidu.com                  # 查询A记录</span><br><span class="line">dig -t A www.baidu.com +trace           # 迭代查询</span><br><span class="line">dig -t A www.baidu.com +recurse         # 递归查询</span><br><span class="line">dig +trace baidu.com                    # 域名解析ip过程</span><br><span class="line">dig -t axfr mageedu.com @172.16.1.100   # 模拟全量传送，获得全部的记录</span><br></pre></td></tr></table></figure>
+<h2 id="host-DNS解析工具"><a href="#host-DNS解析工具" class="headerlink" title="host  DNS解析工具"></a>host  DNS解析工具</h2><ul>
+<li>作用</li>
+</ul>
+<p>一个用于执行DNS查找的简单实用程序。它通常用于将名称转换为IP地址，反之亦然。</p>
+<ul>
+<li>示例</li>
+</ul>
+<p>host -t A <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a> 180.76.76.76<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Using domain server:</span><br><span class="line">Name: 180.76.76.76</span><br><span class="line">Address: 180.76.76.76#53</span><br><span class="line">Aliases: </span><br><span class="line"></span><br><span class="line">www.baidu.com is an alias for www.a.shifen.com.</span><br><span class="line">www.a.shifen.com has address 220.181.111.188</span><br><span class="line">www.a.shifen.com has address 220.181.112.244</span><br></pre></td></tr></table></figure></p>
+<p>host -t A <a href="http://www.baidu.com" target="_blank" rel="noopener">www.baidu.com</a> 223.5.5.5<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Using domain server:</span><br><span class="line">Name: 223.5.5.5</span><br><span class="line">Address: 223.5.5.5#53</span><br><span class="line">Aliases: </span><br><span class="line"></span><br><span class="line">www.baidu.com is an alias for www.a.shifen.com.</span><br><span class="line">www.a.shifen.com has address 61.135.169.125</span><br><span class="line">www.a.shifen.com has address 61.135.169.121</span><br></pre></td></tr></table></figure></p>
+<h2 id="tracepath-跟踪路由"><a href="#tracepath-跟踪路由" class="headerlink" title="tracepath 跟踪路由"></a>tracepath 跟踪路由</h2><ul>
+<li>作用</li>
+</ul>
+<p>用来追踪并显示报文到达目的主机所经过的路由信息，另外还有：tracetoute 命令</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@www ~]# tracepath -n www.baidu.com</span><br><span class="line"> 1?: [LOCALHOST]                                         pmtu 1500</span><br><span class="line"> 1:  172.16.100.1                                          2.444ms </span><br><span class="line"> 1:  172.16.100.1                                          2.097ms </span><br><span class="line"> 2:  172.16.100.1                                          4.669ms pmtu 1492</span><br><span class="line"> 2:  113.46.160.1                                          5.908ms </span><br><span class="line"> 3:  218.241.252.185                                       4.730ms</span><br></pre></td></tr></table></figure>
+<h2 id="nmap-网络扫描器"><a href="#nmap-网络扫描器" class="headerlink" title="nmap 网络扫描器"></a>nmap 网络扫描器</h2><ul>
+<li>作用</li>
+</ul>
+<p>网络扫描器</p>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -sP -PI -PT 10.10.158.0/16    # 扫描一个网段</span><br><span class="line">nmap -p 1-1024 www.baidu.com       # 端口范围扫描</span><br><span class="line">nmap -A 172.16.0.1                 # 扫描全部端口</span><br></pre></td></tr></table></figure>
+<h2 id="tcpdump-网络嗅探器"><a href="#tcpdump-网络嗅探器" class="headerlink" title="tcpdump 网络嗅探器"></a>tcpdump 网络嗅探器</h2><p>网络嗅探器，它能够将本地网卡设置为混杂模式，去嗅探网络中的报文，可以指定过滤条件，仅保留只符合条件的报文</p>
+<ul>
+<li>语法格式</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">-i 指定接口</span><br><span class="line">-w 输出文件</span><br><span class="line">-r 读取文件并解码</span><br><span class="line">-X 使用十六进制和 ascii 码来显示报文的头部和报文的数据</span><br><span class="line">-A 仅显示包的 ascii 码信息，包含链路层首部信息</span><br><span class="line">-XX 显示链路层的首部</span><br><span class="line">-v 显示详细信息</span><br><span class="line">-vv 显示更详细的信息</span><br></pre></td></tr></table></figure>
+<ul>
+<li>抓包表达式</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">expression：表达式</span><br><span class="line">	流向：dir：src，dst，src OR dst，src AND dst</span><br><span class="line">	端口：<span class="built_in">type</span>：host，net，port，portrange</span><br><span class="line">	协议：proto：ether，wlan，ip，arp，tcp，udp</span><br></pre></td></tr></table></figure>
+<ul>
+<li>抓取目标端口的TCP协议的包, -n 是否解析主机名和协议</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tcpdump -i ens33 tcp dst port 80 -nn</span><br></pre></td></tr></table></figure>
+<ul>
+<li>抓取当前主机与指定目标主机的通信</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tcpdump -i ens33 dst host 172.16.100.2 -nn</span><br></pre></td></tr></table></figure>
+<ul>
+<li>主机之间的通信使用 and 来组合过滤</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">tcpdump -i ens33 host 172.16.100.2 and 172.16.100.253</span><br><span class="line">tcpdump -i ens33 host 172.16.100.2 and \(172.16.100.253 or 172.16.100.252\)</span><br></pre></td></tr></table></figure>
+<h1 id="其他软件"><a href="#其他软件" class="headerlink" title="其他软件"></a>其他软件</h1><h2 id="ngxtop-nginx监控"><a href="#ngxtop-nginx监控" class="headerlink" title="ngxtop nginx监控"></a>ngxtop nginx监控</h2><ul>
+<li>作用</li>
+</ul>
+<p>实时解析 nginx 访问日志</p>
+<ul>
+<li>安装</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo pip install gnxtop</span><br></pre></td></tr></table></figure>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">running for 12 seconds, 1308 records processed: 108.10 req/sec</span><br><span class="line"></span><br><span class="line">Summary:</span><br><span class="line">|   count |   avg_bytes_sent |   2xx |   3xx |   4xx |   5xx |</span><br><span class="line">|---------+------------------+-------+-------+-------+-------|</span><br><span class="line">|    1308 |         3110.547 |  1308 |     0 |     0 |     0 |</span><br><span class="line"></span><br><span class="line">Detailed:</span><br><span class="line">| request_path                 |   count |   avg_bytes_sent |   2xx |   3xx |   4xx |   5xx |</span><br><span class="line">|------------------------------+---------+------------------+-------+-------+-------+-------|</span><br><span class="line">| /teacher/getStatus           |     409 |           94.002 |   409 |     0 |     0 |     0 |</span><br><span class="line">| /recruit/getExamineOptions   |     392 |           13.253 |   392 |     0 |     0 |     0 |</span><br><span class="line">| /student/getMoreData         |     129 |         1343.434 |   129 |     0 |     0 |     0 |</span><br><span class="line">| /student/getInfo             |     116 |         2895.302 |   116 |     0 |     0 |     0 |</span><br><span class="line">| /teacher/getInfo             |      77 |         2173.610 |    77 |     0 |     0 |     0 |</span><br><span class="line">| /teacher/getBulkInfo         |      75 |         4872.907 |    75 |     0 |     0 |     0 |</span><br><span class="line">| /admin/getXgInfoByIds        |      57 |          245.298 |    57 |     0 |     0 |     0 |</span><br><span class="line">| /admin/getAdminData          |      15 |          618.333 |    15 |     0 |     0 |     0 |</span><br><span class="line">| /admin/getAdminAllData       |      10 |         1792.300 |    10 |     0 |     0 |     0 |</span><br><span class="line">| /teacherBase/classListenAble |       6 |       489225.000 |     6 |     0 |     0 |     0 |</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/22/python/字典的递归遍历/" rel="next" title="递归移除字典中空值的键">
+                <i class="fa fa-chevron-left"></i> 递归移除字典中空值的键
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/30/python/字典统计技巧/" rel="prev" title="当字典的键和值都无法预知的情况">
+                当字典的键和值都无法预知的情况 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#安装软件"><span class="nav-number">1.</span> <span class="nav-text">安装软件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#压测软件"><span class="nav-number">1.1.</span> <span class="nav-text">压测软件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关命令"><span class="nav-number">1.2.</span> <span class="nav-text">相关命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#进程相关"><span class="nav-number">2.</span> <span class="nav-text">进程相关</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pidof-通过名称查找pid"><span class="nav-number">2.1.</span> <span class="nav-text">pidof 通过名称查找pid</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pgrep-通过名称模糊查找pid"><span class="nav-number">2.2.</span> <span class="nav-text">pgrep 通过名称模糊查找pid</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CPU内存"><span class="nav-number">3.</span> <span class="nav-text">CPU内存</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#lscpu-CPU信息"><span class="nav-number">3.1.</span> <span class="nav-text">lscpu CPU信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#uptime-系统负载"><span class="nav-number">3.2.</span> <span class="nav-text">uptime 系统负载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#w-用户负载"><span class="nav-number">3.3.</span> <span class="nav-text">w 用户负载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#top-进程信息"><span class="nav-number">3.4.</span> <span class="nav-text">top 进程信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#vmstat-虚拟内存统计"><span class="nav-number">3.5.</span> <span class="nav-text">vmstat 虚拟内存统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sar-系统历史报告"><span class="nav-number">3.6.</span> <span class="nav-text">sar 系统历史报告</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#整体CPU统计"><span class="nav-number">3.6.1.</span> <span class="nav-text">整体CPU统计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存使用"><span class="nav-number">3.6.2.</span> <span class="nav-text">内存使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#整体I-O"><span class="nav-number">3.6.3.</span> <span class="nav-text">整体I/O</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#系统负载"><span class="nav-number">3.6.4.</span> <span class="nav-text">系统负载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络流量"><span class="nav-number">3.6.5.</span> <span class="nav-text">网络流量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#磁盘IO"><span class="nav-number">3.6.6.</span> <span class="nav-text">磁盘IO</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pidstat-进程资源占用"><span class="nav-number">3.7.</span> <span class="nav-text">pidstat 进程资源占用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件磁盘"><span class="nav-number">4.</span> <span class="nav-text">文件磁盘</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#iotop-进程IO统计"><span class="nav-number">4.1.</span> <span class="nav-text">iotop 进程IO统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iostat-磁盘总-I-O"><span class="nav-number">4.2.</span> <span class="nav-text">iostat 磁盘总 I/O</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lsof-打开文件查看"><span class="nav-number">4.3.</span> <span class="nav-text">lsof 打开文件查看</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lsblk-分区查看"><span class="nav-number">4.4.</span> <span class="nav-text">lsblk 分区查看</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络相关"><span class="nav-number">5.</span> <span class="nav-text">网络相关</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ethtool-获取或修改网卡信息"><span class="nav-number">5.1.</span> <span class="nav-text">ethtool 获取或修改网卡信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nload-总流量统计"><span class="nav-number">5.2.</span> <span class="nav-text">nload 总流量统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bwm-ng-总流量统计"><span class="nav-number">5.3.</span> <span class="nav-text">bwm-ng 总流量统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nethogs-进程流量"><span class="nav-number">5.4.</span> <span class="nav-text">nethogs 进程流量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iftop-套接字流量"><span class="nav-number">5.5.</span> <span class="nav-text">iftop 套接字流量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ip-地址计算器"><span class="nav-number">5.6.</span> <span class="nav-text">ip 地址计算器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nslookup-域名解析查询"><span class="nav-number">5.7.</span> <span class="nav-text">nslookup 域名解析查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dig-DNS解析工具"><span class="nav-number">5.8.</span> <span class="nav-text">dig DNS解析工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#host-DNS解析工具"><span class="nav-number">5.9.</span> <span class="nav-text">host  DNS解析工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tracepath-跟踪路由"><span class="nav-number">5.10.</span> <span class="nav-text">tracepath 跟踪路由</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#nmap-网络扫描器"><span class="nav-number">5.11.</span> <span class="nav-text">nmap 网络扫描器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tcpdump-网络嗅探器"><span class="nav-number">5.12.</span> <span class="nav-text">tcpdump 网络嗅探器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他软件"><span class="nav-number">6.</span> <span class="nav-text">其他软件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ngxtop-nginx监控"><span class="nav-number">6.1.</span> <span class="nav-text">ngxtop nginx监控</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

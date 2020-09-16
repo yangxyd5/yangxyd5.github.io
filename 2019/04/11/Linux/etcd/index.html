@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="简介Etcd 是 CoreOS 推出的高可用的键值存储系统，主要用于k8s集群的服务发现等，而本身 Etcd 也支持集群模式部署，从而实现自身高可用；  Etcd 构建自身高可用集群主要有三种形式  -   静态发现: 预先已知 Etcd 集群中有哪些节点，在启动时直接指定好 Etcd 的各个 node 节点地址-   Etcd 动态发现: 通过已有的 Etcd 集群作为数据交互点，然后在扩展新的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="etcd 集群搭建">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/04/11/Linux/etcd/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="简介Etcd 是 CoreOS 推出的高可用的键值存储系统，主要用于k8s集群的服务发现等，而本身 Etcd 也支持集群模式部署，从而实现自身高可用；  Etcd 构建自身高可用集群主要有三种形式  -   静态发现: 预先已知 Etcd 集群中有哪些节点，在启动时直接指定好 Etcd 的各个 node 节点地址-   Etcd 动态发现: 通过已有的 Etcd 集群作为数据交互点，然后在扩展新的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-05-07T02:39:23.528Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="etcd 集群搭建">
+<meta name="twitter:description" content="简介Etcd 是 CoreOS 推出的高可用的键值存储系统，主要用于k8s集群的服务发现等，而本身 Etcd 也支持集群模式部署，从而实现自身高可用；  Etcd 构建自身高可用集群主要有三种形式  -   静态发现: 预先已知 Etcd 集群中有哪些节点，在启动时直接指定好 Etcd 的各个 node 节点地址-   Etcd 动态发现: 通过已有的 Etcd 集群作为数据交互点，然后在扩展新的">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/04/11/Linux/etcd/">
+
+
+
+
+
+  <title>etcd 集群搭建 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/04/11/Linux/etcd/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">etcd 集群搭建</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-11T00:00:00+08:00">
+                2019-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/运维笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">运维笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Etcd 是 CoreOS 推出的高可用的键值存储系统，主要用于k8s集群的服务发现等，而本身 Etcd 也支持集群模式部署，从而实现自身高可用；</p>
+<ul>
+<li>Etcd 构建自身高可用集群主要有三种形式</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-   静态发现: 预先已知 Etcd 集群中有哪些节点，在启动时直接指定好 Etcd 的各个 node 节点地址</span><br><span class="line">-   Etcd 动态发现: 通过已有的 Etcd 集群作为数据交互点，然后在扩展新的集群时实现通过已有集群进行服务发现的机制</span><br><span class="line">-   DNS 动态发现: 通过 DNS 查询方式获取其他节点地址信息</span><br></pre></td></tr></table></figure>
+<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><table>
+<thead>
+<tr>
+<th>关键词</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raft</td>
+<td>etcd所采用的保证分布式系统强一致性的算法。</td>
+</tr>
+<tr>
+<td>Node</td>
+<td>一个Raft状态机实例。</td>
+</tr>
+<tr>
+<td>Member</td>
+<td>一个etcd实例。它管理着一个Node，并且可以为客户端请求提供服务。</td>
+</tr>
+<tr>
+<td>Cluster</td>
+<td>由多个Member构成可以协同工作的etcd集群。</td>
+</tr>
+<tr>
+<td>Peer</td>
+<td>对同一个etcd集群中另外一个Member的称呼。</td>
+</tr>
+<tr>
+<td>Client</td>
+<td>向etcd集群发送HTTP请求的客户端。</td>
+</tr>
+<tr>
+<td>WAL</td>
+<td>预写式日志，etcd用于持久化存储的日志格式。</td>
+</tr>
+<tr>
+<td>snapshot</td>
+<td>etcd防止WAL文件过多而设置的快照，存储etcd数据状态。</td>
+</tr>
+<tr>
+<td>Proxy</td>
+<td>etcd的一种模式，为etcd集群提供反向代理服务，提供连接集群任意一个节点对整个集群进行读写操作。</td>
+</tr>
+<tr>
+<td>Leader</td>
+<td>Raft算法中通过竞选而产生的处理所有数据提交的节点。</td>
+</tr>
+<tr>
+<td>Follower</td>
+<td>竞选失败的节点作为Raft中的从属节点，为算法提供强一致性保证。</td>
+</tr>
+<tr>
+<td>Candidate</td>
+<td>当Follower超过一定时间接收不到Leader的心跳时转变为Candidate开始竞选。</td>
+</tr>
+<tr>
+<td>Term</td>
+<td>某个节点成为Leader到下一次竞选时间，称为一个Term。</td>
+</tr>
+<tr>
+<td>Index</td>
+<td>数据项编号。Raft中通过Term和Index来定位数据。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="配置文件选项"><a href="#配置文件选项" class="headerlink" title="配置文件选项"></a>配置文件选项</h2><ul>
+<li>配置文件组织，详见: /etc/etcd/etcd.conf</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#[Member]</span><br><span class="line">....</span><br><span class="line"></span><br><span class="line">#[Clustering]</span><br><span class="line">....</span><br><span class="line"></span><br><span class="line">#[Proxy]</span><br><span class="line">....</span><br><span class="line"></span><br><span class="line">#[Security]</span><br><span class="line">....</span><br><span class="line"></span><br><span class="line">#[Logging]</span><br><span class="line">....</span><br><span class="line"></span><br><span class="line">#[Unsafe]</span><br><span class="line">....</span><br><span class="line"></span><br><span class="line">#[Version]</span><br><span class="line">....</span><br><span class="line"></span><br><span class="line">#[Profiling]</span><br><span class="line">....</span><br><span class="line"></span><br><span class="line">#[Auth]</span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+<ul>
+<li>[Member]</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>命令行</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETCD_CORS=””</td>
+<td>–cors</td>
+<td>用于 CORS（跨域资源共享）的逗号分割的 origin 白名单。</td>
+</tr>
+<tr>
+<td>ETCD_DATA_DIR=”/var/lib/etcd/default.etcd”</td>
+<td>–data-dir</td>
+<td>数据的存放目录。</td>
+</tr>
+<tr>
+<td>ETCD_WAL_DIR=””</td>
+<td>–wal-dir</td>
+<td>指定节点的 was 文件的存储目录，若指定了该参数，wal文件会和其他数据文件分开存储。</td>
+</tr>
+<tr>
+<td>ETCD_LISTEN_PEER_URLS=”<a href="http://localhost:2380&quot;" target="_blank" rel="noopener">http://localhost:2380&quot;</a></td>
+<td>–listen-peer-urls</td>
+<td>接收其他 Member 通讯的 URL 列表，域名无效。</td>
+</tr>
+<tr>
+<td>ETCD_LISTEN_CLIENT_URLS=”<a href="http://localhost:2379&quot;" target="_blank" rel="noopener">http://localhost:2379&quot;</a></td>
+<td>–listen-client-urls</td>
+<td>接收客户端请求的地址。</td>
+</tr>
+<tr>
+<td>ETCD_MAX_SNAPSHOTS=”5”</td>
+<td>–max-snapshots</td>
+<td>保持的快照文件的最大数量 (0 表示不限制)。</td>
+</tr>
+<tr>
+<td>ETCD_MAX_WALS=”5”</td>
+<td>–max-wals</td>
+<td>保持的 wal 文件的最大数量 (0 表示不限制)。</td>
+</tr>
+<tr>
+<td>ETCD_NAME=”default”</td>
+<td>–name</td>
+<td>本 Member 的名字。</td>
+</tr>
+<tr>
+<td>ETCD_SNAPSHOT_COUNT=”100000”</td>
+<td>–snapshot-count</td>
+<td>触发快照到硬盘的已提交事务的数量。</td>
+</tr>
+<tr>
+<td>ETCD_HEARTBEAT_INTERVAL=”100”</td>
+<td>–heartbeat-interval</td>
+<td>心跳间隔时间。</td>
+</tr>
+<tr>
+<td>ETCD_ELECTION_TIMEOUT=”1000”</td>
+<td>–election-timeout</td>
+<td>选举的超时时间。</td>
+</tr>
+<tr>
+<td>ETCD_QUOTA_BACKEND_BYTES=”0”</td>
+<td>–quota-backend-bytes</td>
+<td>当后端大小超过给定配额时（0默认为低空间配额），引发警报。</td>
+</tr>
+<tr>
+<td>ETCD_MAX_REQUEST_BYTES=”1572864”</td>
+<td>–max-request-bytes</td>
+<td>服务器将接受的最大客户端请求大小（字节）。</td>
+</tr>
+<tr>
+<td>ETCD_GRPC_KEEPALIVE_MIN_TIME=”5s”</td>
+<td>–grpc-keepalive-min-time</td>
+<td>客户端在ping服务器之前应等待的最短持续时间间隔。</td>
+</tr>
+<tr>
+<td>ETCD_GRPC_KEEPALIVE_INTERVAL=”2h0m0s”</td>
+<td>–grpc-keepalive-interval</td>
+<td>服务器到客户端ping的频率持续时间，以检查连接是否处于活动状态（0表示禁用）。</td>
+</tr>
+<tr>
+<td>ETCD_GRPC_KEEPALIVE_TIMEOUT=”20s”</td>
+<td>–grpc-keepalive-timeout</td>
+<td>关闭非响应连接之前的额外持续等待时间（0表示禁用）。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>[Clustering]</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>命令行</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETCD_INITIAL_ADVERTISE_PEER_URLS=”<a href="http://localhost:2380&quot;" target="_blank" rel="noopener">http://localhost:2380&quot;</a></td>
+<td>–initial-advertise-peer-urls</td>
+<td>列出这个Member的伙伴 URL 以便通告给集群的其他Member。</td>
+</tr>
+<tr>
+<td>ETCD_ADVERTISE_CLIENT_URLS=”<a href="http://localhost:2379&quot;" target="_blank" rel="noopener">http://localhost:2379&quot;</a></td>
+<td>–advertise-client-urls</td>
+<td>列出这个 Member 的客户端URL，通告给集群中的其他 Member。这些 URL 可以包含域名。</td>
+</tr>
+<tr>
+<td>ETCD_DISCOVERY=””</td>
+<td>–discovery</td>
+<td>用于启动集群的发现URL。</td>
+</tr>
+<tr>
+<td>ETCD_DISCOVERY_FALLBACK=”proxy”</td>
+<td>–discovery-fallback</td>
+<td>当发现服务失败时的期待行为(“exit” 或 “proxy”). “proxy” 仅支持 v2 API。</td>
+</tr>
+<tr>
+<td>ETCD_DISCOVERY_PROXY=””</td>
+<td>–discovery-proxy</td>
+<td>用于请求到发现服务的 HTTP 代理。</td>
+</tr>
+<tr>
+<td>ETCD_DISCOVERY_SRV=””</td>
+<td>–discovery-srv</td>
+<td>用于启动集群的 DNS srv 域名。</td>
+</tr>
+<tr>
+<td>ETCD_INITIAL_CLUSTER=”default=<a href="http://localhost:2380&quot;" target="_blank" rel="noopener">http://localhost:2380&quot;</a></td>
+<td>–initial-cluster</td>
+<td>为启动初始化集群配置。</td>
+</tr>
+<tr>
+<td>ETCD_INITIAL_CLUSTER_TOKEN=”etcd-cluster”</td>
+<td>–initial-cluster-token</td>
+<td>创建集群的 token，这个值每个集群保持唯一。</td>
+</tr>
+<tr>
+<td>ETCD_INITIAL_CLUSTER_STATE=”new”</td>
+<td>–initial-cluster-state</td>
+<td>设置new为初始静态或DNS引导期间出现的所有Member。如果将此选项设置为existing，则etcd将尝试加入现有群集。</td>
+</tr>
+<tr>
+<td>ETCD_STRICT_RECONFIG_CHECK=”true”</td>
+<td>–strict-reconfig-check</td>
+<td>拒绝将导致法定人数丢失的重配置请求。</td>
+</tr>
+<tr>
+<td>ETCD_ENABLE_V2=”true”</td>
+<td>–enable-v2</td>
+<td>接受etcd V2客户端请求。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>[Proxy]</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>命令行</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETCD_PROXY=”off”</td>
+<td>–proxy</td>
+<td>配置etcd以在代理模式下运行。</td>
+</tr>
+<tr>
+<td>ETCD_PROXY_FAILURE_WAIT=”5000”</td>
+<td>–proxy-failure-wait</td>
+<td>在重新考虑代理请求之前，endpoints 将处于失败状态的时间（以毫秒为单位）。</td>
+</tr>
+<tr>
+<td>ETCD_PROXY_REFRESH_INTERVAL=”30000”</td>
+<td>–proxy-refresh-interval</td>
+<td>endpoints 刷新间隔的时间（以毫秒为单位）。</td>
+</tr>
+<tr>
+<td>ETCD_PROXY_DIAL_TIMEOUT=”1000”</td>
+<td>–proxy-dial-timeout</td>
+<td>拨号超时的时间（以毫秒为单位）或0表示禁用超时。</td>
+</tr>
+<tr>
+<td>ETCD_PROXY_WRITE_TIMEOUT=”5000”</td>
+<td>–proxy-write-timeout</td>
+<td>写入超时的时间（以毫秒为单位）或0以禁用超时。</td>
+</tr>
+<tr>
+<td>ETCD_PROXY_READ_TIMEOUT=”0”</td>
+<td>–proxy-read-timeout</td>
+<td>读取超时的时间（以毫秒为单位）或0以禁用超时。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>[Security]</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>命令行</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETCD_CERT_FILE=””</td>
+<td>–cert-file</td>
+<td>客户端服务器TLS证书文件的路径。</td>
+</tr>
+<tr>
+<td>ETCD_KEY_FILE=””</td>
+<td>–key-file</td>
+<td>客户端服务器TLS密钥文件的路径。</td>
+</tr>
+<tr>
+<td>ETCD_CLIENT_CERT_AUTH=”false”</td>
+<td>–client-cert-auth</td>
+<td>启用客户端证书验证。</td>
+</tr>
+<tr>
+<td>ETCD_TRUSTED_CA_FILE=””</td>
+<td>–trusted-ca-file</td>
+<td>客户端服务器的路径TLS可信CA证书文件。</td>
+</tr>
+<tr>
+<td>ETCD_AUTO_TLS=”false”</td>
+<td>–auto-tls</td>
+<td>客户端TLS使用生成的证书。</td>
+</tr>
+<tr>
+<td>ETCD_PEER_CERT_FILE=””</td>
+<td>–peer-cert-file</td>
+<td>对等服务器TLS证书文件的路径。这是对等流量的证书，用于服务器和客户端。</td>
+</tr>
+<tr>
+<td>ETCD_PEER_KEY_FILE=””</td>
+<td>–peer-key-file</td>
+<td>对等服务器TLS密钥文件的路径。这是对等流量的关键，用于服务器和客户端。</td>
+</tr>
+<tr>
+<td>ETCD_PEER_CLIENT_CERT_AUTH=”false”</td>
+<td>–peer-client-cert-auth</td>
+<td>启用对等客户端证书验证。</td>
+</tr>
+<tr>
+<td>ETCD_PEER_TRUSTED_CA_FILE=””</td>
+<td>–peer-trusted-ca-file</td>
+<td>对等服务器TLS可信CA文件的路径。</td>
+</tr>
+<tr>
+<td>ETCD_PEER_AUTO_TLS=”false”</td>
+<td>–peer-auto-tls</td>
+<td>Peer TLS使用自动生成的证书。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>[Logging]</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>命令行参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETCD_DEBUG=”false”</td>
+<td>–debug</td>
+<td>将所有子包的默认日志级别设置为DEBUG。</td>
+</tr>
+<tr>
+<td>ETCD_LOG_PACKAGE_LEVELS=””</td>
+<td>–log-package-levels</td>
+<td>将单个etcd子包设置为特定的日志级别。一个例子是etcdserver=WARNING,security=DEBUG。</td>
+</tr>
+<tr>
+<td>ETCD_LOG_OUTPUT=”default”</td>
+<td>–log-outputs</td>
+<td>指定’stdout’或’stderr’以跳过日志记录，即使在systemd或逗号分隔的输出目标列表下运行也是如此。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>[Unsafe]</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>命令行参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETCD_FORCE_NEW_CLUSTER=”false”</td>
+<td>–force-new-cluster</td>
+<td>强制创建新的单Member群集。它提交配置更改，强制删除集群中的所有现有Member并添加自身。需要将其设置为还原备份。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>[Version]</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>命令行参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETCD_VERSION=”false”</td>
+<td>–version</td>
+<td>版本</td>
+</tr>
+<tr>
+<td>ETCD_AUTO_COMPACTION_RETENTION=”0”</td>
+<td>–auto-compaction-retention</td>
+<td>自动压缩用于 mvcc 键值存储的保持力(注：应该指多版本保存)，单位小时。 0 表示关闭自动压缩。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>[Profiling]</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>命令行参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETCD_ENABLE_PPROF=”false”</td>
+<td>–enable-pprof</td>
+<td>通过HTTP服务器启用运行时分析数据。</td>
+</tr>
+<tr>
+<td>ETCD_METRICS=”basic”</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>[Auth]</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>命令行参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETCD_AUTH_TOKEN=”simple”</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="静态发现"><a href="#静态发现" class="headerlink" title="静态发现"></a>静态发现</h2><ul>
+<li>集群配置，etcd一般部署集群推荐奇数个节点，推荐的数量为3、5或者7个节点构成一个集群。</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">节点</th>
+<th style="text-align:left">地址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">node1</td>
+<td style="text-align:left">172.16.100.100</td>
+</tr>
+<tr>
+<td style="text-align:left">node2</td>
+<td style="text-align:left">172.16.100.101</td>
+</tr>
+<tr>
+<td style="text-align:left">node3</td>
+<td style="text-align:left">172.16.100.102</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>我自己写的集群启动脚本，注意修改脚本变量声明部分</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 本节点名称</span></span><br><span class="line">MEMBER_NAME=<span class="string">"node2"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 本节点IP地址</span></span><br><span class="line">MEMBER_IP=<span class="string">"http://172.16.100.101"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 集群成员地址</span></span><br><span class="line">CLUSTER_MEMBER=<span class="string">"node1=http://172.16.100.100:2380,node2=http://172.16.100.101:2380,node3=http://172.16.100.102:2380"</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> $(dirname $(readlink -f <span class="variable">$0</span>))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">start</span></span>() &#123;</span><br><span class="line">    nohup ./etcd --name <span class="variable">$MEMBER_NAME</span> \</span><br><span class="line">    --initial-advertise-peer-urls <span class="variable">$MEMBER_IP</span>:2380 \</span><br><span class="line">    --listen-peer-urls <span class="variable">$MEMBER_IP</span>:2380 \</span><br><span class="line">    --listen-client-urls http://0.0.0.0:2379 \</span><br><span class="line">    --advertise-client-urls <span class="variable">$MEMBER_IP</span>:2379 \</span><br><span class="line">    --initial-cluster-token etcd-cluster-1 \</span><br><span class="line">    --initial-cluster <span class="variable">$CLUSTER_MEMBER</span> \</span><br><span class="line">    --initial-cluster-state new \</span><br><span class="line">    --<span class="built_in">log</span>-output <span class="string">'stdout'</span> &amp;&gt;log.log &amp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">stop</span></span>() &#123;</span><br><span class="line">    <span class="built_in">kill</span> -15 `pidof etcd`</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="title">status</span></span>() &#123;</span><br><span class="line">    ./etcdctl member list</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> <span class="string">"<span class="variable">$1</span>"</span> <span class="keyword">in</span></span><br><span class="line">    start)</span><br><span class="line">        start;;</span><br><span class="line">    stop)</span><br><span class="line">        stop;;</span><br><span class="line">    restart)</span><br><span class="line">        stop; sleep 3; start;;</span><br><span class="line">    status)</span><br><span class="line">        status;;</span><br><span class="line">    *)</span><br><span class="line">        <span class="built_in">echo</span> <span class="string">"Usage: <span class="variable">$0</span> &#123;start|stop|restart|status&#125;"</span> ;;</span><br><span class="line"><span class="keyword">esac</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>官方文档的完整记录</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ etcd --name infra0 --initial-advertise-peer-urls http://10.0.1.10:2380 \</span><br><span class="line">  --listen-peer-urls http://10.0.1.10:2380 \</span><br><span class="line">  --listen-client-urls http://10.0.1.10:2379,http://127.0.0.1:2379 \</span><br><span class="line">  --advertise-client-urls http://10.0.1.10:2379 \</span><br><span class="line">  --initial-cluster-token etcd-cluster-1 \</span><br><span class="line">  --initial-cluster infra0=http://10.0.1.10:2380,infra1=http://10.0.1.11:2380,infra2=http://10.0.1.12:2380 \</span><br><span class="line">  --initial-cluster-state new</span><br><span class="line"></span><br><span class="line">$ etcd --name infra1 --initial-advertise-peer-urls http://10.0.1.11:2380 \</span><br><span class="line">  --listen-peer-urls http://10.0.1.11:2380 \</span><br><span class="line">  --listen-client-urls http://10.0.1.11:2379,http://127.0.0.1:2379 \</span><br><span class="line">  --advertise-client-urls http://10.0.1.11:2379 \</span><br><span class="line">  --initial-cluster-token etcd-cluster-1 \</span><br><span class="line">  --initial-cluster infra0=http://10.0.1.10:2380,infra1=http://10.0.1.11:2380,infra2=http://10.0.1.12:2380 \</span><br><span class="line">  --initial-cluster-state new</span><br><span class="line"></span><br><span class="line">$ etcd --name infra2 --initial-advertise-peer-urls http://10.0.1.12:2380 \</span><br><span class="line">  --listen-peer-urls http://10.0.1.12:2380 \</span><br><span class="line">  --listen-client-urls http://10.0.1.12:2379,http://127.0.0.1:2379 \</span><br><span class="line">  --advertise-client-urls http://10.0.1.12:2379 \</span><br><span class="line">  --initial-cluster-token etcd-cluster-1 \</span><br><span class="line">  --initial-cluster infra0=http://10.0.1.10:2380,infra1=http://10.0.1.11:2380,infra2=http://10.0.1.12:2380 \</span><br><span class="line">  --initial-cluster-state new</span><br></pre></td></tr></table></figure>
+<h2 id="TODO"><a href="#TODO" class="headerlink" title="TODO"></a>TODO</h2>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/20/personal/Hexo/" rel="next" title="Hexo 博客优化">
+                <i class="fa fa-chevron-left"></i> Hexo 博客优化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/12/Linux/nginx-upsync-module/" rel="prev" title="nginx-upsync-module 服务发现">
+                nginx-upsync-module 服务发现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础概念"><span class="nav-number">2.</span> <span class="nav-text">基础概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置文件选项"><span class="nav-number">3.</span> <span class="nav-text">配置文件选项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#静态发现"><span class="nav-number">4.</span> <span class="nav-text">静态发现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TODO"><span class="nav-number">5.</span> <span class="nav-text">TODO</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

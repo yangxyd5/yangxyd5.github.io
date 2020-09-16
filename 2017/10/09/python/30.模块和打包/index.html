@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="代码组织Python程序由以下内容组成：  包（Package） 模块（Moduler） 函数和类（Class &amp;amp; Function）  在现实开发中，我们会编写大量代码，代码之间会有各种关系，比如：包含、外置、共享等等，如何合理有序的组织是个问题。 Python使用如此三个层次组织代码： 相同功能的代码放在一个目录里面，每个功能又被分成多个功能模块放在不同的文件中，每个文件定义多个不同的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python模块和打包机制">
+<meta property="og:url" content="https://yangjinheng.github.io/2017/10/09/python/30.模块和打包/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="代码组织Python程序由以下内容组成：  包（Package） 模块（Moduler） 函数和类（Class &amp;amp; Function）  在现实开发中，我们会编写大量代码，代码之间会有各种关系，比如：包含、外置、共享等等，如何合理有序的组织是个问题。 Python使用如此三个层次组织代码： 相同功能的代码放在一个目录里面，每个功能又被分成多个功能模块放在不同的文件中，每个文件定义多个不同的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-09T11:01:00.073Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python模块和打包机制">
+<meta name="twitter:description" content="代码组织Python程序由以下内容组成：  包（Package） 模块（Moduler） 函数和类（Class &amp;amp; Function）  在现实开发中，我们会编写大量代码，代码之间会有各种关系，比如：包含、外置、共享等等，如何合理有序的组织是个问题。 Python使用如此三个层次组织代码： 相同功能的代码放在一个目录里面，每个功能又被分成多个功能模块放在不同的文件中，每个文件定义多个不同的">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2017/10/09/python/30.模块和打包/">
+
+
+
+
+
+  <title>Python模块和打包机制 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2017/10/09/python/30.模块和打包/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python模块和打包机制</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-09T00:00:00+08:00">
+                2017-10-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="代码组织"><a href="#代码组织" class="headerlink" title="代码组织"></a>代码组织</h2><p>Python程序由以下内容组成：</p>
+<ul>
+<li>包（Package）</li>
+<li>模块（Moduler）</li>
+<li>函数和类（Class &amp; Function）</li>
+</ul>
+<p>在现实开发中，我们会编写大量代码，代码之间会有各种关系，比如：包含、外置、共享等等，如何合理有序的组织是个问题。</p>
+<p>Python使用如此三个层次组织代码：</p>
+<p>相同功能的代码放在一个目录里面，每个功能又被分成多个功能模块放在不同的文件中，每个文件定义多个不同的函数和类来具体封装你的代码，如此便形成了明了高效的组织形式。比如：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">文件操作所有代码放在 files/ 这个文件，所有读文件的功能模块，放到 files/read.py 文件，所有写的代码都放到 files/write.py 文件。而读入所有内容和按行读入这两个代码分别被封装为 read_all(), readlines() 两个函数。</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>库：这是一个编程语言中的的泛概念，在Python中是由 模块和包 为表现形式</p>
+</blockquote>
+<h3 id="命名空间"><a href="#命名空间" class="headerlink" title="命名空间"></a>命名空间</h3><p>由于在 Python 中一切皆为对象，想要好好理解 Module 和 Package，一定要先理解 Namespace 的概念。 所谓 Namespace ，是指标示符的可见范围。对于 Python 而言，常见的 Namespace 主要有以下几种： </p>
+<ol>
+<li>Build-in Namespace (内建命名空间）</li>
+<li>Global Namespace (全局命名空间）</li>
+<li>Local Namespace (局部命名空间）</li>
+</ol>
+<p>有了命名空间的概念，可以有效的解决函数或者是变量重名的问题。不同的命名空间中允许出现相同的函数名或者 是变量名。它们彼此之间不会相互影响，例如在Namespace A和B中同时有一个名为var的变量，对A.var赋值并不 会改变B.var的值。 </p>
+<h2 id="模块"><a href="#模块" class="headerlink" title="模块"></a>模块</h2><p>一个包含<code>Python</code>代码并且以<code>.py</code>结尾的文本文件就是一个模块，其文件名部分就是模块名，其中定义的所有变量或者函数都属于这个Module，这个Module 对于所有函数而言就相当于一个全局的命名空间，而其中的每个函数又都有自己局部的命名空间。 </p>
+<h3 id="导入方式"><a href="#导入方式" class="headerlink" title="导入方式"></a>导入方式</h3><p>模块导入的方式有以下几种：</p>
+<ul>
+<li>导入模块</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> mymodule  <span class="comment">#导入模块</span></span><br><span class="line"><span class="keyword">import</span> mymodule <span class="keyword">as</span> m1  <span class="comment">#导入模块，但重命名为m1</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>导入模块的部分属性</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> mymodule <span class="keyword">import</span> cc  <span class="comment">#导入模块的一个内容属性</span></span><br><span class="line"><span class="keyword">from</span> mymodule <span class="keyword">import</span> cc <span class="keyword">as</span> c1  <span class="comment">#导入模块内容cc，重命名为c1</span></span><br><span class="line"><span class="keyword">from</span> module <span class="keyword">import</span> cc,bb,aa  <span class="comment">#同时导入多个模块内容</span></span><br><span class="line"><span class="keyword">from</span> module <span class="keyword">import</span> *  <span class="comment">#导入模块的所有属性</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>重新导入已经导入的模块</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">reload(sys)  <span class="comment">#重新导入已经导入的模块，在统一编码规范时常用</span></span><br></pre></td></tr></table></figure>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>现在我们手动创建一个简单的模块：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">4</span>]: cat mymodule.py</span><br><span class="line">cc = <span class="number">1</span></span><br><span class="line">bb = <span class="number">2</span></span><br><span class="line">aa = <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>导入模块，导入模块并重命名</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">import</span> mymodule</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: mymodule.aa</span><br><span class="line">Out[<span class="number">2</span>]: <span class="number">3</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: mymodule.bb</span><br><span class="line">Out[<span class="number">3</span>]: <span class="number">2</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">4</span>]: mymodule.cc</span><br><span class="line">Out[<span class="number">4</span>]: <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">6</span>]: <span class="keyword">import</span> mymodule <span class="keyword">as</span> m1</span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: m1.aa</span><br><span class="line">Out[<span class="number">7</span>]: <span class="number">3</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">8</span>]: m1.cc</span><br><span class="line">Out[<span class="number">8</span>]: <span class="number">1</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">9</span>]: m1.bb</span><br><span class="line">Out[<span class="number">9</span>]: <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>导入模块的部分内容，并且重新命名</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> mymodule <span class="keyword">import</span> aa</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: aa</span><br><span class="line">Out[<span class="number">2</span>]: <span class="number">3</span></span><br><span class="line">    </span><br><span class="line">In [<span class="number">3</span>]: <span class="keyword">from</span> mymodule <span class="keyword">import</span> aa <span class="keyword">as</span> AA</span><br><span class="line"></span><br><span class="line">In [<span class="number">4</span>]: AA</span><br><span class="line">Out[<span class="number">4</span>]: <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>导入模块中的多个内容</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> mymodule <span class="keyword">import</span> aa,bb</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: aa</span><br><span class="line">Out[<span class="number">2</span>]: <span class="number">3</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">3</span>]: bb</span><br><span class="line">Out[<span class="number">3</span>]: <span class="number">2</span></span><br></pre></td></tr></table></figure>
+<h2 id="包"><a href="#包" class="headerlink" title="包"></a>包</h2><p>包是一个目录，并且必须有一个<code>__init__.py</code>文件，它是包的注册文件，文件内容可以为空，一个包内可以有多个 <code>模块</code> 或者 <code>子包</code> 组成，这样一个有层次的目录结构形成了Python的包，可以将包视作模块。</p>
+<p>导入包会执行包下的<code>__init__.py</code>注册文件。</p>
+<p>导入包下的子模块，一定会先导入<code>__init__.py</code>注册文件，然后再导入子模块的代码。</p>
+<p>导入包下的子包，则不会导入父包，只会导入子包的<code>__init__.py</code>。</p>
+<h3 id="导入方式-1"><a href="#导入方式-1" class="headerlink" title="导入方式"></a>导入方式</h3><p>包有以下几种导入方式：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> pack  <span class="comment">#导入一个名叫pack的包</span></span><br><span class="line"><span class="keyword">from</span> pack <span class="keyword">import</span> system  <span class="comment">#从包中导入一个模块</span></span><br><span class="line"><span class="keyword">from</span> pack <span class="keyword">import</span> system,mymodule  <span class="comment">#从包中导入多个模块</span></span><br></pre></td></tr></table></figure>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><p>这就是一个叫 pack 的包，因为它包含一个 <code>__init__.py</code> 的文件。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">19</span>]: !tree m</span><br><span class="line">m</span><br><span class="line">├── __init__.py</span><br><span class="line">├── m1.py</span><br><span class="line">└── m2</span><br><span class="line">    ├── __init__.py</span><br><span class="line">    └── m21</span><br><span class="line">        └── __init__.py</span><br><span class="line"></span><br><span class="line"><span class="number">2</span> directories, <span class="number">4</span> files</span><br><span class="line"></span><br><span class="line">每个py文件中都包含以下代码</span><br><span class="line">print(<span class="string">'m/__init__.py'</span>)    <span class="comment">#文件名称</span></span><br><span class="line">print(__name__)    <span class="comment">#文件名</span></span><br><span class="line">var = __file__   <span class="comment">#模块变量</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>导入一个包，会执行<code>__init__</code>注册文件</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">16</span>]: <span class="keyword">import</span> m</span><br><span class="line">m/__init__.py</span><br><span class="line">m</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: m.var</span><br><span class="line">Out[<span class="number">2</span>]: <span class="string">'/home/python/magedu/projects/test/m/__init__.py'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>导入子模块，一定会导入父模块</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> m <span class="keyword">import</span> m1</span><br><span class="line">m/__init__.py</span><br><span class="line">m</span><br><span class="line">m/m1.py</span><br><span class="line">m.m1</span><br><span class="line"></span><br><span class="line">In [<span class="number">11</span>]: m.m1.var</span><br><span class="line">Out[<span class="number">11</span>]: <span class="string">'/home/python/magedu/projects/test/m/m1.py'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>导入子包时候，不会导入父包</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> m <span class="keyword">import</span> m2</span><br><span class="line">m/m2/__init__.py</span><br><span class="line">m.m2</span><br><span class="line">In [<span class="number">3</span>]: m2.var</span><br><span class="line">Out[<span class="number">3</span>]: <span class="string">'/home/python/magedu/projects/test/m/m2/__init__.py'</span></span><br><span class="line">    </span><br><span class="line">In [<span class="number">1</span>]: <span class="keyword">from</span> m.m2 <span class="keyword">import</span> m21</span><br><span class="line">m/m2/m21/__init__.py</span><br><span class="line">m.m2.m21</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: m21.var</span><br><span class="line">Out[<span class="number">2</span>]: <span class="string">'/home/python/magedu/projects/test/m/m2/m21/__init__.py'</span></span><br></pre></td></tr></table></figure>
+<p>通常<code>__int__.py</code>文件为空，但是我们还可以为它增加其他的功能。我们在导入一个包时，实际上是导入了它的<code>__init__.py</code>文件。这样我们可以在<code>__init__.py</code>文件中批量导入我们所需要的模块，而不再需要一个一个的导入。 </p>
+<ul>
+<li>相对导入和绝对导入</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">Out[<span class="number">2</span>]: vim ./m/__init__.py</span><br><span class="line"><span class="keyword">from</span> . <span class="keyword">import</span> m1           <span class="comment">#在m模块的__init__.py文件中使用相对导入</span></span><br><span class="line">print(<span class="string">'m/__init__.py'</span>)</span><br><span class="line">print(__name__)</span><br><span class="line">var = __file__</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">10</span>]: <span class="keyword">import</span> m</span><br><span class="line">m/m1.py</span><br><span class="line">m.m1</span><br><span class="line">m/__init__.py</span><br><span class="line">m</span><br><span class="line"></span><br><span class="line">In [<span class="number">11</span>]: m.m1.var</span><br><span class="line">Out[<span class="number">11</span>]: <span class="string">'/home/python/magedu/projects/test/m/m1.py'</span></span><br></pre></td></tr></table></figure>
+<p>相对导入时模块内部之间互相引用资源的，不是为了直接运行的。</p>
+<h2 id="importlib"><a href="#importlib" class="headerlink" title="importlib"></a>importlib</h2><p>importlib 可以将字符串视作模块导入，同时利用反射方法可以使用字符串在类中查找方法、属性</p>
+<ul>
+<li>text1.py</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Persion</span><span class="params">()</span>:</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,name)</span>:</span></span><br><span class="line">        self.name = name</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">dream</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">"&#123;&#125;在做梦"</span>.format(self.name))</span><br></pre></td></tr></table></figure>
+<ul>
+<li>test2.py</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> importlib</span><br><span class="line"></span><br><span class="line">modu = <span class="string">"test"</span></span><br><span class="line">cls = <span class="string">"Persion"</span></span><br><span class="line"></span><br><span class="line">test = importlib.import_module(modu)</span><br><span class="line"></span><br><span class="line">the_class = getattr(test,cls)</span><br><span class="line"></span><br><span class="line">the_class(<span class="string">"杨金恒"</span>).dream()</span><br></pre></td></tr></table></figure>
+<h2 id="示例应用"><a href="#示例应用" class="headerlink" title="示例应用"></a>示例应用</h2><p>例如，一个传递参数实现不同日志记录方式的装饰器模块，其他模块就可以直接导入，并使用它。</p>
+<h3 id="模块化装饰器"><a href="#模块化装饰器" class="headerlink" title="模块化装饰器"></a>模块化装饰器</h3><ul>
+<li>装饰器模块</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">(magedu353) [python@localhost test]$ cat logger.py </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">logger</span><span class="params">(mode_type)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">wrapper</span><span class="params">(func)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_wrapper</span><span class="params">(*args,**kwargs)</span>:</span></span><br><span class="line">            <span class="keyword">if</span> mode_type == <span class="string">'file'</span>:</span><br><span class="line">                print(<span class="string">'write file...'</span>)</span><br><span class="line">                <span class="keyword">return</span> func(*args,**kwargs)</span><br><span class="line">            <span class="keyword">elif</span> mode_type == <span class="string">'stdout'</span>:</span><br><span class="line">                print(<span class="string">'write stdout...'</span>)</span><br><span class="line">                <span class="keyword">return</span> func(*args,**kwargs)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                print(<span class="string">'mode_type error...'</span>)</span><br><span class="line">        <span class="keyword">return</span> _wrapper</span><br><span class="line">    <span class="keyword">return</span> wrapper</span><br></pre></td></tr></table></figure>
+<ul>
+<li>调用装饰器模块的程序</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">(magedu353) [python@localhost test]$ cat func.py </span><br><span class="line"><span class="keyword">import</span> logger</span><br><span class="line"></span><br><span class="line"><span class="meta">@logger.logger('file')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func1</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'this is func1'</span>)</span><br><span class="line"></span><br><span class="line"><span class="meta">@logger.logger('stdout')</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">func2</span><span class="params">()</span>:</span></span><br><span class="line">    print(<span class="string">'this is func2'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    func1()</span><br><span class="line">    func2()</span><br></pre></td></tr></table></figure>
+<ul>
+<li>运行结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">(magedu353) [python@localhost test]$ python func.py </span><br><span class="line">[<span class="string">'__builtins__'</span>, <span class="string">'__cached__'</span>, <span class="string">'__doc__'</span>, <span class="string">'__file__'</span>, <span class="string">'__loader__'</span>, <span class="string">'__name__'</span>, <span class="string">'__package__'</span>, <span class="string">'__spec__'</span>, <span class="string">'logger'</span>]</span><br><span class="line">write file...</span><br><span class="line">this <span class="keyword">is</span> func1</span><br><span class="line">write stdout...</span><br><span class="line">this <span class="keyword">is</span> func2</span><br></pre></td></tr></table></figure>
+<p>可以看到 <code>logger</code> 模块被导入到 <code>func</code> 的命名空间，<code>func</code> 就可以直接调用 <code>logger</code> 的功能了。</p>
+<h2 id="相关属性"><a href="#相关属性" class="headerlink" title="相关属性"></a>相关属性</h2><h3 id="搜索路径"><a href="#搜索路径" class="headerlink" title="搜索路径"></a>搜索路径</h3><p>即：导入模块时在哪些路径下搜索模块，搜索路径是编译 Python 时候指定的，它以一个列表的形式保存在<code>sys.path</code>变量里，其中每个元素表示一个路径，对这个列表 append ，可以增加搜索路径。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">6</span>]: <span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: sys.path</span><br><span class="line">Out[<span class="number">7</span>]: </span><br><span class="line">[<span class="string">''</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/envs/magedu353/bin'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/lib/python35.zip'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/lib/python3.5'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/lib/python3.5/plat-linux'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/lib/python3.5/lib-dynload'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/envs/magedu353/lib/python3.5/site-packages'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/envs/magedu353/lib/python3.5/site-packages/IPython/extensions'</span>,</span><br><span class="line"> <span class="string">'/home/python/.ipython'</span>]</span><br><span class="line">In [<span class="number">8</span>]: sys.path.append(<span class="string">'/app/python'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">9</span>]: sys.path</span><br><span class="line">Out[<span class="number">9</span>]: </span><br><span class="line">[<span class="string">''</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/envs/magedu353/bin'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/lib/python35.zip'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/lib/python3.5'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/lib/python3.5/plat-linux'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/lib/python3.5/lib-dynload'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/envs/magedu353/lib/python3.5/site-packages'</span>,</span><br><span class="line"> <span class="string">'/home/python/.pyenv/versions/3.5.3/envs/magedu353/lib/python3.5/site-packages/IPython/extensions'</span>,</span><br><span class="line"> <span class="string">'/home/python/.ipython'</span>,</span><br><span class="line"> <span class="string">'/app/python'</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="模块属性"><a href="#模块属性" class="headerlink" title="模块属性"></a>模块属性</h3><table>
+<thead>
+<tr>
+<th>属性</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__file__</code></td>
+<td>被引用模块的路径</td>
+</tr>
+<tr>
+<td><code>__cached__</code></td>
+<td>编译后字节码文件路径</td>
+</tr>
+<tr>
+<td><code>__spec__</code></td>
+<td>模块的规范</td>
+</tr>
+<tr>
+<td><code>__name__</code></td>
+<td>是模块内置的一个属性，一般如果模块是被引用的时候, 它的值是模块名, 如果这个python文件被直接运行, 那么它的值是<code>&#39;__main__&#39;</code></td>
+</tr>
+<tr>
+<td><code>__package__</code></td>
+<td>如果文件是个包它的值和<code>__name__</code>是相同的，如果是子模块，则和父模块一致</td>
+</tr>
+<tr>
+<td><code>__all__</code></td>
+<td>在包的注册文件内，它的值是个模块名组成的列表，该属性表示当使用<code>import * from xxx</code>时候，哪些模块会被导入进来</td>
+</tr>
+<tr>
+<td><code>__doc__</code></td>
+<td>模块的注释文档</td>
+</tr>
+</tbody>
+</table>
+<h3 id="隐藏变量"><a href="#隐藏变量" class="headerlink" title="隐藏变量"></a>隐藏变量</h3><p>如果不想让某个属性被<code>from module import *</code>导入，那么你可以给不想导入的属性标识符前面加<code>_</code>，但这不能组织<code>import foo.__bar</code>这种形式的导入。</p>
+<h3 id="测试方法"><a href="#测试方法" class="headerlink" title="测试方法"></a>测试方法</h3><p><code>__name__</code> 模块的内置属性，它存放了模块的名字。</p>
+<p>当处于不同的命名空间，就为不同的值，即：作为模块被导入时它就为模块的名称，作为程序入口执行时候，它就为<code>__main__</code>表示当前处于顶层作用域。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    ....</span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+<p>在模块中填写这段代码，可以实现当直接执行时候测试该模块，作为模块导入时，则不会执行。</p>
+<h3 id="动态装载"><a href="#动态装载" class="headerlink" title="动态装载"></a>动态装载</h3><p>一般我们在程序中，直接使用<code>import module</code>方式导入，这种方法是静态的，Python提前扫描，并装载好模块在内存中，有时候我们需要动态装在一个模块。</p>
+<ul>
+<li>模块1，名称：<code>mymodule</code></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,name,color)</span>:</span></span><br><span class="line">        self.name = name</span><br><span class="line">        self.color = color</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">bark</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(self.name,<span class="string">'woof...'</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>需要使用动态装载的程序</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> importlib</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plugin</span><span class="params">(name,sep=<span class="string">'.'</span>)</span>:</span>                  <span class="comment">#功能，动态导入一个以点分割的模块</span></span><br><span class="line">    mod,_,cls = name,partition(sep)        <span class="comment">#参数处理，就是以点分割</span></span><br><span class="line">    module = importlib.import_module(mod)  <span class="comment">#动态导入模块</span></span><br><span class="line">    attrib = getattr(module,cls)           <span class="comment">#通过反射获得模块的一个属性</span></span><br><span class="line">    <span class="keyword">return</span> attrib                          <span class="comment">#返回已经导入的模块供程序使用</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'main'</span>:</span><br><span class="line">    plugin(<span class="string">'mymodule.Dog'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="打包分发"><a href="#打包分发" class="headerlink" title="打包分发"></a>打包分发</h2><ul>
+<li>setuptools模块</li>
+</ul>
+<p>setuptools 可以说是 Python distutils 的增强版，它能帮助我们更好的创建和分发 Python 的包，尤其是具有复杂依赖关系的包。对于开发者来说，能够更好的组织自己项目的分发和发布；对于用户来说，不需要安装 setuptools 也可以使用由它创建的包，只需要一个启动模块即可。</p>
+<p>实现这样的的包管理机制主要由两部分构成：</p>
+<ul>
+<li>一个存储在 Python 官方网站的集中式仓库，名叫 Python Package Index（PyPI）</li>
+<li>另外就是基于 distutils 开发的 setuptools 包管理系统</li>
+</ul>
+<h3 id="打包方法"><a href="#打包方法" class="headerlink" title="打包方法"></a>打包方法</h3><ul>
+<li>创建一个目录，将需要打包的包放在里面</li>
+<li>在该目录中创建一个 <code>setup.py</code>，里面的内容为我们发布包的相关信息。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> distutils.core <span class="keyword">import</span> setup</span><br><span class="line">setup(name=<span class="string">'mypackage'</span>,</span><br><span class="line">      version=<span class="string">'1.0.0'</span>,</span><br><span class="line">      description=<span class="string">'test package'</span>,</span><br><span class="line">      author=<span class="string">'yangjinheng'</span>,</span><br><span class="line">      author_email=<span class="string">'jinhengyang@foxmail.com'</span>,</span><br><span class="line">      url=<span class="string">'http://www.yangjinheng.com'</span>,</span><br><span class="line">      packages=[<span class="string">'m'</span>,<span class="string">'m.m1'</span>,<span class="string">'m.m2'</span>,<span class="string">'m.m2.m21'</span>],</span><br><span class="line">      )</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>version</td>
+<td>版本号</td>
+</tr>
+<tr>
+<td>description</td>
+<td>描述信息</td>
+</tr>
+<tr>
+<td>author</td>
+<td>作者信息</td>
+</tr>
+<tr>
+<td>author_email</td>
+<td>作者email</td>
+</tr>
+<tr>
+<td>url</td>
+<td>包的网站</td>
+</tr>
+<tr>
+<td>packages</td>
+<td>需要处理的包目录</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>详见：python setup.py –help</p>
+</blockquote>
+<h3 id="脚本参数"><a href="#脚本参数" class="headerlink" title="脚本参数"></a>脚本参数</h3><table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>build</td>
+<td>构建安装所需的所有模块</td>
+</tr>
+<tr>
+<td>sdist</td>
+<td>创建一个源代码发布（tar.gz，zip文件等）</td>
+</tr>
+<tr>
+<td>bdist</td>
+<td>创建一个二进制分发包</td>
+</tr>
+<tr>
+<td>bdist_rpm</td>
+<td>创建一个RPM分发</td>
+</tr>
+<tr>
+<td>bdist_wininst</td>
+<td>创建一个windows 下可执行的安装程序</td>
+</tr>
+<tr>
+<td>install</td>
+<td>从构建中安装</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>详见：python setup.py –help-commands</p>
+</blockquote>
+<h3 id="创建源码包"><a href="#创建源码包" class="headerlink" title="创建源码包"></a>创建源码包</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">(magedu353) [python@localhost package]$ ll</span><br><span class="line">总用量 <span class="number">4</span></span><br><span class="line">drwxrwxr-x <span class="number">3</span> python python  <span class="number">48</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">11</span>:<span class="number">33</span> m</span><br><span class="line">-rw-rw-r-- <span class="number">1</span> python python <span class="number">258</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">11</span>:<span class="number">34</span> setup.py</span><br><span class="line">(magedu353) [python@localhost package]$ python setup.py sdist</span><br><span class="line">running sdist</span><br><span class="line">running check</span><br><span class="line">warning: sdist: manifest template <span class="string">'MANIFEST.in'</span> does <span class="keyword">not</span> exist (using default file list)</span><br><span class="line"></span><br><span class="line">warning: sdist: standard file <span class="keyword">not</span> found: should have one of README, README.txt</span><br><span class="line"></span><br><span class="line">writing manifest file <span class="string">'MANIFEST'</span></span><br><span class="line">creating mypackage<span class="number">-1.0</span><span class="number">.0</span></span><br><span class="line">creating mypackage<span class="number">-1.0</span><span class="number">.0</span>/m</span><br><span class="line">making hard links <span class="keyword">in</span> mypackage<span class="number">-1.0</span><span class="number">.0</span>...</span><br><span class="line">hard linking setup.py -&gt; mypackage-1.0.0</span><br><span class="line">hard linking m/__init__.py -&gt; mypackage-1.0.0/m</span><br><span class="line">hard linking m/m1.py -&gt; mypackage-1.0.0/m</span><br><span class="line">creating dist</span><br><span class="line">Creating tar archive</span><br><span class="line">removing <span class="string">'mypackage-1.0.0'</span> (<span class="keyword">and</span> everything under it)</span><br><span class="line">(magedu353) [python@localhost package]$ ll</span><br><span class="line">总用量 <span class="number">8</span></span><br><span class="line">drwxrwxr-x <span class="number">2</span> python python  <span class="number">36</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">12</span>:<span class="number">08</span> dist</span><br><span class="line">drwxrwxr-x <span class="number">3</span> python python  <span class="number">48</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">11</span>:<span class="number">33</span> m</span><br><span class="line">-rw-rw-r-- <span class="number">1</span> python python  <span class="number">74</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">12</span>:<span class="number">08</span> MANIFEST</span><br><span class="line">-rw-rw-r-- <span class="number">1</span> python python <span class="number">258</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">11</span>:<span class="number">34</span> setup.py</span><br><span class="line">(magedu353) [python@localhost package]$ cd dist/</span><br><span class="line">(magedu353) [python@localhost dist]$ ll</span><br><span class="line">总用量 <span class="number">4</span></span><br><span class="line">-rw-rw-r-- <span class="number">1</span> python python <span class="number">571</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">12</span>:<span class="number">08</span> mypackage<span class="number">-1.0</span><span class="number">.0</span>.tar.gz    <span class="comment">#构建完成</span></span><br></pre></td></tr></table></figure>
+<h3 id="安装源码包"><a href="#安装源码包" class="headerlink" title="安装源码包"></a>安装源码包</h3><ul>
+<li>通过pip安装</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">(magedu353) [python@localhost dist]$ pip install ./mypackage<span class="number">-1.0</span><span class="number">.0</span>.tar.gz </span><br><span class="line">Processing ./mypackage<span class="number">-1.0</span><span class="number">.0</span>.tar.gz</span><br><span class="line">Installing collected packages: mypackage</span><br><span class="line">  Running setup.py install <span class="keyword">for</span> mypackage ... done</span><br><span class="line">Successfully installed mypackage<span class="number">-1.0</span><span class="number">.0</span>    <span class="comment">#安装完成</span></span><br></pre></td></tr></table></figure>
+<p>安装后会出现在：site-packages 这样类似的目录中，并且可以使用<code>pip list</code>命令找到</p>
+<ul>
+<li>直接解压后安装</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">(magedu353) [python@localhost package]$ cd dist/</span><br><span class="line">(magedu353) [python@localhost dist]$ ll</span><br><span class="line">总用量 <span class="number">4</span></span><br><span class="line">-rw-rw-r-- <span class="number">1</span> python python <span class="number">571</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">12</span>:<span class="number">08</span> mypackage<span class="number">-1.0</span><span class="number">.0</span>.tar.gz</span><br><span class="line">(magedu353) [python@localhost dist]$ tar zxfv mypackage<span class="number">-1.0</span><span class="number">.0</span>.tar.gz     <span class="comment">#解压构建的包</span></span><br><span class="line">mypackage<span class="number">-1.0</span><span class="number">.0</span>/</span><br><span class="line">mypackage<span class="number">-1.0</span><span class="number">.0</span>/m/</span><br><span class="line">mypackage<span class="number">-1.0</span><span class="number">.0</span>/m/__init__.py</span><br><span class="line">mypackage<span class="number">-1.0</span><span class="number">.0</span>/m/m1.py</span><br><span class="line">mypackage<span class="number">-1.0</span><span class="number">.0</span>/setup.py</span><br><span class="line">mypackage<span class="number">-1.0</span><span class="number">.0</span>/PKG-INFO</span><br><span class="line">(magedu353) [python@localhost dist]$ ll</span><br><span class="line">总用量 <span class="number">4</span></span><br><span class="line">drwxrwxr-x <span class="number">3</span> python python  <span class="number">47</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">12</span>:<span class="number">08</span> mypackage<span class="number">-1.0</span><span class="number">.0</span></span><br><span class="line">-rw-rw-r-- <span class="number">1</span> python python <span class="number">571</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">12</span>:<span class="number">08</span> mypackage<span class="number">-1.0</span><span class="number">.0</span>.tar.gz</span><br><span class="line">(magedu353) [python@localhost dist]$ cd mypackage<span class="number">-1.0</span><span class="number">.0</span></span><br><span class="line">(magedu353) [python@localhost mypackage<span class="number">-1.0</span><span class="number">.0</span>]$ ll</span><br><span class="line">总用量 <span class="number">8</span></span><br><span class="line">drwxrwxr-x <span class="number">2</span> python python  <span class="number">38</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">12</span>:<span class="number">08</span> m</span><br><span class="line">-rw-rw-r-- <span class="number">1</span> python python <span class="number">227</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">12</span>:<span class="number">08</span> PKG-INFO</span><br><span class="line">-rw-rw-r-- <span class="number">1</span> python python <span class="number">258</span> <span class="number">5</span>月  <span class="number">20</span> <span class="number">11</span>:<span class="number">34</span> setup.py</span><br><span class="line">(magedu353) [python@localhost mypackage<span class="number">-1.0</span><span class="number">.0</span>]$ python setup.py install   <span class="comment">#执行安装脚本</span></span><br><span class="line">running install</span><br><span class="line">running build</span><br><span class="line">running build_py</span><br><span class="line">creating build</span><br><span class="line">creating build/lib</span><br><span class="line">creating build/lib/m</span><br><span class="line">copying m/__init__.py -&gt; build/lib/m</span><br><span class="line">copying m/m1.py -&gt; build/lib/m</span><br><span class="line">running install_lib</span><br><span class="line">creating /home/python/.pyenv/versions/magedu353/lib/python3<span class="number">.5</span>/site-packages/m</span><br><span class="line">copying build/lib/m/__init__.py -&gt; /home/python/.pyenv/versions/magedu353/lib/python3.5/site-packages/m</span><br><span class="line">copying build/lib/m/m1.py -&gt; /home/python/.pyenv/versions/magedu353/lib/python3.5/site-packages/m</span><br><span class="line">byte-compiling /home/python/.pyenv/versions/magedu353/lib/python3<span class="number">.5</span>/site-packages/m/__init__.py to __init__.cpython<span class="number">-35.</span>pyc</span><br><span class="line">byte-compiling /home/python/.pyenv/versions/magedu353/lib/python3<span class="number">.5</span>/site-packages/m/m1.py to m1.cpython<span class="number">-35.</span>pyc</span><br><span class="line">running install_egg_info</span><br><span class="line">Writing /home/python/.pyenv/versions/magedu353/lib/python3<span class="number">.5</span>/site-packages/mypackage<span class="number">-1.0</span><span class="number">.0</span>-py3<span class="number">.5</span>.egg-info      <span class="comment">#安装完成</span></span><br></pre></td></tr></table></figure>
+<p>安装后会出现在：site-packages 这样类似的目录中，并且可以使用<code>pip list</code>命令找到</p>
+<h3 id="安装后使用"><a href="#安装后使用" class="headerlink" title="安装后使用"></a>安装后使用</h3><p>安装后就向一般的模块一样，导入使用即可</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">2</span>]: <span class="keyword">import</span> m</span><br><span class="line">m/m1.py</span><br><span class="line">m.m1</span><br><span class="line">m/__init__.py</span><br><span class="line">m</span><br><span class="line"></span><br><span class="line">In [<span class="number">4</span>]: m.__path__</span><br><span class="line">Out[<span class="number">4</span>]: [<span class="string">'/home/python/.pyenv/versions/3.5.3/envs/magedu353/lib/python3.5/site-packages/m'</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="卸载安装包"><a href="#卸载安装包" class="headerlink" title="卸载安装包"></a>卸载安装包</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">(magedu353) [python@localhost test]$ pip uninstall mypackage</span><br><span class="line">Uninstalling mypackage<span class="number">-1.0</span><span class="number">.0</span>:</span><br><span class="line">  /home/python/.pyenv/versions/<span class="number">3.5</span><span class="number">.3</span>/envs/magedu353/lib/python3<span class="number">.5</span>/site-packages/m/__init__.py</span><br><span class="line">  /home/python/.pyenv/versions/<span class="number">3.5</span><span class="number">.3</span>/envs/magedu353/lib/python3<span class="number">.5</span>/site-packages/m/__pycache__/__init__.cpython<span class="number">-35.</span>pyc</span><br><span class="line">  /home/python/.pyenv/versions/<span class="number">3.5</span><span class="number">.3</span>/envs/magedu353/lib/python3<span class="number">.5</span>/site-packages/m/__pycache__/m1.cpython<span class="number">-35.</span>pyc</span><br><span class="line">  /home/python/.pyenv/versions/<span class="number">3.5</span><span class="number">.3</span>/envs/magedu353/lib/python3<span class="number">.5</span>/site-packages/m/m1.py</span><br><span class="line">  /home/python/.pyenv/versions/<span class="number">3.5</span><span class="number">.3</span>/envs/magedu353/lib/python3<span class="number">.5</span>/site-packages/mypackage<span class="number">-1.0</span><span class="number">.0</span>-py3<span class="number">.5</span>.egg-info</span><br><span class="line">Proceed (y/n)? y</span><br><span class="line">  Successfully uninstalled mypackage<span class="number">-1.0</span><span class="number">.0</span></span><br><span class="line">You are using pip version <span class="number">9.0</span><span class="number">.1</span>, however version <span class="number">10.0</span><span class="number">.1</span> <span class="keyword">is</span> available.</span><br><span class="line">You should consider upgrading via the <span class="string">'pip install --upgrade pip'</span> command.</span><br></pre></td></tr></table></figure>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/08/python/29.hashlib加密解密/" rel="next" title="hashlib加密解密">
+                <i class="fa fa-chevron-left"></i> hashlib加密解密
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/20/web/javascript/" rel="prev" title="Javascript学习笔记">
+                Javascript学习笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#代码组织"><span class="nav-number">1.</span> <span class="nav-text">代码组织</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#命名空间"><span class="nav-number">1.1.</span> <span class="nav-text">命名空间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模块"><span class="nav-number">2.</span> <span class="nav-text">模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#导入方式"><span class="nav-number">2.1.</span> <span class="nav-text">导入方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例"><span class="nav-number">2.2.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#包"><span class="nav-number">3.</span> <span class="nav-text">包</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#导入方式-1"><span class="nav-number">3.1.</span> <span class="nav-text">导入方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#示例-1"><span class="nav-number">3.2.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#importlib"><span class="nav-number">4.</span> <span class="nav-text">importlib</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例应用"><span class="nav-number">5.</span> <span class="nav-text">示例应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#模块化装饰器"><span class="nav-number">5.1.</span> <span class="nav-text">模块化装饰器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相关属性"><span class="nav-number">6.</span> <span class="nav-text">相关属性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#搜索路径"><span class="nav-number">6.1.</span> <span class="nav-text">搜索路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模块属性"><span class="nav-number">6.2.</span> <span class="nav-text">模块属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#隐藏变量"><span class="nav-number">6.3.</span> <span class="nav-text">隐藏变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#测试方法"><span class="nav-number">6.4.</span> <span class="nav-text">测试方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动态装载"><span class="nav-number">6.5.</span> <span class="nav-text">动态装载</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打包分发"><span class="nav-number">7.</span> <span class="nav-text">打包分发</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#打包方法"><span class="nav-number">7.1.</span> <span class="nav-text">打包方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#脚本参数"><span class="nav-number">7.2.</span> <span class="nav-text">脚本参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建源码包"><span class="nav-number">7.3.</span> <span class="nav-text">创建源码包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装源码包"><span class="nav-number">7.4.</span> <span class="nav-text">安装源码包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装后使用"><span class="nav-number">7.5.</span> <span class="nav-text">安装后使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#卸载安装包"><span class="nav-number">7.6.</span> <span class="nav-text">卸载安装包</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

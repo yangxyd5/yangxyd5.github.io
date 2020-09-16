@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言需求今天接到个私活，一个朋友需要把美国IDC机房的20台主机切割成虚拟机，每台主机切割成8个虚拟机，每台虚拟机安装一个操作系统，要求能够访问网页，又要重新拾起多年不用的 KVM 虚拟化了，废话不多说，现学现卖了。 安装KVM 环境准备  getenforce                           # 检查 selinux 是否已经关闭systemctl status firewa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="KVM自动克隆">
+<meta property="og:url" content="https://yangjinheng.github.io/2018/08/03/Linux/kvm-autoc-reatekvm/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="前言需求今天接到个私活，一个朋友需要把美国IDC机房的20台主机切割成虚拟机，每台主机切割成8个虚拟机，每台虚拟机安装一个操作系统，要求能够访问网页，又要重新拾起多年不用的 KVM 虚拟化了，废话不多说，现学现卖了。 安装KVM 环境准备  getenforce                           # 检查 selinux 是否已经关闭systemctl status firewa">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-08-13T11:01:23.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="KVM自动克隆">
+<meta name="twitter:description" content="前言需求今天接到个私活，一个朋友需要把美国IDC机房的20台主机切割成虚拟机，每台主机切割成8个虚拟机，每台虚拟机安装一个操作系统，要求能够访问网页，又要重新拾起多年不用的 KVM 虚拟化了，废话不多说，现学现卖了。 安装KVM 环境准备  getenforce                           # 检查 selinux 是否已经关闭systemctl status firewa">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2018/08/03/Linux/kvm-autoc-reatekvm/">
+
+
+
+
+
+  <title>KVM自动克隆 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2018/08/03/Linux/kvm-autoc-reatekvm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">KVM自动克隆</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-03T22:30:55+08:00">
+                2018-08-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/运维笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">运维笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言需求"><a href="#前言需求" class="headerlink" title="前言需求"></a>前言需求</h2><p>今天接到个私活，一个朋友需要把美国IDC机房的20台主机切割成虚拟机，每台主机切割成8个虚拟机，每台虚拟机安装一个操作系统，要求能够访问网页，又要重新拾起多年不用的 KVM 虚拟化了，废话不多说，现学现卖了。</p>
+<h2 id="安装KVM"><a href="#安装KVM" class="headerlink" title="安装KVM"></a>安装KVM</h2><ul>
+<li>环境准备</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">getenforce                           <span class="comment"># 检查 selinux 是否已经关闭</span></span><br><span class="line">systemctl status firewalld           <span class="comment"># 关闭防火墙</span></span><br><span class="line">lsmod | grep kvm                     <span class="comment"># 检查内核是否支持 KVM 模块，Linux 默认是集成了 KVM</span></span><br><span class="line">grep -Eo <span class="string">"vmx|svm"</span> /proc/cpuinfo     <span class="comment"># 检查CPU是否支持虚拟化</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装KVM</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum -y install qemu-kvm qemu-kvm-tools virt-manager libvirt virt-install</span><br><span class="line"></span><br><span class="line">systemctl start libvirtd.service     <span class="comment"># 启动 KVM 服务</span></span><br><span class="line">systemctl status libvirtd.service    <span class="comment"># 检查 KVM 服务是否正常启动</span></span><br></pre></td></tr></table></figure>
+<h2 id="准备模板机"><a href="#准备模板机" class="headerlink" title="准备模板机"></a>准备模板机</h2><ul>
+<li>准备系统镜像</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">CentOS 下载地址：http://isoredirect.centos.org/centos/7/isos/x86_64/CentOS-7-x86_64-Everything-1804.iso</span><br><span class="line"></span><br><span class="line">mkdir -p /kvm_data/images                                                 <span class="comment"># 新建系统镜像存放目录</span></span><br><span class="line">dd <span class="keyword">if</span>=/dev/sr0 of=/kvm_data/images/CentOS-7-x86_64-Everything-1804.iso    <span class="comment"># 将光盘镜像复制出来</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>准备模板磁盘</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-img create -f qcow2 /kvm_data/centos7.5.qcow2 20G                   <span class="comment"># 创建 qcow2 格式的磁盘</span></span><br><span class="line"></span><br><span class="line">qemu-img info /kvm_data/centos7.5.qcow2                                  <span class="comment"># 初始化磁盘</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>初始化虚拟机，指定CPU个数、内存大小、VNC端口，等硬件信息</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">virt-install --virt-type=kvm --name=centos7.5 --vcpus=2 -r 2048 -c /kvm_data/images/CentOS-7-x86_64-Everything-1804.iso --network network=default --graphics vnc,listen=0.0.0.0,port=9527 --noautoconsole --os-type=linux --os-variant=rhel7 --disk path=/kvm_data/centos7.5.qcow2,size=20,format=qcow2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>初始化完成后使用VNC连接安装操作系统</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">VNC Viewer                   <span class="comment"># 下载这个软件连接，连接上面设置的本机的 VNC 端口，对模板机进行定制</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>常用管理命令</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">virsh start vhost_name                          <span class="comment"># 启动虚拟机</span></span><br><span class="line">virsh list --all                                <span class="comment"># 查看所有虚拟机</span></span><br><span class="line">virsh destroy vhost_name                        <span class="comment"># 关闭虚拟机电源</span></span><br><span class="line">virsh undefine name                             <span class="comment"># 删除主机配置</span></span><br><span class="line">virsh define file-name.xml                      <span class="comment"># 根据文件定义虚拟机</span></span><br><span class="line">virsh snapshot-create-as vhost_name vhost_name  <span class="comment"># 创建快照</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>KVM 文件组织</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/etc/libvirt/qemu/    <span class="comment"># 配置文件目录</span></span><br><span class="line">/kvm_data/*.qcow2     <span class="comment"># 主数据文件</span></span><br></pre></td></tr></table></figure>
+<h2 id="定制模板机"><a href="#定制模板机" class="headerlink" title="定制模板机"></a>定制模板机</h2><ul>
+<li>定制模板机，做克隆前准备</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment">#--------------------------------------------------克隆必须--------------------------------------------------</span></span><br><span class="line"><span class="comment"># 删除SSH主机密钥</span></span><br><span class="line">rm -rf /etc/ssh/ssh_host_*</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除设备规则文件</span></span><br><span class="line">rm -rf /etc/udev/rules.d/70-*</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除系统日志</span></span><br><span class="line">rm -rf /var/<span class="built_in">log</span>/*</span><br><span class="line"></span><br><span class="line"><span class="comment"># 清空登录前文字</span></span><br><span class="line"><span class="built_in">echo</span> &gt;/etc/issue.net</span><br><span class="line"><span class="built_in">echo</span> &gt;/etc/issue</span><br><span class="line"></span><br><span class="line"><span class="comment"># 登陆后欢迎文字</span></span><br><span class="line"><span class="built_in">echo</span> -e <span class="string">'\nWelcome to aliyun Elastic Compute Service!\n'</span> &gt;/etc/motd</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改主机名</span></span><br><span class="line">HOSTNAME=localhost.localdomain</span><br><span class="line">sed -ir <span class="string">"/^HOSTNAME=/cHOSTNAME=<span class="variable">$HOSTNAME</span>"</span> /etc/sysconfig/network</span><br><span class="line"></span><br><span class="line">HOSTNAME=localhost.localdomain</span><br><span class="line">hostnamectl <span class="built_in">set</span>-hostname <span class="variable">$HOSTNAME</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># CentOS_6 关闭防火墙</span></span><br><span class="line">service iptables stop</span><br><span class="line">chkconfig iptables off</span><br><span class="line">systemctl stop firewalld</span><br><span class="line">systemctl <span class="built_in">disable</span> firewalld</span><br><span class="line"></span><br><span class="line"><span class="comment"># CentOS6 优化不必要的启动项</span></span><br><span class="line">chkconfig | awk <span class="string">'&#123;if ($1!~"crond|sshd|network|rsyslog|sysstat|chronyd")&#123;system("chkconfig "$1" off")&#125;&#125;'</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭SElinux</span></span><br><span class="line">setenforce 0</span><br><span class="line">sed -i <span class="string">'/^SELINUX=/cSELINUX=disabled'</span> /etc/selinux/config</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用sudo授权</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"jinheng    ALL=(ALL)    NOPASSWD: ALL"</span> &gt;&gt;/etc/sudoers</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改语言为英文</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">'LANG="en_US.UTF-8"'</span> &gt;/etc/sysconfig/i18n</span><br><span class="line"><span class="built_in">source</span> /etc/sysconfig/i18n</span><br><span class="line"></span><br><span class="line">localectl <span class="built_in">set</span>-locale LANG=en_US.UTF-8</span><br><span class="line"></span><br><span class="line"><span class="comment"># 同步系统时间</span></span><br><span class="line">sed -i <span class="string">'/^server/d'</span> /etc/chrony.conf</span><br><span class="line">sed -i <span class="string">'3iserver ntp1.aliyun.com iburst'</span> /etc/chrony.conf</span><br><span class="line">sed -i <span class="string">'3iserver cn.ntp.org.cn iburst'</span> /etc/chrony.conf</span><br><span class="line">sed -i <span class="string">'3iserver us.ntp.org.cn iburst'</span> /etc/chrony.conf</span><br><span class="line">chkconfig chronyd on</span><br><span class="line">service chronyd start</span><br><span class="line">systemctl <span class="built_in">enable</span> chronyd</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装yum源</span></span><br><span class="line">rm -f /etc/yum.repos.d/* ; yum clean all</span><br><span class="line">curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-6.repo</span><br><span class="line">curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-6.repo</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装常用软件</span></span><br><span class="line">yum -y install lrzsz wget vim tree telnet nmap tcpdump lsof nc</span><br><span class="line"></span><br><span class="line"><span class="comment"># 配置网卡</span></span><br><span class="line">BOOTPROTO=static</span><br><span class="line">DEVICE=ens33</span><br><span class="line">ONBOOT=yes</span><br><span class="line">IPADDR=172.16.0.253</span><br><span class="line">NETMASK=255.255.255.0</span><br><span class="line">GATEWAY=172.16.0.254</span><br><span class="line">DNS1=180.76.76.76</span><br><span class="line">DNS2=223.5.5.5</span><br><span class="line"></span><br><span class="line"><span class="comment">#--------------------------------------------------SSH相关--------------------------------------------------</span></span><br><span class="line"><span class="comment"># 修改端口为5522</span></span><br><span class="line">sed -i <span class="string">'/Port 22/cPort 5522'</span> /etc/ssh/sshd_config</span><br><span class="line"></span><br><span class="line"><span class="comment"># 禁止root账户登陆</span></span><br><span class="line">sed -i <span class="string">'/PermitRootLogin/cPermitRootLogin yes'</span> /etc/ssh/sshd_config</span><br><span class="line"></span><br><span class="line"><span class="comment"># 关闭密码登陆，使用密钥登陆</span></span><br><span class="line">sed -i <span class="string">'/^PasswordAuthentication/cPasswordAuthentication no'</span> /etc/ssh/sshd_config</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解决登陆慢的问题</span></span><br><span class="line">sed -i <span class="string">'/^GSSAPIAuthentication/cGSSAPIAuthentication no'</span> /etc/ssh/sshd_config</span><br><span class="line">sed -i <span class="string">'/^UseDNS/cUseDNS no'</span> /etc/ssh/sshd_config</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重启生效</span></span><br><span class="line">service sshd restart</span><br><span class="line">systemctl restart sshd</span><br><span class="line"></span><br><span class="line"><span class="comment">#--------------------------------------------------系统优化--------------------------------------------------</span></span><br><span class="line"><span class="comment"># 修改限制：/etc/security/limits.conf</span></span><br><span class="line">cat &gt;&gt;/etc/security/limits.conf&lt;&lt;EOF</span><br><span class="line">*        soft    core        unlimited</span><br><span class="line">*        hard    core        unlimited</span><br><span class="line">*        soft    data        unlimited</span><br><span class="line">*        hard    data        unlimited</span><br><span class="line">*        soft    fsize       unlimited</span><br><span class="line">*        hard    fsize       unlimited</span><br><span class="line">*        soft    memlock     unlimited</span><br><span class="line">*        hard    memlock     unlimited</span><br><span class="line">*        soft    nofile      1024000</span><br><span class="line">*        hard    nofile      1024000</span><br><span class="line">*        soft    rss         unlimited</span><br><span class="line">*        hard    rss         unlimited</span><br><span class="line">*        soft    stack       unlimited</span><br><span class="line">*        hard    stack       unlimited</span><br><span class="line">*        soft    nproc       102400</span><br><span class="line">*        hard    nproc       102400</span><br><span class="line">*        soft    locks       unlimited</span><br><span class="line">*        hard    locks       unlimited</span><br><span class="line">*        soft    sigpending  unlimited</span><br><span class="line">*        hard    sigpending  unlimited</span><br><span class="line">*        soft    msgqueue    unlimited</span><br><span class="line">*        hard    msgqueue    unlimited</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="comment"># 优化内核参数</span></span><br><span class="line">cat &gt;&gt;/etc/sysctl.conf&lt;&lt;EOF</span><br><span class="line">net.ipv4.tcp_fin_timeout = 2</span><br><span class="line">net.ipv4.tcp_tw_reuse = 1</span><br><span class="line">net.ipv4.tcp_tw_recycle = 1</span><br><span class="line">net.ipv4.tcp_syncookies = 1</span><br><span class="line">net.ipv4.tcp_keepalive_time = 600</span><br><span class="line">net.ipv4.ip_local_port_range = 4000    65000</span><br><span class="line">net.ipv4.tcp_max_syn_backlog = 16384</span><br><span class="line">net.ipv4.tcp_max_tw_buckets = 36000</span><br><span class="line">net.ipv4.route.gc_timeout = 100</span><br><span class="line">net.ipv4.tcp_syn_retries = 1</span><br><span class="line">net.ipv4.tcp_synack_retries = 1</span><br><span class="line">net.core.somaxconn = 16384</span><br><span class="line">net.core.netdev_max_backlog = 16384</span><br><span class="line">net.ipv4.tcp_max_orphans = 16384</span><br><span class="line"><span class="comment"># 以下参数是对iptables防火墙的优化，防火墙不开会提示，可以忽略不理。</span></span><br><span class="line">net.nf_conntrack_max = 25000000</span><br><span class="line">net.netfilter.nf_conntrack_max = 25000000</span><br><span class="line">net.netfilter.nf_conntrack_tcp_timeout_established = 180</span><br><span class="line">net.netfilter.nf_conntrack_tcp_timeout_time_wait = 120</span><br><span class="line">net.netfilter.nf_conntrack_tcp_timeout_close_wait = 60</span><br><span class="line">net.netfilter.nf_conntrack_tcp_timeout_fin_wait = 120</span><br><span class="line">net.core.wmem_default = 8388608</span><br><span class="line">net.core.rmem_default = 8388608</span><br><span class="line">net.core.wmem_max = 16777216</span><br><span class="line">net.core.rmem_max = 16777216</span><br><span class="line">EOF</span><br><span class="line">sysctl -p</span><br><span class="line"></span><br><span class="line"><span class="comment">#--------------------------------------------------细节优化--------------------------------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 集群互信通信</span></span><br><span class="line"><span class="comment"># 创建密钥</span></span><br><span class="line">[[ -d ~/.ssh ]] || mkdir ~/.ssh</span><br><span class="line">ssh-keygen -qt rsa -P <span class="string">''</span> -f ~/.ssh/id_rsa</span><br><span class="line"></span><br><span class="line"><span class="comment"># 公钥添加到本机的授权文件</span></span><br><span class="line">cat ~/.ssh/id_rsa.pub &gt;&gt;~/.ssh/authorized_keys</span><br><span class="line">chmod 600 ~/.ssh/authorized_keys</span><br><span class="line"></span><br><span class="line"><span class="comment"># 分发密钥和授权文件</span></span><br><span class="line"><span class="keyword">for</span> host <span class="keyword">in</span> node&#123;2..9&#125;; <span class="keyword">do</span> scp -p ~/.ssh/&#123;id_rsa,authorized_keys&#125; <span class="variable">$&#123;host&#125;</span>:/root/.ssh;<span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 集群HOSTS文件解析</span></span><br><span class="line">cat &gt;&gt;/etc/hosts&lt;&lt;EOF</span><br><span class="line">172.16.0.101    node1</span><br><span class="line">172.16.0.102    node2</span><br><span class="line">172.16.0.103    node3</span><br><span class="line">172.16.0.104    node4</span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="comment"># 升级系统</span></span><br><span class="line">yum -y update ; yum clean all</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将常用指令写入历史</span></span><br><span class="line"><span class="built_in">history</span> -c</span><br><span class="line">hostnamectl <span class="built_in">set</span>-hostname</span><br><span class="line">vi /etc/sysconfig/network</span><br><span class="line">vi /etc/hosts</span><br><span class="line">vi /etc/sysconfig/network-scripts/ifcfg-</span><br><span class="line"></span><br><span class="line"><span class="comment"># CentOS 图形界面相关优化</span></span><br><span class="line">    </span><br><span class="line">分辨率修改：应用程序-系统工具-设备-显示-分辨率</span><br><span class="line"></span><br><span class="line">图标大小：主文件夹-框架栏上的三个横杠-点击缩小的按钮-50%</span><br></pre></td></tr></table></figure>
+<h2 id="克隆模板机"><a href="#克隆模板机" class="headerlink" title="克隆模板机"></a>克隆模板机</h2><ul>
+<li>基本步骤</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 克隆虚拟机</span></span><br><span class="line">    cp /kvm_data/centos7.5.qcow2 /kvm_data/centos7.5-1.qcow2</span><br><span class="line">    virsh dumpxml centos7.5 &gt; /etc/libvirt/qemu/centos7.5-1.xml</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编辑克隆主机配置：vim /etc/libvirt/qemu/centos7.5-1.xml 修改以下内容</span></span><br><span class="line">    &lt;name&gt;：     <span class="comment"># 虚拟机的名字</span></span><br><span class="line">    &lt;uuid&gt;：     <span class="comment"># 不重复的UUID</span></span><br><span class="line">    &lt;<span class="built_in">source</span>&gt;：   <span class="comment"># 主数据文件</span></span><br><span class="line">    &lt;mac&gt;：      <span class="comment"># 不重复的网卡mac地址</span></span><br><span class="line">    &lt;graphics&gt;： <span class="comment"># 修改vnc端口</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入克隆后的系统</span></span><br><span class="line">    virsh define /etc/libvirt/qemu/centos7.5-1.xml</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动克隆的虚拟机，并修改主机名</span></span><br><span class="line">    virsh start centos7.5-1</span><br><span class="line">    hostnamectl <span class="built_in">set</span>-hostname centos7.5-1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为VNC设置密码：vim /etc/libvirt/qemu/centos7.5-1.xml 修改以下内容</span></span><br><span class="line">    &lt;graphics&gt;：增加 passwd=<span class="string">'123456'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>自动化克隆脚本</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 模板域名称</span></span><br><span class="line">DOMINFO=centos7.5</span><br><span class="line"></span><br><span class="line"><span class="comment"># 模板镜像文件</span></span><br><span class="line">TEMPLATE=/kvm_data/centos7.5.qcow2</span><br><span class="line"></span><br><span class="line"><span class="comment"># 克隆个数</span></span><br><span class="line">NUMBER=2</span><br><span class="line"></span><br><span class="line"><span class="comment"># 镜像存放目录，默认与模板路径相同</span></span><br><span class="line">DATAPATH=<span class="variable">$&#123;TEMPLATE%/*&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 模板机 VNC 端口</span></span><br><span class="line">VNCPORT=9527</span><br><span class="line"></span><br><span class="line"><span class="comment"># ---------------------------代码区---------------------------</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 检测镜像文件存在性</span></span><br><span class="line">[[ -f <span class="variable">$TEMPLATE</span> ]] || &#123; <span class="built_in">echo</span> <span class="string">"模板镜像文件不存在"</span> &amp;&amp; <span class="built_in">exit</span>; &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 基础文件名，请勿修改</span></span><br><span class="line">BASENAME=<span class="variable">$&#123;TEMPLATE##*/&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 自增端口</span></span><br><span class="line">CPORT=<span class="variable">$VNCPORT</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 复制镜像并克隆</span></span><br><span class="line"><span class="keyword">for</span> ((i=1;i&lt;=<span class="variable">$NUMBER</span>;i++)) ;<span class="keyword">do</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"开始克隆第<span class="variable">$&#123;i&#125;</span>台"</span></span><br><span class="line"></span><br><span class="line">    COPY=<span class="variable">$&#123;BASENAME/.qcow2/_$i.qcow2&#125;</span></span><br><span class="line">    cp -a <span class="variable">$TEMPLATE</span> <span class="variable">$DATAPATH</span>/<span class="variable">$COPY</span>;</span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"模板镜像复制完成"</span></span><br><span class="line"></span><br><span class="line">    COPYNAME=<span class="variable">$&#123;COPY##*/&#125;</span></span><br><span class="line">    XML=<span class="variable">$&#123;COPYNAME/qcow2/xml&#125;</span></span><br><span class="line">    virsh dumpxml <span class="variable">$DOMINFO</span> &gt; /etc/libvirt/qemu/<span class="variable">$XML</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"克隆虚拟机配置生成完成"</span></span><br><span class="line"></span><br><span class="line">    sed -i <span class="string">"/&lt;name&gt;/s/&gt;.*&lt;/&gt;<span class="variable">$XML</span>&lt;/"</span> /etc/libvirt/qemu/<span class="variable">$XML</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"克隆虚拟机域名称修改完成"</span></span><br><span class="line"></span><br><span class="line">    UUID=`uuidgen`</span><br><span class="line">    sed -i <span class="string">"/&lt;uuid&gt;/s/&gt;.*&lt;/&gt;<span class="variable">$UUID</span>&lt;/"</span> /etc/libvirt/qemu/<span class="variable">$XML</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"克隆虚拟机UUID修改完成"</span></span><br><span class="line"></span><br><span class="line">    sed -i <span class="string">"s/<span class="variable">$BASENAME</span>/<span class="variable">$COPY</span>/"</span> /etc/libvirt/qemu/<span class="variable">$XML</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"克隆虚拟机镜像路径修改完成"</span></span><br><span class="line"></span><br><span class="line">    MAC=<span class="string">"<span class="variable">$(hexdump -n3 -e'/3 "52:54:00" 3/1 ":%02X"' /dev/urandom)</span>"</span></span><br><span class="line">    sed -i <span class="string">"/&lt;mac address/s/'.*'/'<span class="variable">$MAC</span>'/"</span> /etc/libvirt/qemu/<span class="variable">$XML</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"克隆虚拟机网卡MAC地址修改完成"</span></span><br><span class="line"></span><br><span class="line">    sed -i <span class="string">"/vnc/s/port='<span class="variable">$VNCPORT</span>'/port='<span class="variable">$((++CPORT)</span>)'/"</span> /etc/libvirt/qemu/<span class="variable">$XML</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"设置VNC端口完成"</span></span><br><span class="line"></span><br><span class="line">    PASSWD=`date +%N`</span><br><span class="line">    sed -i <span class="string">"/'vnc'/s/'vnc'/&amp; passwd='<span class="variable">$PASSWD</span>'/"</span> /etc/libvirt/qemu/<span class="variable">$XML</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"设置VNC密码完成"</span></span><br><span class="line"></span><br><span class="line">    virsh define /etc/libvirt/qemu/<span class="variable">$XML</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"注册克隆虚拟机完成"</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    域名称: <span class="variable">$COPYNAME</span></span></span><br><span class="line"><span class="string">    镜像文件：<span class="variable">$DATAPATH</span>/<span class="variable">$COPY</span></span></span><br><span class="line"><span class="string">    配置文件：/etc/libvirt/qemu/<span class="variable">$XML</span></span></span><br><span class="line"><span class="string">    UUID：<span class="variable">$UUID</span></span></span><br><span class="line"><span class="string">    网卡地址：<span class="variable">$MAC</span></span></span><br><span class="line"><span class="string">    VNC端口：<span class="variable">$CPORT</span></span></span><br><span class="line"><span class="string">    VNC密码：<span class="variable">$PASSWD</span></span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    "</span>&gt;&gt;alonekvm.log</span><br><span class="line"></span><br><span class="line">    <span class="built_in">echo</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"克隆<span class="variable">$&#123;NUMBER&#125;</span>台虚拟机完成"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"请逐个启动虚拟机，并修改主机名称"</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/14/web/jQuery/" rel="next" title="jQuery学习笔记">
+                <i class="fa fa-chevron-left"></i> jQuery学习笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/19/personal/Typora/" rel="prev" title="Typora编辑页面调整">
+                Typora编辑页面调整 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言需求"><span class="nav-number">1.</span> <span class="nav-text">前言需求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装KVM"><span class="nav-number">2.</span> <span class="nav-text">安装KVM</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#准备模板机"><span class="nav-number">3.</span> <span class="nav-text">准备模板机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定制模板机"><span class="nav-number">4.</span> <span class="nav-text">定制模板机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#克隆模板机"><span class="nav-number">5.</span> <span class="nav-text">克隆模板机</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

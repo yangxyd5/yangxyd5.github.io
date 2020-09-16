@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Socket在标准库 net 包下提供了可一直的网络 I/O 接口，其中包含了 Socket Socket 在 TCP/IP 网络分层中并不存在，它是对 TCP/UDP 的封装  TCPAddr 结构体表示服务器 IP 和端口  type TCPAddr struct &amp;#123;    IP IP    Port int    Zone string&amp;#125;  TCPConn 结构体表示连接">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络编程基础和框架">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/10/07/go/3.网络编程/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="Socket在标准库 net 包下提供了可一直的网络 I/O 接口，其中包含了 Socket Socket 在 TCP/IP 网络分层中并不存在，它是对 TCP/UDP 的封装  TCPAddr 结构体表示服务器 IP 和端口  type TCPAddr struct &amp;#123;    IP IP    Port int    Zone string&amp;#125;  TCPConn 结构体表示连接">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-01-06T07:58:31.155Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="网络编程基础和框架">
+<meta name="twitter:description" content="Socket在标准库 net 包下提供了可一直的网络 I/O 接口，其中包含了 Socket Socket 在 TCP/IP 网络分层中并不存在，它是对 TCP/UDP 的封装  TCPAddr 结构体表示服务器 IP 和端口  type TCPAddr struct &amp;#123;    IP IP    Port int    Zone string&amp;#125;  TCPConn 结构体表示连接">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/10/07/go/3.网络编程/">
+
+
+
+
+
+  <title>网络编程基础和框架 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/10/07/go/3.网络编程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">网络编程基础和框架</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-07T00:00:00+08:00">
+                2019-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/golang/" itemprop="url" rel="index">
+                    <span itemprop="name">golang</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h1><p>在标准库 net 包下提供了可一直的网络 I/O 接口，其中包含了 Socket</p>
+<p>Socket 在 TCP/IP 网络分层中并不存在，它是对 TCP/UDP 的封装</p>
+<ol>
+<li>TCPAddr 结构体表示服务器 IP 和端口</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> TCPAddr <span class="keyword">struct</span> &#123;</span><br><span class="line">    IP IP</span><br><span class="line">    Port <span class="keyword">int</span></span><br><span class="line">    Zone <span class="keyword">string</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>TCPConn 结构体表示连接，封装了数据读写操作</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> TCPConn <span class="keyword">struct</span> &#123;</span><br><span class="line">	conn</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>TCPListener 负责监听服务器端特定端口</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> TCPListener <span class="keyword">struct</span> &#123;</span><br><span class="line">    fd *netFD</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="回显服务器"><a href="#回显服务器" class="headerlink" title="回显服务器"></a>回显服务器</h2><ul>
+<li>server</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"net"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 创建 TCPAddress 变量，指向协议 TCP4，监听本机的一个端口</span></span><br><span class="line">	addr, _ := net.ResolveTCPAddr(<span class="string">"tcp4"</span>, <span class="string">"localhost:8000"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 监听 TCPAddress 设定的地址</span></span><br><span class="line">	lis, _ := net.ListenTCP(<span class="string">"tcp4"</span>, addr)</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">"服务器已经启动"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 服务器接收和建立连接是不间断的</span></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="comment">// 阻塞时等待客户端消息，返回连接对象，用于接收客户端消息或向客户端发送消息</span></span><br><span class="line">		conn, _ := lis.Accept()</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 把数据读取到切片中</span></span><br><span class="line">		b := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">256</span>)</span><br><span class="line">		fmt.Println(<span class="string">"read之前"</span>)</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 客户端没有发送数据且客户端对象没有关闭，Read() 将会阻塞，一旦接收到数据就不阻塞</span></span><br><span class="line">		count, _ := conn.Read(b)</span><br><span class="line">		fmt.Println(<span class="string">"接收到数据:"</span>, <span class="keyword">string</span>(b[:count]))</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 向客户端返回一个消息</span></span><br><span class="line">		conn.Write([]<span class="keyword">byte</span>(<span class="string">"server"</span> + <span class="keyword">string</span>(b[:count])))</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 关闭连接</span></span><br><span class="line">		conn.Close()</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">"服务器停止运行"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>client</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"net"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 创建服务器端地址</span></span><br><span class="line">	addr, _ := net.ResolveTCPAddr(<span class="string">"tcp4"</span>, <span class="string">"localhost:8000"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 创建连接</span></span><br><span class="line">	conn, _ := net.DialTCP(<span class="string">"tcp"</span>, <span class="literal">nil</span>, addr)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 发送数据</span></span><br><span class="line">	conn.Write([]<span class="keyword">byte</span>(<span class="string">"客户端发送的数据"</span>))</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 接收数据</span></span><br><span class="line">	b := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">256</span>)</span><br><span class="line">	fmt.Println(<span class="string">"read之前"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 接收数据</span></span><br><span class="line">	count, _ := conn.Read(b)</span><br><span class="line">	fmt.Println(<span class="string">"接收到数据:"</span>, <span class="keyword">string</span>(b[:count]))</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 关闭连接</span></span><br><span class="line">	conn.Close()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="并发回显服务器"><a href="#并发回显服务器" class="headerlink" title="并发回显服务器"></a>并发回显服务器</h2><ul>
+<li>server，使用 goroutine 接收处理每个请求</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 创建 TCPAddress 变量，指向协议 TCP4，监听本机的一个端口</span></span><br><span class="line">	addr, _ := net.ResolveTCPAddr(<span class="string">"tcp4"</span>, <span class="string">"localhost:8000"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 监听 TCPAddress 设定的地址</span></span><br><span class="line">	lis, _ := net.ListenTCP(<span class="string">"tcp4"</span>, addr)</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">"服务器已经启动"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 服务器接收和建立连接是不间断的</span></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="comment">// 阻塞时等待客户端消息，返回连接对象，用于接收客户端消息或向客户端发送消息</span></span><br><span class="line">		conn, _ := lis.Accept()</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 添加 goroutine 让服务器支持并发</span></span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="comment">// 把数据读取到切片中</span></span><br><span class="line">			b := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">256</span>)</span><br><span class="line">			fmt.Println(<span class="string">"read之前"</span>)</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 有意延迟</span></span><br><span class="line">			time.Sleep(<span class="number">2e9</span>)</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 客户端没有发送数据且客户端对象没有关闭，Read() 将会阻塞，一旦接收到数据就不阻塞</span></span><br><span class="line">			count, _ := conn.Read(b)</span><br><span class="line">			fmt.Println(<span class="string">"接收到数据:"</span>, <span class="keyword">string</span>(b[:count]))</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 向客户端返回一个消息</span></span><br><span class="line">			conn.Write([]<span class="keyword">byte</span>(<span class="string">"server"</span> + <span class="keyword">string</span>(b[:count])))</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 关闭连接</span></span><br><span class="line">			conn.Close()</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Println(<span class="string">"服务器停止运行"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>client，使用 go route 模拟同时发送 10 个请求</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 创建服务器端地址</span></span><br><span class="line">	addr, _ := net.ResolveTCPAddr(<span class="string">"tcp4"</span>, <span class="string">"localhost:8000"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">10</span>; i++ &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="comment">// 创建连接</span></span><br><span class="line">			conn, _ := net.DialTCP(<span class="string">"tcp"</span>, <span class="literal">nil</span>, addr)</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 发送数据</span></span><br><span class="line">			conn.Write([]<span class="keyword">byte</span>(<span class="string">"客户端发送的数据"</span>))</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 接收数据</span></span><br><span class="line">			b := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">256</span>)</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 接收数据</span></span><br><span class="line">			count, _ := conn.Read(b)</span><br><span class="line">			fmt.Println(<span class="string">"接收到数据:"</span>, <span class="keyword">string</span>(b[:count]))</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 关闭连接</span></span><br><span class="line">			conn.Close()</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">	time.Sleep(<span class="number">3e9</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="点对点通信"><a href="#点对点通信" class="headerlink" title="点对点通信"></a>点对点通信</h2><p>点对点通信是一个客户端与客户端的通信</p>
+<ul>
+<li>server</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Username  <span class="keyword">string</span></span><br><span class="line">	OtherUser <span class="keyword">string</span></span><br><span class="line">	Msg       <span class="keyword">string</span></span><br><span class="line">	ServerMsg <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	usermap = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]net.Conn)</span><br><span class="line">	user    = <span class="built_in">new</span>(User)</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	addr, _ := net.ResolveTCPAddr(<span class="string">"tcp4"</span>, <span class="string">"127.0.0.1:8000"</span>)</span><br><span class="line">	lis, _ := net.ListenTCP(<span class="string">"tcp4"</span>, addr)</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		conn, _ := lis.Accept()</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">for</span> &#123;</span><br><span class="line">				b := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">1024</span>)</span><br><span class="line">				count, _ := conn.Read(b)</span><br><span class="line">				array := strings.Split(<span class="keyword">string</span>(b[:count]), <span class="string">"-"</span>)</span><br><span class="line">				user.Username = array[<span class="number">0</span>]</span><br><span class="line">				user.OtherUser = array[<span class="number">1</span>]</span><br><span class="line">				user.Msg = array[<span class="number">2</span>]</span><br><span class="line">				user.ServerMsg = array[<span class="number">3</span>]</span><br><span class="line">				usermap[user.Username]=conn</span><br><span class="line">				<span class="keyword">if</span> v, ok := usermap[user.OtherUser]; ok &amp;&amp; v != <span class="literal">nil</span> &#123;</span><br><span class="line">					message := fmt.Sprintf(<span class="string">"%s-%s-%s-%s"</span>, user.Username, user.OtherUser, user.Msg, user.ServerMsg)</span><br><span class="line">					n, err := v.Write([]<span class="keyword">byte</span>(message))</span><br><span class="line">					<span class="keyword">if</span> n &lt;= <span class="number">0</span> || err != <span class="literal">nil</span> &#123;</span><br><span class="line">						<span class="built_in">delete</span>(usermap, user.OtherUser)</span><br><span class="line">						conn.Close()</span><br><span class="line">						v.Close()</span><br><span class="line">						<span class="keyword">break</span></span><br><span class="line">					&#125;</span><br><span class="line">				&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">					user.ServerMsg = <span class="string">"对方不在线"</span></span><br><span class="line">					message := fmt.Sprintf(<span class="string">"%s-%s-%s-%s"</span>, user.Username, user.OtherUser, user.Msg, user.ServerMsg)</span><br><span class="line">					conn.Write([]<span class="keyword">byte</span>(message))</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>client</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Username      <span class="keyword">string</span></span><br><span class="line">	OtherUsername <span class="keyword">string</span></span><br><span class="line">	Msg           <span class="keyword">string</span></span><br><span class="line">	ServerMsg     <span class="keyword">string</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> (</span><br><span class="line">	user = <span class="built_in">new</span>(User)</span><br><span class="line">	wg   sync.WaitGroup</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	wg.Add(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">	fmt.Println(<span class="string">"请输入您的账号:"</span>)</span><br><span class="line">	fmt.Scanln(&amp;user.Username)</span><br><span class="line">	fmt.Println(<span class="string">"请输入要给谁发送消息:"</span>)</span><br><span class="line">	fmt.Scanln(&amp;user.OtherUsername)</span><br><span class="line"></span><br><span class="line">	addr, _ := net.ResolveTCPAddr(<span class="string">"tcp4"</span>, <span class="string">"127.0.0.1:8000"</span>)</span><br><span class="line">	conn, _ := net.DialTCP(<span class="string">"tcp4"</span>, <span class="literal">nil</span>, addr)</span><br><span class="line"></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">"请输入要发送的信息，本提示仅一次，以后直接输入"</span>)</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			fmt.Scanln(&amp;user.Msg)</span><br><span class="line">			<span class="keyword">if</span> user.Msg == <span class="string">"exit"</span> &#123;</span><br><span class="line">				conn.Close()</span><br><span class="line">				wg.Done()</span><br><span class="line">				os.Exit(<span class="number">0</span>)</span><br><span class="line">			&#125;</span><br><span class="line">			message := fmt.Sprintf(<span class="string">"%s-%s-%s-%s"</span>, user.Username, user.OtherUsername, user.Msg, user.ServerMsg)</span><br><span class="line">			conn.Write([]<span class="keyword">byte</span>(message))</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			b := <span class="built_in">make</span>([]<span class="keyword">byte</span>, <span class="number">1024</span>)</span><br><span class="line">			count, _ := conn.Read(b)</span><br><span class="line">			array := strings.Split(<span class="keyword">string</span>(b[:count]), <span class="string">"-"</span>)</span><br><span class="line">			user2 := <span class="built_in">new</span>(User)</span><br><span class="line">			user2.Username = array[<span class="number">0</span>]</span><br><span class="line">			user2.OtherUsername = array[<span class="number">1</span>]</span><br><span class="line">			user2.Msg = array[<span class="number">2</span>]</span><br><span class="line">			user2.ServerMsg = array[<span class="number">3</span>]</span><br><span class="line">			<span class="keyword">if</span> user2.ServerMsg != <span class="string">""</span> &#123;</span><br><span class="line">				fmt.Println(<span class="string">"\t服务器的消息"</span>, user2.ServerMsg)</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				fmt.Println(<span class="string">"\t"</span>, user2.Username, <span class="string">":"</span>, user2.Msg)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">	wg.Wait()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="http-服务器"><a href="#http-服务器" class="headerlink" title="http 服务器"></a>http 服务器</h1><ol>
+<li>HandleFunc 可以设置函数的请求路径</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// HandleFunc registers the handler function for the given pattern</span></span><br><span class="line"><span class="comment">// in the DefaultServeMux.</span></span><br><span class="line"><span class="comment">// The documentation for ServeMux explains how patterns are matched.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">HandleFunc</span><span class="params">(pattern <span class="keyword">string</span>, handler <span class="keyword">func</span>(ResponseWriter, *Request)</span>)</span> &#123;</span><br><span class="line">	DefaultServeMux.HandleFunc(pattern, handler)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol start="2">
+<li>ListenAndServe 实现了监听服务</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ListenAndServe always returns a non-nil error.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">ListenAndServe</span><span class="params">(addr <span class="keyword">string</span>, handler Handler)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	server := &amp;Server&#123;Addr: addr, Handler: handler&#125;</span><br><span class="line">	<span class="keyword">return</span> server.ListenAndServe()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>第一个 Go web 项目</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">welcome</span><span class="params">(w http.ResponseWriter, r *http.Request)</span></span> &#123;</span><br><span class="line">	w.Header().Set(<span class="string">"Content-Type"</span>, <span class="string">"text/html;charset=utf-8"</span>)</span><br><span class="line">	fmt.Fprint(w, <span class="string">"&lt;h1&gt;服务器返回的信息&lt;/h1&gt;"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	http.HandleFunc(<span class="string">"/"</span>, welcome)</span><br><span class="line">	http.ListenAndServe(<span class="string">"127.0.0.1:8080"</span>, <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="单控制器"><a href="#单控制器" class="headerlink" title="单控制器"></a>单控制器</h2><p>在 Go 语言的 net/http 包下有 ServeMux 实现了 Front 设计模式的 Front 窗口，ServeMux 负责接收请求并把请求分发给处理器（Handler）</p>
+<ol>
+<li>Http.ServeMux 源码实现了 Handler 接口</li>
+</ol>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> Handler <span class="keyword">interface</span> &#123;                     <span class="comment">// 处理一个请求的处理器</span></span><br><span class="line">	ServeHTTP(ResponseWriter, *Request)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> ServeMux <span class="keyword">struct</span> &#123;                      <span class="comment">// ServeMux 结构体</span></span><br><span class="line">	mu    sync.RWMutex</span><br><span class="line">	m     <span class="keyword">map</span>[<span class="keyword">string</span>]muxEntry</span><br><span class="line">	es    []muxEntry <span class="comment">// slice of entries sorted from longest to shortest.</span></span><br><span class="line">	hosts <span class="keyword">bool</span>       <span class="comment">// whether any patterns contain hostnames</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// ServeMux 结构体重写了 ServeHTTP 这个方法，就是 ServeMux 结构体实现了 ServeHTTP 方法</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(mux *ServeMux)</span> <span class="title">ServeHTTP</span><span class="params">(w ResponseWriter, r *Request)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> r.RequestURI == <span class="string">"*"</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> r.ProtoAtLeast(<span class="number">1</span>, <span class="number">1</span>) &#123;</span><br><span class="line">			w.Header().Set(<span class="string">"Connection"</span>, <span class="string">"close"</span>)</span><br><span class="line">		&#125;</span><br><span class="line">		w.WriteHeader(StatusBadRequest)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	h, _ := mux.Handler(r)</span><br><span class="line">	h.ServeHTTP(w, r)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>自定义结构体，实现 Handler 接口后，这个结构体就属于一个处理器，可以处理请求</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"fmt"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Myhandeler <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(mh *Myhandeler)</span> <span class="title">ServeHTTP</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	fmt.Fprintln(res, <span class="string">"输出内容"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	myhandeler := Myhandeler&#123;&#125;</span><br><span class="line">	server := http.Server&#123;</span><br><span class="line">		Addr:    <span class="string">"127.0.0.1:8090"</span>,</span><br><span class="line">		Handler: &amp;myhandeler,</span><br><span class="line">	&#125;</span><br><span class="line">	server.ListenAndServe()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="多控制器"><a href="#多控制器" class="headerlink" title="多控制器"></a>多控制器</h2><p>在实际开发中，必须有多个控制器，来区分业务，Go 语言中支持两种处理方式</p>
+<ol>
+<li>多个处理器（Handler）</li>
+<li>多个处理函数（HandleFunc）</li>
+</ol>
+<h3 id="使用多处理器"><a href="#使用多处理器" class="headerlink" title="使用多处理器"></a>使用多处理器</h3><p>使用 Http.Handler 把不同的 URL 绑定到不同的处理器，在浏览器输入：/myhandler 或者 /myother 可以访问两个处理器，访问其他出现 404</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Myhandeler <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span> Myother <span class="keyword">struct</span> &#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(mh *Myhandeler)</span> <span class="title">ServeHTTP</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	res.Write([]<span class="keyword">byte</span>(<span class="string">"&lt;h1&gt;Myhandeler 输出内容&lt;/h1&gt;"</span>))</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(mh *Myother)</span> <span class="title">ServeHTTP</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	res.Write([]<span class="keyword">byte</span>(<span class="string">"&lt;h1&gt;Myother 输出内容&lt;/h1&gt;"</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	myhandeler := Myhandeler&#123;&#125;</span><br><span class="line">	myother := Myother&#123;&#125;</span><br><span class="line">	server := http.Server&#123;Addr: <span class="string">"127.0.0.1:8080"</span>&#125;</span><br><span class="line">	http.Handle(<span class="string">"/myhandler"</span>, &amp;myhandeler)</span><br><span class="line">	http.Handle(<span class="string">"/myother"</span>, &amp;myother)</span><br><span class="line">	server.ListenAndServe()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="多处理器函数"><a href="#多处理器函数" class="headerlink" title="多处理器函数"></a>多处理器函数</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">myhandler</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	res.Write([]<span class="keyword">byte</span>(<span class="string">"&lt;h1&gt;Myhandeler 输出内容&lt;/h1&gt;"</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">myother</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	res.Write([]<span class="keyword">byte</span>(<span class="string">"&lt;h1&gt;Myother 输出内容&lt;/h1&gt;"</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	server := http.Server&#123;Addr: <span class="string">"127.0.0.1:8080"</span>&#125;</span><br><span class="line">	http.HandleFunc(<span class="string">"/myhandler"</span>, myhandler)</span><br><span class="line">	http.HandleFunc(<span class="string">"/myother"</span>, myother)</span><br><span class="line">	server.ListenAndServe()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="获取请求头和参数"><a href="#获取请求头和参数" class="headerlink" title="获取请求头和参数"></a>获取请求头和参数</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 设置响应头</span></span><br><span class="line">	res.Header().Set(<span class="string">"Content-Type"</span>, <span class="string">"text/html;charset=utf-8"</span>)</span><br><span class="line"></span><br><span class="line">	res.Write([]<span class="keyword">byte</span>(<span class="string">"&lt;h3&gt;请求头的信息&lt;/h3&gt;"</span>))</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 请求头</span></span><br><span class="line">	header := req.Header</span><br><span class="line">	<span class="keyword">for</span> k, v := <span class="keyword">range</span> header &#123;</span><br><span class="line">		key := []<span class="keyword">byte</span>(k)</span><br><span class="line">		res.Write(key)</span><br><span class="line">		res.Write([]<span class="keyword">byte</span>(<span class="string">" -&gt; "</span>))</span><br><span class="line">		<span class="keyword">for</span> _, v := <span class="keyword">range</span> v &#123;</span><br><span class="line">			res.Write([]<span class="keyword">byte</span>(v))</span><br><span class="line">			res.Write([]<span class="keyword">byte</span>(<span class="string">"&amp;nbsp;"</span>))</span><br><span class="line">		&#125;</span><br><span class="line">		res.Write([]<span class="keyword">byte</span>(<span class="string">"&lt;/br&gt;"</span>))</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	res.Write([]<span class="keyword">byte</span>(<span class="string">"&lt;h3&gt;请求参数的信息&lt;/h3&gt;"</span>))</span><br><span class="line">	<span class="comment">// 请求参数</span></span><br><span class="line">	req.ParseForm()</span><br><span class="line">	form := req.Form</span><br><span class="line">	<span class="keyword">for</span> k, _ := <span class="keyword">range</span> form &#123;</span><br><span class="line">		key := []<span class="keyword">byte</span>(k)</span><br><span class="line">		res.Write(key)</span><br><span class="line">		res.Write([]<span class="keyword">byte</span>(<span class="string">" -&gt; "</span>))</span><br><span class="line">		res.Write([]<span class="keyword">byte</span>(req.FormValue(k)))</span><br><span class="line">		<span class="comment">// for _, v := range v &#123;</span></span><br><span class="line">		<span class="comment">// 	res.Write([]byte(v))</span></span><br><span class="line">		<span class="comment">// 	res.Write([]byte("&amp;nbsp;"))</span></span><br><span class="line">		<span class="comment">// &#125;</span></span><br><span class="line">		res.Write([]<span class="keyword">byte</span>(<span class="string">"&lt;/br&gt;"</span>))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	server := http.Server&#123;Addr: <span class="string">"127.0.0.1:8080"</span>&#125;</span><br><span class="line">	http.HandleFunc(<span class="string">"/handler"</span>, handler)</span><br><span class="line">	server.ListenAndServe()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><ul>
+<li>站点的文件组织</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">web/</span><br><span class="line">├── main.<span class="keyword">go</span>                              <span class="comment">// main 函数</span></span><br><span class="line">├── src                                  <span class="comment">// go 源码文件</span></span><br><span class="line">├── static                               <span class="comment">// 静态文件资源</span></span><br><span class="line">│   ├── css</span><br><span class="line">│   ├── images</span><br><span class="line">│   └── js</span><br><span class="line">│       └── main.js</span><br><span class="line">└── templates                            <span class="comment">// 模板文件目录</span></span><br><span class="line">    └── index.html</span><br></pre></td></tr></table></figure>
+<h2 id="html-模板"><a href="#html-模板" class="headerlink" title="html 模板"></a>html 模板</h2><ul>
+<li>静态文件：static/js/main.js</li>
+</ul>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">button = <span class="built_in">document</span>.querySelector(<span class="string">".button"</span>);</span><br><span class="line"></span><br><span class="line">button.addEventListener(<span class="string">"click"</span>, <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    alert(<span class="string">"点击了按钮"</span>);</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>模板文件：templates/index.html</li>
+</ul>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=<span class="string">"en"</span>&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">    &lt;meta charset=<span class="string">"UTF-8"</span>&gt;</span><br><span class="line">    &lt;meta name=<span class="string">"viewport"</span> content=<span class="string">"width=device-width, initial-scale=1.0"</span>&gt;</span><br><span class="line">    &lt;meta http-equiv=<span class="string">"X-UA-Compatible"</span> content=<span class="string">"ie=edge"</span>&gt;</span><br><span class="line">    &lt;title&gt;Document&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;h2&gt;Hello Golang&lt;/h2&gt;</span><br><span class="line">    &lt;input <span class="keyword">type</span>=<span class="string">"button"</span> value=<span class="string">"æŒ‰é’®"</span> class=<span class="string">"button"</span>/&gt;</span><br><span class="line">    &lt;script src="/static/js/main.js"&gt;&lt;/script&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>main.go</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"html/template"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	t, _ := template.ParseFiles(<span class="string">"templates/index.html"</span>)</span><br><span class="line">	t.Execute(res, <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	server := http.Server&#123;Addr: <span class="string">"127.0.0.1:8080"</span>&#125;</span><br><span class="line">	<span class="comment">// 让静态文件服务生效</span></span><br><span class="line">	http.Handle(<span class="string">"/static/"</span>, http.StripPrefix(<span class="string">"/static/"</span>, http.FileServer(http.Dir(<span class="string">"static"</span>))))</span><br><span class="line">	http.HandleFunc(<span class="string">"/handler"</span>, handler)</span><br><span class="line">	server.ListenAndServe()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="简单的-HTTP-文件服务器"><a href="#简单的-HTTP-文件服务器" class="headerlink" title="简单的 HTTP 文件服务器"></a>简单的 HTTP 文件服务器</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">        <span class="string">"net/http"</span></span><br><span class="line">        <span class="string">"os"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">        server := http.Server&#123;Addr: <span class="string">":80"</span>&#125;</span><br><span class="line">        http.Handle(<span class="string">"/"</span>, http.FileServer(http.Dir(os.Args[<span class="number">1</span>])))</span><br><span class="line">        server.ListenAndServe()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="文件上传和下载"><a href="#文件上传和下载" class="headerlink" title="文件上传和下载"></a>文件上传和下载</h1><h2 id="文件上传"><a href="#文件上传" class="headerlink" title="文件上传"></a>文件上传</h2><table>
+<thead>
+<tr>
+<th>头信息</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>exctype=”application/x-www-form-urlencoded”</td>
+<td>默认值。表单会被编码为键=值&amp;</td>
+</tr>
+<tr>
+<td>exctype=”multipart/form-data”</td>
+<td>编码成消息，每个控件对应消息的一部分，请求方式必须是 POST，它可以上传文件和表单</td>
+</tr>
+<tr>
+<td>exctype=”text/plain”</td>
+<td>纯文本形式编码</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>HTML</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;body&gt;</span><br><span class="line">    &lt;form action=&quot;/upload&quot; method=&quot;POST&quot; enctype=&quot;multipart/form-data&quot;&gt;</span><br><span class="line">    名称：&lt;input type=&quot;text&quot; name=&quot;name&quot;&gt;&lt;br&gt;</span><br><span class="line">    文件：&lt;input type=&quot;file&quot; name=&quot;file&quot;&gt;&lt;br&gt;</span><br><span class="line">    &lt;input type=&quot;submit&quot; value=&quot;提交&quot;&gt;&lt;br&gt;</span><br><span class="line">    &lt;/form&gt;</span><br><span class="line">&lt;/body&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>后端代码</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"html/template"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">upload</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	username := req.FormValue(<span class="string">"name"</span>)</span><br><span class="line">	file, header, _ := req.FormFile(<span class="string">"file"</span>)</span><br><span class="line">	b, _ := ioutil.ReadAll(file)</span><br><span class="line">	ioutil.WriteFile(<span class="string">"D:/"</span>+header.Filename, b, <span class="number">0777</span>)</span><br><span class="line">	res.Write([]<span class="keyword">byte</span>(username + <span class="string">"上传成功"</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	t, _ := template.ParseFiles(<span class="string">"templates/index.html"</span>)</span><br><span class="line">	t.Execute(res, <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	server := http.Server&#123;Addr: <span class="string">"127.0.0.1:8080"</span>&#125;</span><br><span class="line">	http.Handle(<span class="string">"/static/"</span>, http.StripPrefix(<span class="string">"/static/"</span>, http.FileServer(http.Dir(<span class="string">"static"</span>))))</span><br><span class="line">	http.HandleFunc(<span class="string">"/"</span>, handler)</span><br><span class="line">	http.HandleFunc(<span class="string">"/upload"</span>, upload)</span><br><span class="line">	server.ListenAndServe()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="文件下载"><a href="#文件下载" class="headerlink" title="文件下载"></a>文件下载</h2><p>客户端下载文件时候，服务器需要设置的响应头信息：</p>
+<ol>
+<li>Content-Type: 内容的 MIME 类型</li>
+</ol>
+<p>application/octet-stream 任意类型</p>
+<ol start="2">
+<li>Content-Disposition: 客户端对内容的操作方式</li>
+</ol>
+<p>inline 默认值，表示浏览器能解析就解析，不能解析就下载</p>
+<p>attachment;filename=下载时显示的文件名，客户端始终会下载文件</p>
+<ul>
+<li>html 代码</li>
+</ul>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span>=<span class="string">"/download?filename=abc.jpg"</span>&gt;</span>下载<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>后端代码</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">"html/template"</span></span><br><span class="line">	<span class="string">"io/ioutil"</span></span><br><span class="line">	<span class="string">"net/http"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">download</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	filename := req.FormValue(<span class="string">"filename"</span>)</span><br><span class="line">	f, err := ioutil.ReadFile(<span class="string">"D:/"</span> + filename)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		res.Write([]<span class="keyword">byte</span>(<span class="string">"下载失败"</span>))</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">    </span><br><span class="line">	res.Header().Set(<span class="string">"Content-Type"</span>, <span class="string">"application/octet-stream"</span>)</span><br><span class="line">	res.Header().Set(<span class="string">"Content-Disposition"</span>, <span class="string">"attachment;filename="</span>+filename)</span><br><span class="line">	res.Write(f)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">handler</span><span class="params">(res http.ResponseWriter, req *http.Request)</span></span> &#123;</span><br><span class="line">	t, _ := template.ParseFiles(<span class="string">"templates/index.html"</span>)</span><br><span class="line">	t.Execute(res, <span class="literal">nil</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	server := http.Server&#123;Addr: <span class="string">"127.0.0.1:8080"</span>&#125;</span><br><span class="line">	http.Handle(<span class="string">"/static/"</span>, http.StripPrefix(<span class="string">"/static/"</span>, http.FileServer(http.Dir(<span class="string">"static"</span>))))</span><br><span class="line">	http.HandleFunc(<span class="string">"/"</span>, handler)</span><br><span class="line">	http.HandleFunc(<span class="string">"/download"</span>, download)</span><br><span class="line">	server.ListenAndServe()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> User <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name <span class="keyword">string</span> <span class="string">`json:"fullname"`</span></span><br><span class="line">	Age  <span class="keyword">int</span>    <span class="string">`json:"age"`</span></span><br><span class="line">	Sex  <span class="keyword">string</span> <span class="string">`json:"gender"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/20/go/2.函数和结构体/" rel="next" title="函数结构体和面向对象和并发">
+                <i class="fa fa-chevron-left"></i> 函数结构体和面向对象和并发
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/12/31/kubernetes/K8S+Ceph+EFK/" rel="prev" title="Helm + storageclass + EFK">
+                Helm + storageclass + EFK <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Socket"><span class="nav-number">1.</span> <span class="nav-text">Socket</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#回显服务器"><span class="nav-number">1.1.</span> <span class="nav-text">回显服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#并发回显服务器"><span class="nav-number">1.2.</span> <span class="nav-text">并发回显服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#点对点通信"><span class="nav-number">1.3.</span> <span class="nav-text">点对点通信</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#http-服务器"><span class="nav-number">2.</span> <span class="nav-text">http 服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#单控制器"><span class="nav-number">2.1.</span> <span class="nav-text">单控制器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多控制器"><span class="nav-number">2.2.</span> <span class="nav-text">多控制器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用多处理器"><span class="nav-number">2.2.1.</span> <span class="nav-text">使用多处理器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#多处理器函数"><span class="nav-number">2.2.2.</span> <span class="nav-text">多处理器函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取请求头和参数"><span class="nav-number">2.3.</span> <span class="nav-text">获取请求头和参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目结构"><span class="nav-number">2.4.</span> <span class="nav-text">项目结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#html-模板"><span class="nav-number">2.5.</span> <span class="nav-text">html 模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简单的-HTTP-文件服务器"><span class="nav-number">2.6.</span> <span class="nav-text">简单的 HTTP 文件服务器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件上传和下载"><span class="nav-number">3.</span> <span class="nav-text">文件上传和下载</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件上传"><span class="nav-number">3.1.</span> <span class="nav-text">文件上传</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件下载"><span class="nav-number">3.2.</span> <span class="nav-text">文件下载</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

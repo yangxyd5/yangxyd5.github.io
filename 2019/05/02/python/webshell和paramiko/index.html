@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="SSHClientclass SSHClient (ClosingContextManager):    def __init__(self):        self._system_host_keys = HostKeys()        self._host_keys = HostKeys()        self._host_keys_filename = None        se">
+<meta property="og:type" content="article">
+<meta property="og:title" content="webshell和paramiko">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/05/02/python/webshell和paramiko/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="SSHClientclass SSHClient (ClosingContextManager):    def __init__(self):        self._system_host_keys = HostKeys()        self._host_keys = HostKeys()        self._host_keys_filename = None        se">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-05-03T15:54:01.215Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="webshell和paramiko">
+<meta name="twitter:description" content="SSHClientclass SSHClient (ClosingContextManager):    def __init__(self):        self._system_host_keys = HostKeys()        self._host_keys = HostKeys()        self._host_keys_filename = None        se">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/05/02/python/webshell和paramiko/">
+
+
+
+
+
+  <title>webshell和paramiko | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/05/02/python/webshell和paramiko/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">webshell和paramiko</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-02T00:00:00+08:00">
+                2019-05-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="SSHClient"><a href="#SSHClient" class="headerlink" title="SSHClient"></a>SSHClient</h1><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SSHClient</span> <span class="params">(ClosingContextManager)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self._system_host_keys = HostKeys()</span><br><span class="line">        self._host_keys = HostKeys()</span><br><span class="line">        self._host_keys_filename = <span class="literal">None</span></span><br><span class="line">        self._log_channel = <span class="literal">None</span></span><br><span class="line">        self._policy = RejectPolicy()</span><br><span class="line">        self._transport = <span class="literal">None</span></span><br><span class="line">        self._agent = <span class="literal">None</span></span><br></pre></td></tr></table></figure>
+<p>SSH 服务器会话的一种高级表示形式。这个类封装了 <code>.Transport</code>, <code>.Channel</code> 和 <code>.SFTPClient</code>，以处理验证和打开通道的大部分方面。一个典型的用例是：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">client = SSHClient()</span><br><span class="line">client.load_system_host_keys()</span><br><span class="line">client.connect(&apos;ssh.example.com&apos;)</span><br><span class="line">stdin, stdout, stderr = client.exec_command(&apos;ls -l&apos;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">您可以传递用于身份验证和服务器主机密钥检查的显式重写。默认机制是尝试使用本地密钥文件或 SSH 代理(如果正在运行)。此类的实例可用作上下文管理器。</span><br></pre></td></tr></table></figure>
+<h2 id="load-system-host-keys"><a href="#load-system-host-keys" class="headerlink" title="load_system_host_keys"></a>load_system_host_keys</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_system_host_keys</span><span class="params">(self, filename=None)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>从系统(只读)文件加载主机密钥。使用此方法读取的主机密钥不会被 Save_host_keys 保存。此方法可多次调用。</p>
+<p>每个新的主机密钥集将与现有集合并(如果有冲突，则新的替换旧的)。</p>
+<p>如果将 filename 保留为 None，将尝试从 OpenSSH 使用的用户的本地 known hosts 文件中读取密钥，如果无法读取该文件，则不会引发任何例外。这可能只适用于POSIX。</p>
+<p>参数：filename 要读取的文件名，或 None</p>
+<p>异常引发：IOError，如果提供了文件名，但无法读取该文件</p>
+<h2 id="load-host-keys"><a href="#load-host-keys" class="headerlink" title="load_host_keys"></a>load_host_keys</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_host_keys</span><span class="params">(self, filename)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>从本地主机密钥文件加载主机密钥。</p>
+<p>使用此方法读取的主机密钥将在通过 load_system_host_keys 加载的键之后进行检查，但将由 Save_host_keys 保存(这样就可以修改它们)。</p>
+<p>缺少的主机密钥策略 .AutoAddPolicy 在连接到先前未知的服务器时将密钥添加到此集合并保存它们。此方法可多次调用。</p>
+<p>每个新的主机密钥集将与现有集合并(如果有冲突，则新的替换旧的)。自动保存时，使用最后一个主机名。</p>
+<p>参数：filename 要读取的文件名</p>
+<p>异常引发：IOError，如果提供了文件名，但无法读取该文件</p>
+<h2 id="save-host-keys"><a href="#save-host-keys" class="headerlink" title="save_host_keys"></a>save_host_keys</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">save_host_keys</span><span class="params">(self, filename)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>将主机密钥保存回文件。</p>
+<p>只有加载了 load_host_keys (加上任何直接添加的) 的主机密钥才会被保存-而不是加载了 load_system_host_keys 的任何主机密钥。</p>
+<p>参数：filename 保存到</p>
+<p>异常引发：IOError 如果无法写入文件</p>
+<h2 id="get-host-keys"><a href="#get-host-keys" class="headerlink" title="get_host_keys"></a>get_host_keys</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_host_keys</span><span class="params">(self)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>获取本地的 .hostkeys 对象。这可用于检查本地主机密钥或更改它们。</p>
+<p>返回值：作为 .host keys 对象的本地主机密钥。</p>
+<h2 id="set-log-channel"><a href="#set-log-channel" class="headerlink" title="set_log_channel"></a>set_log_channel</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set_log_channel</span><span class="params">(self, name)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>设置日志记录通道。</p>
+<p>默认的是 Paramiko.transport，但是它可以设置为您想要的任何东西。</p>
+<p>参数：name 用于日志记录的新通道名称</p>
+<h2 id="set-missing-host-key-policy"><a href="#set-missing-host-key-policy" class="headerlink" title="set_missing_host_key_policy"></a>set_missing_host_key_policy</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">set_missing_host_key_policy</span><span class="params">(self, policy)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>将策略设置为在没有已知主机密钥的情况下连接到服务器时使用。</p>
+<p>详细的说:</p>
+<p>Policy 是一个 policy class (或其实例)，即 .MissingHostKeyPolicy 的一些子类，如 .RejectPolicy (默认值)、.AutoAddPolicy .WarningPolicy 或用户创建的子类。</p>
+<p>当 host key 出现在客户端对象缓存的主机密钥结构中(由 load_system_host_keys 和 / 或 load_host_keys 操纵的主机密钥)时，主机密钥是已知的。</p>
+<p>参数：.MissingHostKeyPolicy policy 从先前未知的服务器接收主机密钥时要使用的策略</p>
+<h2 id="families-and-addresses"><a href="#families-and-addresses" class="headerlink" title="_families_and_addresses"></a>_families_and_addresses</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_families_and_addresses</span><span class="params">(self, hostname, port)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>生成准备连接的：地址家族 + IP + 端口</p>
+<p>参数：hostname 要连接到的服务器</p>
+<p>参数：port 要连接到的服务器端口</p>
+<p>返回值：yield 可迭代的 (家族，地址) 的元组</p>
+<h2 id="connect"><a href="#connect" class="headerlink" title="connect"></a>connect</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">connect</span><span class="params">(self, hostname, port=SSH_PORT, username=None, password=None, pkey=None, </span></span></span><br><span class="line"><span class="function"><span class="params">            key_filename=None, timeout=None, allow_agent=True, look_for_keys=True, compress=False, </span></span></span><br><span class="line"><span class="function"><span class="params">            sock=None, gss_auth=False, gss_kex=False, gss_deleg_creds=True, gss_host=None,</span></span></span><br><span class="line"><span class="function"><span class="params">            banner_timeout=None, auth_timeout=None, gss_trust_dns=True, passphrase=None,)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>连接到SSH服务器并对其进行身份验证。服务器的主机密钥将根据系统主机密钥(参见 load_system_host_keys)和任何本地主机密钥(load_host_keys)进行检查。<br>如果在这两组主机密钥中都没有找到服务器的主机名，则使用丢失的主机密钥策略(请参阅set_missing_host_key_policy)。<br>默认策略是拒绝密钥并引发一个 .sshexception。</p>
+<p>身份验证按以下优先顺序进行:</p>
+<ol>
+<li><p>传入的 pkey 或 key_filename (如果有的话)<br> key_filename 可以包含 OpenSSH 公共证书路径和常规私有密钥路径;<br> 当找到以 cert.pub 结尾的文件时，假定它们与私钥匹配，并且将加载这两个组件。(私钥本身不需要在 key_filename 中列出，只需要证书即可。)</p>
+</li>
+<li><p>任何我们可以通过SSH代理找到的密钥</p>
+</li>
+<li><p>可在 ~/.ssh/ 中发现的任何 id_rsa、id_dsa 或 id_ecdsa 密钥<br> 当 OpenSSH-style 的公共证书与现有的此类私钥匹配时(例如，一个拥有 id_rsa 和 id_rsa-cert.pub)，证书将与私钥一起加载，并用于身份验证。</p>
+</li>
+<li><p>如果给定密码，则使用普通用户名/密码验证</p>
+</li>
+</ol>
+<p>如果私钥需要密码来解锁，并且传入了密码，则该密码将用于尝试解锁密钥。</p>
+<p>参数  hostname:        字符串   要连接到的服务器<br>参数  port:            整形     要连接到的服务器端口<br>参数  username:        字符串   进行身份验证的用户名(默认为当前本地用户名)<br>参数  password:        字符串   用于密码认证; 如果没有提供 passphrase ，也可用于私钥解密。<br>参数  passphrase:      字符串   用于解密私钥。<br>参数  pkey:            .PKey   用于身份验证的可选私钥<br>参数  key_filename:    字符串   要尝试验证的可选私钥和/或证书的文件名或文件名列表<br>参数  timeout:         浮点数   TCP连接的可选超时(以秒为单位)<br>参数  allow_agent:     布尔值   设置为 False 以禁用到 SSH 代理的连接<br>参数  look_for_keys:   布尔值   设置为 False 以禁用在 ~/.ssh/ 中搜索可发现的私钥文件<br>参数  compress:        布尔值   设置为 True 打开压缩<br>参数  sock:            socket  一个打开的套接字或类似套接字的对象(如 .Channel)，用于与目标主机通信<br>参数  gss_auth:        布尔值  如果您想使用 GSS-API 身份验证，请使用 True<br>参数  gss_kex:         布尔值  执行 GSS-API 密钥交换和用户身份验证<br>参数  gss_deleg_creds: 布尔值  是否委托 GSS-API 客户端凭据<br>参数  gss_host:        字符串  kerberos 数据库中的目标名称。默认值:主机名<br>参数  gss_trust_dns:   布尔值  指示是否信任 DNS 将连接到的主机的名称安全地规范化(默认为 True)。<br>参数  banner_timeout:  浮点数  可选超时(以秒为单位)，以等待出现 SSH banner。<br>参数  auth_timeout:    浮点数  等待身份验证响应的可选超时(以秒为单位)。</p>
+<h2 id="close"><a href="#close" class="headerlink" title="close"></a>close</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">close</span><span class="params">(self)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>关闭这个 SSHClient 及其底层 . transport。</p>
+<p>警告::</p>
+<p>在某些情况下，如果不这样做，可能会导致 Python 解释器在关闭时挂起(通常是由于竞态条件)。</p>
+<p>当您使用完客户端对象时，最好是 close 它们，而不是依赖于垃圾收集。</p>
+<h2 id="exec-command"><a href="#exec-command" class="headerlink" title="exec_command"></a>exec_command</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">exec_command</span><span class="params">(self, command, bufsize=<span class="number">-1</span>, timeout=None, get_pty=False, environment=None,)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>在 SSH 服务器上执行命令。打开一个新的 .Channel，并执行请求的命令。命令的输入和输出流作为 Python file-like 对象返回，这些对象表示 stdin、stdout 和 stderr。</p>
+<p>参数 command     字符串: 要执行的命令</p>
+<p>参数 bufsize     整形:   解释方式与 Python 中内置的 file() 函数相同。</p>
+<p>参数 timeout     整形:   设置命令的通道超时。见 .Channel.settimeout</p>
+<p>参数 environment 字典:   shell 环境变量的 dict，将合并到远程命令在其中执行的默认环境中。</p>
+<p>​                         警告：服务器可能静默地拒绝某些环境变量；有关详细信息，请参阅 .channel.set_Environment_variable 的警告。</p>
+<p>返回值：执行命令结果的三元组 stdin、stdout 和 stderr</p>
+<p>异常引发 .SSHException – 如果服务器无法执行该命令</p>
+<h2 id="invoke-shell"><a href="#invoke-shell" class="headerlink" title="invoke_shell"></a>invoke_shell</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">invoke_shell</span><span class="params">(self, term=<span class="string">'vt100'</span>, width=<span class="number">80</span>, height=<span class="number">24</span>, width_pixels=<span class="number">0</span>, height_pixels=<span class="number">0</span>, environment=None)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>在 SSH 服务器上启动交互式shell会话。打开一个新的 .Channel 并使用请求的终端类型和大小连接到伪终端。</p>
+<p>参数：term 要模拟的终端类型（例如，vt100）</p>
+<p>参数：width 终端窗口的宽度（以字符为单位）</p>
+<p>参数：height 终端窗口的高度（以字符为单位）</p>
+<p>参数：width_pixels 终端窗口的宽度（以像素为单位）</p>
+<p>参数：height_pixels 终端窗口的高度（以像素为单位）</p>
+<p>参数：environment 命令的环境</p>
+<p>返回值：连接到远程 shell 的新 .Channel</p>
+<p>异常引发：.SSHException  - 如果服务器无法调用shell</p>
+<h2 id="open-sftp"><a href="#open-sftp" class="headerlink" title="open_sftp"></a>open_sftp</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">open_sftp</span><span class="params">(self)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>在SSH服务器上打开一个SFTP会话。</p>
+<p>返回值：一个新的 .SFTPClient 会话对象</p>
+<h2 id="get-transport"><a href="#get-transport" class="headerlink" title="get_transport"></a>get_transport</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_transport</span><span class="params">(self)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>返回此 SSH 连接的基础 <code>.Transport</code> 对象。</p>
+<p>这可以用于执行低级任务，例如打开特定类型的通道。</p>
+<h2 id="key-from-filepath"><a href="#key-from-filepath" class="headerlink" title="_key_from_filepath"></a>_key_from_filepath</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_key_from_filepath</span><span class="params">(self, filename, klass, password)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>尝试从给定的字符串路径 filename ：</p>
+<p>尝试从给定的字符串路径文件名推导出 .pkey</p>
+<ol>
+<li><p>如果 filename 看来是证书，则加载匹配的私钥。</p>
+</li>
+<li><p>否则，文件名将被假定为私钥，如果存在匹配的公共证书，则将加载它。</p>
+</li>
+</ol>
+<h2 id="auth"><a href="#auth" class="headerlink" title="_auth"></a>_auth</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">_auth</span><span class="params">(self, username, password, pkey, key_filenames, allow_agent, </span></span></span><br><span class="line"><span class="function"><span class="params">        look_for_keys, gss_auth, gss_kex, gss_deleg_creds, gss_host, passphrase,)</span>:</span></span><br></pre></td></tr></table></figure>
+<p>按以下顺序尝试：</p>
+<ul>
+<li>密钥传入，如果有传入。</li>
+<li>可以通过SSH代理找到任何密钥(如果允许的话)。</li>
+<li>在 ~/.ssh/（如果允许）中可发现的任何 id_rsa、id_dsa 或 id_ecdsa 密钥。</li>
+<li>如果提供了密码，请使用普通用户名/密码。<br>(可能需要密码来解锁私钥(如果 passphrase 也没有给出]，或者用于双因素身份验证(这是必需的)。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/28/python/Tornado/" rel="next" title="Tornado 笔记">
+                <i class="fa fa-chevron-left"></i> Tornado 笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/08/go/time/" rel="prev" title="go 标准库之 time">
+                go 标准库之 time <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SSHClient"><span class="nav-number">1.</span> <span class="nav-text">SSHClient</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#load-system-host-keys"><span class="nav-number">1.1.</span> <span class="nav-text">load_system_host_keys</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#load-host-keys"><span class="nav-number">1.2.</span> <span class="nav-text">load_host_keys</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#save-host-keys"><span class="nav-number">1.3.</span> <span class="nav-text">save_host_keys</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#get-host-keys"><span class="nav-number">1.4.</span> <span class="nav-text">get_host_keys</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#set-log-channel"><span class="nav-number">1.5.</span> <span class="nav-text">set_log_channel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#set-missing-host-key-policy"><span class="nav-number">1.6.</span> <span class="nav-text">set_missing_host_key_policy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#families-and-addresses"><span class="nav-number">1.7.</span> <span class="nav-text">_families_and_addresses</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#connect"><span class="nav-number">1.8.</span> <span class="nav-text">connect</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#close"><span class="nav-number">1.9.</span> <span class="nav-text">close</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exec-command"><span class="nav-number">1.10.</span> <span class="nav-text">exec_command</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#invoke-shell"><span class="nav-number">1.11.</span> <span class="nav-text">invoke_shell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#open-sftp"><span class="nav-number">1.12.</span> <span class="nav-text">open_sftp</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#get-transport"><span class="nav-number">1.13.</span> <span class="nav-text">get_transport</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#key-from-filepath"><span class="nav-number">1.14.</span> <span class="nav-text">_key_from_filepath</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#auth"><span class="nav-number">1.15.</span> <span class="nav-text">_auth</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="序列化 序列化  将一段数据、对象，转换为字节流，以便保存到文件、数据库或经过网络传输的过程称之为序列化。  反序列化  在需要时候重新打开已序列化数据，或者在另外的计算机上需要恢复，通过相同序列化格式恢复得到原来的数据结构，这个过程称作反序列化。 pickle模块Python 中自带的序列化的机制为 pickle 库提供。 import pickle 转换为bytes.dumps用法：dumps">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python序列化">
+<meta property="og:url" content="https://yangjinheng.github.io/2017/09/24/python/15.Python序列化/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="序列化 序列化  将一段数据、对象，转换为字节流，以便保存到文件、数据库或经过网络传输的过程称之为序列化。  反序列化  在需要时候重新打开已序列化数据，或者在另外的计算机上需要恢复，通过相同序列化格式恢复得到原来的数据结构，这个过程称作反序列化。 pickle模块Python 中自带的序列化的机制为 pickle 库提供。 import pickle 转换为bytes.dumps用法：dumps">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-10-13T06:57:44.225Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python序列化">
+<meta name="twitter:description" content="序列化 序列化  将一段数据、对象，转换为字节流，以便保存到文件、数据库或经过网络传输的过程称之为序列化。  反序列化  在需要时候重新打开已序列化数据，或者在另外的计算机上需要恢复，通过相同序列化格式恢复得到原来的数据结构，这个过程称作反序列化。 pickle模块Python 中自带的序列化的机制为 pickle 库提供。 import pickle 转换为bytes.dumps用法：dumps">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2017/09/24/python/15.Python序列化/">
+
+
+
+
+
+  <title>Python序列化 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2017/09/24/python/15.Python序列化/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python序列化</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-24T00:00:00+08:00">
+                2017-09-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h1><ul>
+<li>序列化</li>
+</ul>
+<p>将一段数据、对象，转换为字节流，以便保存到文件、数据库或经过网络传输的过程称之为序列化。</p>
+<ul>
+<li>反序列化</li>
+</ul>
+<p>在需要时候重新打开已序列化数据，或者在另外的计算机上需要恢复，通过相同序列化格式恢复得到原来的数据结构，这个过程称作反序列化。</p>
+<h1 id="pickle模块"><a href="#pickle模块" class="headerlink" title="pickle模块"></a>pickle模块</h1><p>Python 中自带的序列化的机制为 <code>pickle</code> 库提供。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> pickle</span><br></pre></td></tr></table></figure>
+<h2 id="转换为bytes-dumps"><a href="#转换为bytes-dumps" class="headerlink" title="转换为bytes.dumps"></a>转换为bytes.dumps</h2><p>用法：<code>dumps(obj, protocol=None, *, fix_imports=True)</code></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="从bytes还原-loads"><a href="#从bytes还原-loads" class="headerlink" title="从bytes还原.loads"></a>从bytes还原.loads</h2><p>用法：<code>loads(data, *, fix_imports=True, encoding=&#39;ASCII&#39;, errors=&#39;strict&#39;)</code></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">3</span>]: d = dict(name=<span class="string">'yangjinheng'</span>,age=<span class="number">20</span>,sex=<span class="string">'man'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">4</span>]: a = pickle.dumps(d)</span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: pickle.loads(a)</span><br><span class="line">Out[<span class="number">5</span>]: &#123;<span class="string">'name'</span>: <span class="string">'yangjinheng'</span>, <span class="string">'age'</span>: <span class="number">20</span>, <span class="string">'sex'</span>: <span class="string">'man'</span>&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="转换到文件-dump"><a href="#转换到文件-dump" class="headerlink" title="转换到文件.dump"></a>转换到文件.dump</h2><p>用法：<code>dump(obj, file, protocol=None, *, fix_imports=True)</code></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="从文件还原-load"><a href="#从文件还原-load" class="headerlink" title="从文件还原.load"></a>从文件还原.load</h2><p>用法：<code>load(file, *, fix_imports=True, encoding=&#39;ASCII&#39;, errors=&#39;strict&#39;)</code></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">14</span>]: <span class="keyword">with</span> open(<span class="string">'d:/pickle'</span>,<span class="string">'rb'</span>) <span class="keyword">as</span> file:</span><br><span class="line">    ...:     d = pickle.load(file)</span><br><span class="line">    ...:     print(d)</span><br><span class="line">    ...:</span><br><span class="line">&#123;<span class="string">'name'</span>: <span class="string">'yangjinheng'</span>, <span class="string">'age'</span>: <span class="number">20</span>, <span class="string">'sex'</span>: <span class="string">'man'</span>&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="msgpack模块"><a href="#msgpack模块" class="headerlink" title="msgpack模块"></a>msgpack模块</h2><h1 id="json模块"><a href="#json模块" class="headerlink" title="json模块"></a>json模块</h1><p><code>JSON(JavaScript Object Notation)</code> ，是一种轻量级的数据交换格式。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">官方文档：http://www.json.org/json-zh.html</span><br></pre></td></tr></table></figure>
+<ul>
+<li>JSON和Python数据类型的对应关系</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>示例</th>
+<th>JSON类型</th>
+<th>Python类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>{}</td>
+<td>object</td>
+<td>dict</td>
+</tr>
+<tr>
+<td>[]</td>
+<td>array</td>
+<td>list、tuple</td>
+</tr>
+<tr>
+<td>“string”</td>
+<td>string</td>
+<td>str</td>
+</tr>
+<tr>
+<td>1234</td>
+<td>number (int)</td>
+<td>int</td>
+</tr>
+<tr>
+<td>1234.56</td>
+<td>number (real)</td>
+<td>float</td>
+</tr>
+<tr>
+<td>true</td>
+<td>true</td>
+<td>True</td>
+</tr>
+<tr>
+<td>false</td>
+<td>false</td>
+<td>False</td>
+</tr>
+<tr>
+<td>null</td>
+<td>null</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<h2 id="字典转文件"><a href="#字典转文件" class="headerlink" title="字典转文件"></a>字典转文件</h2><ul>
+<li>Python 字典</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">d1 = &#123;<span class="string">'one'</span>: <span class="literal">None</span>, <span class="string">'two'</span>: <span class="literal">True</span>, <span class="string">'three'</span>: <span class="literal">False</span>, <span class="string">'forty'</span>: [<span class="number">255</span>, <span class="string">'ABC'</span>], <span class="string">'five'</span>: &#123;<span class="string">'one'</span>: <span class="number">1</span>, <span class="string">'two'</span>: <span class="number">2</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>转换为 JSON 并写入文件，两种方式</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> open(<span class="string">'d:/config.json'</span>,<span class="string">'w'</span>) <span class="keyword">as</span> file:</span><br><span class="line">    json.dump(d1,file,indent=<span class="number">4</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">json.dump(d1, open(<span class="string">'d:/1.json'</span>, <span class="string">"w"</span>),indent=<span class="number">4</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="文件转字典"><a href="#文件转字典" class="headerlink" title="文件转字典"></a>文件转字典</h2><ul>
+<li>JSON文件，<code>d:/config.json</code></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="string">"one"</span>: null,</span><br><span class="line">    <span class="string">"two"</span>: true,</span><br><span class="line">    <span class="string">"three"</span>: false,</span><br><span class="line">    <span class="string">"forty"</span>: [</span><br><span class="line">        <span class="number">255</span>,</span><br><span class="line">        <span class="string">"ABC"</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">"five"</span>: &#123;</span><br><span class="line">        <span class="string">"one"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="string">"two"</span>: <span class="number">2</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>转换为 Python 字典，两种方式</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> open(<span class="string">'d:/config.json'</span>,<span class="string">'r'</span>) <span class="keyword">as</span> file:</span><br><span class="line">    d1 = json.load(file)</span><br><span class="line">    print(d1)</span><br><span class="line"></span><br><span class="line">&#123;<span class="string">'one'</span>: <span class="literal">None</span>, <span class="string">'two'</span>: <span class="literal">True</span>, <span class="string">'three'</span>: <span class="literal">False</span>, <span class="string">'forty'</span>: [<span class="number">255</span>, <span class="string">'ABC'</span>], <span class="string">'five'</span>: &#123;<span class="string">'one'</span>: <span class="number">1</span>, <span class="string">'two'</span>: <span class="number">2</span>&#125;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>d1 = json.load(open(<span class="string">'d:/config.json'</span>))</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(d1)</span><br><span class="line">&#123;<span class="string">'one'</span>: <span class="literal">None</span>, <span class="string">'two'</span>: <span class="literal">True</span>, <span class="string">'three'</span>: <span class="literal">False</span>, <span class="string">'forty'</span>: [<span class="number">255</span>, <span class="string">'ABC'</span>], <span class="string">'five'</span>: &#123;<span class="string">'one'</span>: <span class="number">1</span>, <span class="string">'two'</span>: <span class="number">2</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="字典转字符串"><a href="#字典转字符串" class="headerlink" title="字典转字符串"></a>字典转字符串</h2><ul>
+<li>Python 字典</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">d1 = &#123;<span class="string">'one'</span>: <span class="literal">None</span>, <span class="string">'two'</span>: <span class="literal">True</span>, <span class="string">'three'</span>: <span class="literal">False</span>, <span class="string">'forty'</span>: [<span class="number">255</span>, <span class="string">'ABC'</span>], <span class="string">'five'</span>: &#123;<span class="string">'one'</span>: <span class="number">1</span>, <span class="string">'two'</span>: <span class="number">2</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>转为 JSON 字符串</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>d2 = json.dumps(d1)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(d2)</span><br><span class="line"><span class="string">'&#123;"one": null, "two": true, "three": false, "forty": [255, "ABC"], "five": &#123;"one": 1, "two": 2&#125;&#125;'</span></span><br></pre></td></tr></table></figure>
+<h2 id="字符串转字典"><a href="#字符串转字典" class="headerlink" title="字符串转字典"></a>字符串转字典</h2><ul>
+<li>JSON 字符串</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">d2 = <span class="string">'&#123;"one": null, "two": true, "three": false, "forty": [255, "ABC"], "five": &#123;"one": 1, "two": 2&#125;&#125;'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>转换为 Python 字典</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>d3 = json.loads(d2)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(d3)</span><br><span class="line">&#123;<span class="string">'one'</span>: <span class="literal">None</span>, <span class="string">'two'</span>: <span class="literal">True</span>, <span class="string">'three'</span>: <span class="literal">False</span>, <span class="string">'forty'</span>: [<span class="number">255</span>, <span class="string">'ABC'</span>], <span class="string">'five'</span>: &#123;<span class="string">'one'</span>: <span class="number">1</span>, <span class="string">'two'</span>: <span class="number">2</span>&#125;&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="csv模块"><a href="#csv模块" class="headerlink" title="csv模块"></a>csv模块</h1><p>全称：逗号分隔的值（Comma-Separated Values），有时也称作字符分隔值，因为分隔字符也可以不是逗号。</p>
+<ul>
+<li><p>没有编码声明的纯文本格式文件</p>
+</li>
+<li><p>使用逗号 <code>,</code> 分隔字段</p>
+</li>
+<li>使用回车换行 <code>CRLF</code> 分割记录</li>
+<li>使用双引号对元字符进行转义</li>
+<li>可选的表头，与字段对其即可</li>
+</ul>
+<h2 id="csv-write-text"><a href="#csv-write-text" class="headerlink" title="csv.write_text()"></a>csv.write_text()</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"></span><br><span class="line">test = <span class="string">"""name,age,sex,class</span></span><br><span class="line"><span class="string">yangjinheng,29,man,10</span></span><br><span class="line"><span class="string">songyaru,27,woman,10</span></span><br><span class="line"><span class="string">zhaoxiaoman,27,woman,10</span></span><br><span class="line"><span class="string">yangzhongxiao,26,man,10"""</span></span><br><span class="line"></span><br><span class="line">file = Path(<span class="string">'D:/test.csv'</span>)</span><br><span class="line">file.write_text(test)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>age</th>
+<th>sex</th>
+<th>class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>yangjinheng</td>
+<td>29</td>
+<td>man</td>
+<td>10</td>
+</tr>
+<tr>
+<td>songyaru</td>
+<td>27</td>
+<td>woman</td>
+<td>10</td>
+</tr>
+<tr>
+<td>zhaoxiaoman</td>
+<td>27</td>
+<td>woman</td>
+<td>10</td>
+</tr>
+<tr>
+<td>yangzhongxiao</td>
+<td>26</td>
+<td>man</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<h2 id="csv-reader"><a href="#csv-reader" class="headerlink" title="csv.reader()"></a>csv.reader()</h2><ul>
+<li>创建对象</li>
+</ul>
+<p>语法：<code>reader(iterable [, dialect=&#39;excel&#39;] [参数=值])</code></p>
+<p><code>iterable</code> ：必须是一个可迭代的对象，例如打开的文件，有 <code>__next__()</code>方法的。</p>
+<p><code>dialect</code> ：解析规则，默认是用逗号分隔的 <code>excel</code> ，其他可用值：<code>[&#39;excel&#39;, &#39;excel-tab&#39;, &#39;unix&#39;]</code></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>delimiter = ‘,’</td>
+<td>用作字段分隔的字符</td>
+</tr>
+<tr>
+<td>quotechar = ‘“‘</td>
+<td>用作引用的字符</td>
+</tr>
+<tr>
+<td>escapechar = None</td>
+<td>用作转义的字符</td>
+</tr>
+<tr>
+<td>doublequote = True</td>
+<td>连续两次引号是否被解释为一个引号</td>
+</tr>
+<tr>
+<td>skipinitialspace = False</td>
+<td>是否忽略分隔符后面跟着的空格</td>
+</tr>
+<tr>
+<td>lineterminator = ‘\r\n</td>
+<td>行结束符</td>
+</tr>
+<tr>
+<td>quoting = QUOTE_MINIMAL</td>
+<td>写入时候如何生成引号，默认仅在需要时生成，QUOTE_ALL表示总是生成</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>csv.reader支持的方法</li>
+</ul>
+<p><code>__next__()</code>：得到csv对象的下一行内容列表</p>
+<p><code>line_num</code>：从csv对象读取的行数</p>
+<p><code>fieldnames</code> ：取得字段名称</p>
+<ul>
+<li>示例，迭代 <code>csv.reader</code> 对象打印每一行</li>
+</ul>
+<p><code>csv.reader</code> 的结果是一个<code>csv.reader</code>对象，支持方法：<code>__next__()</code>、</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(Path(<span class="string">'D:/test.csv'</span>),newline=<span class="string">''</span>) <span class="keyword">as</span> file:</span><br><span class="line">    reader = csv.reader(file)    <span class="comment">#将csv的规则应用到这个可迭代对象（打开的文件），生成csv.reader对象</span></span><br><span class="line">    <span class="comment"># print(reader.line_num)</span></span><br><span class="line">    <span class="keyword">for</span> row <span class="keyword">in</span> reader:</span><br><span class="line">        print(row)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[<span class="string">'name'</span>, <span class="string">'age'</span>, <span class="string">'sex'</span>, <span class="string">'class'</span>]</span><br><span class="line">[<span class="string">'yangjinheng'</span>, <span class="string">'29'</span>, <span class="string">'man'</span>, <span class="string">'10'</span>]</span><br><span class="line">[<span class="string">'songyaru'</span>, <span class="string">'27'</span>, <span class="string">'woman'</span>, <span class="string">'10'</span>]</span><br><span class="line">[<span class="string">'zhaoxiaoman'</span>, <span class="string">'27'</span>, <span class="string">'woman'</span>, <span class="string">'10'</span>]</span><br><span class="line">[<span class="string">'yangzhongxiao'</span>, <span class="string">'26'</span>, <span class="string">'man'</span>, <span class="string">'10'</span>]</span><br></pre></td></tr></table></figure>
+<h2 id="csv-writer"><a href="#csv-writer" class="headerlink" title="csv.writer"></a>csv.writer</h2><p><code>writerow</code> 方法：写入单行数据到csv.writer对象</p>
+<p><code>writerows</code> 方法：写入所有行数据到csv.writer对象</p>
+<ul>
+<li>示例向csv.writer对象写入数据</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"></span><br><span class="line">csvData = [[<span class="string">'Name of Person'</span>, <span class="string">'Age'</span>], [<span class="string">'Peter'</span>, <span class="string">'22'</span>], [<span class="string">'Jasmine'</span>, <span class="string">'21'</span>], [<span class="string">'Sam'</span>, <span class="string">'24'</span>]]</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'D:/test1.csv'</span>, <span class="string">'w'</span>,newline=<span class="string">''</span>) <span class="keyword">as</span> file:</span><br><span class="line">    writer = csv.writer(file)    <span class="comment">#将csv的规则应用到这个可迭代对象（打开的文件），生成csv.writer对象</span></span><br><span class="line">    writer.writerows(csvData)    <span class="comment">#调用csv.writer对象的writerows方法，写入数据</span></span><br></pre></td></tr></table></figure>
+<h1 id="ini文件"><a href="#ini文件" class="headerlink" title="ini文件"></a>ini文件</h1><p>.ini 文件是Initialization File的缩写，即初始化文件有时候，INI文件也会以不同的扩展名，如“.CFG”、“.CONF”、或是“.TXT”代替。</p>
+<ul>
+<li>组成介绍</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">- ini 基本组成：parameters（键值）、sections（节）、comments（注释）</span><br><span class="line">- parameters 它是 ini 文件最基本的元素，每个 parameter 都有一个 name 和一个 value</span><br><span class="line">- sections 使用 [section name] 标记在其范围内的所有 parameter 都属于该 section</span><br><span class="line">- [DEFAULT] 是一个特殊的 section ，它为所有的 section 提供默认值</span><br><span class="line">- ; 表示注释，在 ini 规范中称作 comments</span><br></pre></td></tr></table></figure>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[DEFAULT]</span><br><span class="line">ServerAliveInterval = <span class="number">45</span></span><br><span class="line">Compression = yes</span><br><span class="line">CompressionLevel = <span class="number">9</span></span><br><span class="line">ForwardX11 = yes</span><br><span class="line"></span><br><span class="line">[bitbucket.org]</span><br><span class="line">User = Tom</span><br><span class="line"></span><br><span class="line">[topsecret.com]</span><br><span class="line">Port: <span class="number">50022</span></span><br><span class="line">ForwardX11: no</span><br></pre></td></tr></table></figure>
+<h2 id="configparser"><a href="#configparser" class="headerlink" title="configparser"></a>configparser</h2><p><code>configparser</code>模块可以把 <code>ini</code> 文件当作一个嵌套的字典，默认使用的是有序字典，使用所有的 <code>section</code> 当作字典的键，值是所有 <code>parameter</code> 键值对。</p>
+<h2 id="读取文件-read"><a href="#读取文件-read" class="headerlink" title="读取文件.read"></a>读取文件.read</h2><p>读取 ini 文件，可以是单个文件，也可以是文件列表，可以指定文件编码。</p>
+<p>语法：<code>read(filenames, encoding=None)</code></p>
+<ul>
+<li>初始化实例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> configparser    <span class="comment">#导入模块</span></span><br><span class="line"></span><br><span class="line">config = configparser.ConfigParser()    <span class="comment">#定义类</span></span><br><span class="line"></span><br><span class="line">config.read(<span class="string">'d:/initest.ini'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="从字典中读取ini-read-dict"><a href="#从字典中读取ini-read-dict" class="headerlink" title="从字典中读取ini.read_dict"></a>从字典中读取ini.read_dict</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>parser = configparser.ConfigParser()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>parser.read_dict(&#123;<span class="string">'section1'</span>: &#123;<span class="string">'key1'</span>: <span class="string">'value1'</span>,</span><br><span class="line"><span class="meta">... </span>                               <span class="string">'key2'</span>: <span class="string">'value2'</span>,</span><br><span class="line"><span class="meta">... </span>                               <span class="string">'key3'</span>: <span class="string">'value3'</span>&#125;,</span><br><span class="line"><span class="meta">... </span>                  <span class="string">'section2'</span>: &#123;<span class="string">'keyA'</span>: <span class="string">'valueA'</span>,</span><br><span class="line"><span class="meta">... </span>                               <span class="string">'keyB'</span>: <span class="string">'valueB'</span>,</span><br><span class="line"><span class="meta">... </span>                               <span class="string">'keyC'</span>: <span class="string">'valueC'</span>&#125;,</span><br><span class="line"><span class="meta">... </span>                  <span class="string">'section3'</span>: &#123;<span class="string">'foo'</span>: <span class="string">'x'</span>,</span><br><span class="line"><span class="meta">... </span>                               <span class="string">'bar'</span>: <span class="string">'y'</span>,</span><br><span class="line"><span class="meta">... </span>                               <span class="string">'baz'</span>: <span class="string">'z'</span>&#125;</span><br><span class="line"><span class="meta">... </span>&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="从类文件对象中读取-read-file"><a href="#从类文件对象中读取-read-file" class="headerlink" title="从类文件对象中读取.read_file"></a>从类文件对象中读取.read_file</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">TODO</span><br></pre></td></tr></table></figure>
+<h3 id="从字符串中读取-read-string"><a href="#从字符串中读取-read-string" class="headerlink" title="从字符串中读取.read_string"></a>从字符串中读取.read_string</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">TODO</span><br></pre></td></tr></table></figure>
+<h2 id="查看方法"><a href="#查看方法" class="headerlink" title="查看方法"></a>查看方法</h2><h3 id="所有节-sections"><a href="#所有节-sections" class="headerlink" title="所有节.sections"></a>所有节.sections</h3><p>返回一个所有节组成的列表</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">7</span>]: config.sections()</span><br><span class="line">Out[<span class="number">7</span>]: [<span class="string">'bitbucket.org'</span>, <span class="string">'topsecret.com'</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="返回节中的键值-items"><a href="#返回节中的键值-items" class="headerlink" title="返回节中的键值.items"></a>返回节中的键值.items</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">19</span>]: config.items(<span class="string">'bitbucket.org'</span>)</span><br><span class="line">Out[<span class="number">19</span>]:</span><br><span class="line">[(<span class="string">'serveraliveinterval'</span>, <span class="string">'45'</span>),</span><br><span class="line"> (<span class="string">'compression'</span>, <span class="string">'yes'</span>),</span><br><span class="line"> (<span class="string">'compressionlevel'</span>, <span class="string">'9'</span>),</span><br><span class="line"> (<span class="string">'forwardx11'</span>, <span class="string">'yes'</span>),</span><br><span class="line"> (<span class="string">'user'</span>, <span class="string">'Tom'</span>)]</span><br></pre></td></tr></table></figure>
+<h3 id="节视图-keys"><a href="#节视图-keys" class="headerlink" title="节视图.keys"></a>节视图.keys</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">84</span>]: config.sections()</span><br><span class="line">Out[<span class="number">84</span>]: [<span class="string">'bitbucket.org'</span>, <span class="string">'topsecret.com'</span>]</span><br><span class="line"></span><br><span class="line">In [<span class="number">85</span>]: list(config.keys())</span><br><span class="line">Out[<span class="number">85</span>]: [<span class="string">'DEFAULT'</span>, <span class="string">'bitbucket.org'</span>, <span class="string">'topsecret.com'</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="对象视图-values"><a href="#对象视图-values" class="headerlink" title="对象视图.values"></a>对象视图.values</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">105</span>]: <span class="keyword">for</span> i <span class="keyword">in</span> config.values():</span><br><span class="line">     ...:     <span class="comment">#print(dir(i))</span></span><br><span class="line">     ...:     print(i.name,list(i.items()))</span><br><span class="line">     ...:</span><br><span class="line">DEFAULT [(<span class="string">'serveraliveinterval'</span>, <span class="string">'45'</span>), (<span class="string">'compression'</span>, <span class="string">'yes'</span>), (<span class="string">'compressionlevel'</span>, <span class="string">'9'</span>), (<span class="string">'forwardx11'</span>, <span class="string">'yes'</span>), (<span class="string">'balence'</span>, <span class="string">'100'</span>)]</span><br><span class="line">bitbucket.org [(<span class="string">'user'</span>, <span class="string">'Tom'</span>), (<span class="string">'serveraliveinterval'</span>, <span class="string">'45'</span>), (<span class="string">'compression'</span>, <span class="string">'yes'</span>), (<span class="string">'compressionlevel'</span>, <span class="string">'9'</span>), (<span class="string">'forwardx11'</span>, <span class="string">'yes'</span>), (<span class="string">'balence'</span>, <span class="string">'100'</span>)]</span><br><span class="line">topsecret.com [(<span class="string">'port'</span>, <span class="string">'50022'</span>), (<span class="string">'forwardx11'</span>, <span class="string">'no'</span>), (<span class="string">'user'</span>, <span class="string">'jack'</span>), (<span class="string">'serveraliveinterval'</span>, <span class="string">'45'</span>), (<span class="string">'compression'</span>, <span class="string">'yes'</span>), (<span class="string">'compressionlevel'</span>, <span class="string">'9'</span>), (<span class="string">'balence'</span>, <span class="string">'100'</span>)]</span><br><span class="line">balence [(<span class="string">'tom'</span>, <span class="string">'1000'</span>), (<span class="string">'serveraliveinterval'</span>, <span class="string">'45'</span>), (<span class="string">'compression'</span>, <span class="string">'yes'</span>), (<span class="string">'compressionlevel'</span>, <span class="string">'9'</span>), (<span class="string">'forwardx11'</span>, <span class="string">'yes'</span>), (<span class="string">'balence'</span>, <span class="string">'100'</span>)]</span><br></pre></td></tr></table></figure>
+<h3 id="取得默认值-defaults"><a href="#取得默认值-defaults" class="headerlink" title="取得默认值.defaults"></a>取得默认值.defaults</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">37</span>]: config.defaults()</span><br><span class="line">Out[<span class="number">37</span>]:</span><br><span class="line">OrderedDict([(<span class="string">'serveraliveinterval'</span>, <span class="string">'45'</span>),</span><br><span class="line">             (<span class="string">'compression'</span>, <span class="string">'yes'</span>),</span><br><span class="line">             (<span class="string">'compressionlevel'</span>, <span class="string">'9'</span>),</span><br><span class="line">             (<span class="string">'forwardx11'</span>, <span class="string">'yes'</span>),</span><br><span class="line">             (<span class="string">'balence'</span>, <span class="string">'100'</span>)])</span><br></pre></td></tr></table></figure>
+<h2 id="指定读取"><a href="#指定读取" class="headerlink" title="指定读取"></a>指定读取</h2><h3 id="获取指定option的键值-get"><a href="#获取指定option的键值-get" class="headerlink" title="获取指定option的键值.get"></a>获取指定option的键值.get</h3><ul>
+<li>get方法获取</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">26</span>]: config.get(<span class="string">'bitbucket.org'</span>,<span class="string">'user'</span>)</span><br><span class="line">Out[<span class="number">26</span>]: <span class="string">'Tom'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>直接读取</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">23</span>]: config[<span class="string">'bitbucket.org'</span>][<span class="string">'user'</span>]</span><br><span class="line">Out[<span class="number">23</span>]: <span class="string">'Tom'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>获取为整型.getint</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">27</span>]: config.getint(<span class="string">'topsecret.com'</span>,<span class="string">'Port'</span>)</span><br><span class="line">Out[<span class="number">27</span>]: <span class="number">50022</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">28</span>]: a = config.getint(<span class="string">'topsecret.com'</span>,<span class="string">'Port'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">29</span>]: type(a)</span><br><span class="line">Out[<span class="number">29</span>]: int</span><br></pre></td></tr></table></figure>
+<ul>
+<li>获取为浮点型.getfloat</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">31</span>]: config.getfloat(<span class="string">'bitbucket.org'</span>,<span class="string">'balence'</span>)</span><br><span class="line">Out[<span class="number">31</span>]: <span class="number">35.9</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">32</span>]: a = config.getfloat(<span class="string">'bitbucket.org'</span>,<span class="string">'balence'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">33</span>]: type(a)</span><br><span class="line">Out[<span class="number">33</span>]: float</span><br></pre></td></tr></table></figure>
+<ul>
+<li>取得为布尔值.getboolean</li>
+</ul>
+<h3 id="获取指定节下的键-options"><a href="#获取指定节下的键-options" class="headerlink" title="获取指定节下的键.options"></a>获取指定节下的键.options</h3><p>返回给定节名称的选项名称列表，包含默认值</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">13</span>]: config.options(<span class="string">'bitbucket.org'</span>)</span><br><span class="line">Out[<span class="number">13</span>]:</span><br><span class="line">[<span class="string">'user'</span>,</span><br><span class="line"> <span class="string">'serveraliveinterval'</span>,</span><br><span class="line"> <span class="string">'compression'</span>,</span><br><span class="line"> <span class="string">'compressionlevel'</span>,</span><br><span class="line"> <span class="string">'forwardx11'</span>]</span><br></pre></td></tr></table></figure>
+<h2 id="检测方法"><a href="#检测方法" class="headerlink" title="检测方法"></a>检测方法</h2><h3 id="节存在性-has-section"><a href="#节存在性-has-section" class="headerlink" title="节存在性.has_section"></a>节存在性.has_section</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">38</span>]: config.has_section(<span class="string">'bitbucket.org'</span>)</span><br><span class="line">Out[<span class="number">38</span>]: <span class="literal">True</span></span><br><span class="line">    </span><br><span class="line">或    </span><br><span class="line"></span><br><span class="line">In [<span class="number">43</span>]: <span class="string">'bitbucket.org'</span> <span class="keyword">in</span> config</span><br><span class="line">Out[<span class="number">43</span>]: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h3 id="键值对存在性-has-option"><a href="#键值对存在性-has-option" class="headerlink" title="键值对存在性.has_option"></a>键值对存在性.has_option</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">39</span>]: config.has_option(<span class="string">'bitbucket.org'</span>,<span class="string">'Port'</span>)</span><br><span class="line">Out[<span class="number">39</span>]: <span class="literal">False</span></span><br><span class="line">    </span><br><span class="line">In [<span class="number">40</span>]: config.has_option(<span class="string">'topsecret.com'</span>,<span class="string">'Port'</span>)</span><br><span class="line">Out[<span class="number">40</span>]: <span class="literal">True</span></span><br><span class="line"></span><br><span class="line">或检查值</span><br><span class="line"></span><br><span class="line">In [<span class="number">45</span>]: <span class="string">'50022'</span> <span class="keyword">in</span> config[<span class="string">'topsecret.com'</span>][<span class="string">'Port'</span>]</span><br><span class="line">Out[<span class="number">45</span>]: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h2 id="修改方法"><a href="#修改方法" class="headerlink" title="修改方法"></a>修改方法</h2><h3 id="增加节-add-section"><a href="#增加节-add-section" class="headerlink" title="增加节.add_section"></a>增加节.add_section</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">46</span>]: config.add_section(<span class="string">'balence'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="设定节中的键值-set"><a href="#设定节中的键值-set" class="headerlink" title="设定节中的键值.set"></a>设定节中的键值.set</h3><ul>
+<li>修改ini的数据</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">49</span>]: config.set(<span class="string">'balence'</span>,<span class="string">'Tom'</span>,<span class="string">'1000'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="删除节内键值-remove-option"><a href="#删除节内键值-remove-option" class="headerlink" title="删除节内键值.remove_option"></a>删除节内键值.remove_option</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">76</span>]: config.remove_option(<span class="string">'bitbucket.org'</span>,<span class="string">'balence'</span>)</span><br><span class="line">Out[<span class="number">76</span>]: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h3 id="删除节-remove-section"><a href="#删除节-remove-section" class="headerlink" title="删除节.remove_section"></a>删除节.remove_section</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">78</span>]: config.remove_section(<span class="string">'balence1'</span>)</span><br><span class="line">Out[<span class="number">78</span>]: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h3 id="写入磁盘-write"><a href="#写入磁盘-write" class="headerlink" title="写入磁盘.write"></a>写入磁盘.write</h3><p>语法：<code>write(self, fp, space_around_delimiters=True)</code></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">51</span>]: config.write(open(<span class="string">'d:/initest.ini'</span>,<span class="string">'w'</span>))</span><br></pre></td></tr></table></figure>
+<p>对ini的修改已经写入磁盘文件</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">[DEFAULT]</span><br><span class="line">serveraliveinterval = <span class="number">45</span></span><br><span class="line">compression = yes</span><br><span class="line">compressionlevel = <span class="number">9</span></span><br><span class="line">forwardx11 = yes</span><br><span class="line">balence = <span class="number">100</span></span><br><span class="line"></span><br><span class="line">[bitbucket.org]</span><br><span class="line">user = Tom</span><br><span class="line">balence = <span class="number">35.9</span></span><br><span class="line"></span><br><span class="line">[topsecret.com]</span><br><span class="line">port = <span class="number">50022</span></span><br><span class="line">forwardx11 = no</span><br><span class="line">user = jack</span><br><span class="line"></span><br><span class="line">[balence]</span><br><span class="line">tom = <span class="number">1000</span></span><br></pre></td></tr></table></figure>
+<h3 id="清空文件-clear"><a href="#清空文件-clear" class="headerlink" title="清空文件.clear"></a>清空文件.clear</h3><p>仅保留DEFAULT</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">107</span>]: config.clear()</span><br></pre></td></tr></table></figure>
+<h3 id="弹出-pop"><a href="#弹出-pop" class="headerlink" title="弹出.pop"></a>弹出.pop</h3><h3 id="弹出节-popitem"><a href="#弹出节-popitem" class="headerlink" title="弹出节.popitem"></a>弹出节.popitem</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">144</span>]: config.popitem()</span><br><span class="line">Out[<span class="number">144</span>]: (<span class="string">'bitbucket.org'</span>, &lt;Section: bitbucket.org&gt;)</span><br><span class="line"></span><br><span class="line">In [<span class="number">145</span>]: config.popitem()</span><br><span class="line">Out[<span class="number">145</span>]: (<span class="string">'topsecret.com'</span>, &lt;Section: topsecret.com&gt;)</span><br><span class="line"></span><br><span class="line">In [<span class="number">146</span>]: config.popitem()</span><br><span class="line">Out[<span class="number">146</span>]: (<span class="string">'balence'</span>, &lt;Section: balence&gt;)</span><br></pre></td></tr></table></figure>
+<h2 id="DEFAULT"><a href="#DEFAULT" class="headerlink" title="DEFAULT"></a>DEFAULT</h2><p><code>[DEFAULT]</code> 一般包含 ini 格式配置文件的默认项，所以 <code>configparser</code> 部分方法会自动跳过这个 <code>section</code> 。<br>前面已经提到 <code>sections()</code> 是获取不到的，还有删除方法对 <code>[DEFAULT]</code> 也无效：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; config.remove_section(&apos;DEFAULT&apos;)</span><br><span class="line">False</span><br><span class="line">&gt;&gt;&gt; config.clear()</span><br><span class="line">&gt;&gt;&gt; &apos;DEFAULT&apos; in config</span><br><span class="line">True</span><br><span class="line">&gt;&gt;&gt; &apos;ForwardX11&apos; in config[&apos;DEFAULT&apos;]</span><br><span class="line">True</span><br><span class="line">&gt;&gt;&gt; config.sections()</span><br><span class="line">[]123456789</span><br></pre></td></tr></table></figure>
+<p>但指定删除和修改 [DEFAULT] 里的 keys &amp; values 是可以的：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; config.remove_option(&apos;DEFAULT&apos;, &apos;ForwardX11&apos;)</span><br><span class="line">True</span><br><span class="line">&gt;&gt;&gt; config.set(&apos;DEFAULT&apos;, &apos;ForwardX11&apos;,&apos;no&apos;)</span><br><span class="line">&gt;&gt;&gt; config[&apos;DEFAULT&apos;][&apos;ForwardX11&apos;]</span><br><span class="line">&apos;no&apos;12345</span><br></pre></td></tr></table></figure>
+<p>还有个特殊的是，has_section() 也无效，可以和 in 区别使用</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&gt;&gt;&gt; config.has_section(&apos;DEFAULT&apos;)</span><br><span class="line">False</span><br><span class="line">&gt;&gt;&gt; &apos;DEFAULT&apos; in config</span><br><span class="line">True</span><br></pre></td></tr></table></figure>
+<h2 id="Xshell-配置文件读写"><a href="#Xshell-配置文件读写" class="headerlink" title="Xshell 配置文件读写"></a>Xshell 配置文件读写</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> configparser</span><br><span class="line"></span><br><span class="line"><span class="comment"># 字典序列化为 ini 文件</span></span><br><span class="line">data = &#123;</span><br><span class="line">    <span class="string">"CONNECTION"</span>: &#123;</span><br><span class="line">        <span class="string">"Port"</span>: <span class="string">"22"</span>,</span><br><span class="line">        <span class="string">"Host"</span>: <span class="string">"172.16.100.11"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"TERMINAL"</span>: &#123;</span><br><span class="line">        <span class="string">"ScrollbackSize"</span>: <span class="string">"200000"</span>,</span><br><span class="line">        <span class="string">"InitKeypadMode"</span>: <span class="string">"2"</span>,</span><br><span class="line">        <span class="string">"TerminalNameForEcho"</span>: <span class="string">"Xshell"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"TERMINAL:WINDOW"</span>: &#123;</span><br><span class="line">        <span class="string">"ColorScheme"</span>: <span class="string">"New Black"</span>,</span><br><span class="line">        <span class="string">"CursorBlinkInterval"</span>: <span class="string">"400"</span>,</span><br><span class="line">        <span class="string">"FontSize"</span>: <span class="string">"12"</span>,</span><br><span class="line">        <span class="string">"CursorBlink"</span>: <span class="string">"1"</span>,</span><br><span class="line">        <span class="string">"FontFace"</span>: <span class="string">"Consolas"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">"CONNECTION:AUTHENTICATION"</span>: &#123;</span><br><span class="line">        <span class="string">"UserName"</span>: <span class="string">"root"</span>,</span><br><span class="line">        <span class="string">"Password"</span>: <span class="string">"123456"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">parser = configparser.ConfigParser()</span><br><span class="line">parser.read_dict(data)</span><br><span class="line">parser.write(open(<span class="string">"output.ini"</span>, <span class="string">"w+"</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 读取 ini 文件为字典</span></span><br><span class="line">config = configparser.ConfigParser()</span><br><span class="line">config.read(<span class="string">'output.ini'</span>)</span><br><span class="line">data = config._sections</span><br><span class="line">print(data)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Xshell 配置文件</span></span><br><span class="line"><span class="comment"># data = &#123;</span></span><br><span class="line"><span class="comment">#     "CONNECTION": &#123;"Port": "22", "Host": "172.16.100.11"&#125;, </span></span><br><span class="line"><span class="comment">#     "TERMINAL": &#123;"ScrollbackSize": "200000", "InitKeypadMode": "2", "TerminalNameForEcho": "Xshell"&#125;,</span></span><br><span class="line"><span class="comment">#     "TERMINAL:WINDOW": &#123;"ColorScheme": "New Black", "CursorBlinkInterval": "400", "FontSize": "12", "CursorBlink": "1", "FontFace": "Consolas"&#125;,</span></span><br><span class="line"><span class="comment">#     "CONNECTION:AUTHENTICATION": &#123;"UserName": "root","Password": "123456"&#125;</span></span><br><span class="line"><span class="comment"># &#125;</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/23/python/14.argparse参数解析器/" rel="next" title="argparse参数解析器">
+                <i class="fa fa-chevron-left"></i> argparse参数解析器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/25/python/16.re正则表达式/" rel="prev" title="re正则表达式模块">
+                re正则表达式模块 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#序列化"><span class="nav-number">1.</span> <span class="nav-text">序列化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pickle模块"><span class="nav-number">2.</span> <span class="nav-text">pickle模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#转换为bytes-dumps"><span class="nav-number">2.1.</span> <span class="nav-text">转换为bytes.dumps</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从bytes还原-loads"><span class="nav-number">2.2.</span> <span class="nav-text">从bytes还原.loads</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#转换到文件-dump"><span class="nav-number">2.3.</span> <span class="nav-text">转换到文件.dump</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从文件还原-load"><span class="nav-number">2.4.</span> <span class="nav-text">从文件还原.load</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#msgpack模块"><span class="nav-number">2.5.</span> <span class="nav-text">msgpack模块</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#json模块"><span class="nav-number">3.</span> <span class="nav-text">json模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#字典转文件"><span class="nav-number">3.1.</span> <span class="nav-text">字典转文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件转字典"><span class="nav-number">3.2.</span> <span class="nav-text">文件转字典</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字典转字符串"><span class="nav-number">3.3.</span> <span class="nav-text">字典转字符串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#字符串转字典"><span class="nav-number">3.4.</span> <span class="nav-text">字符串转字典</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#csv模块"><span class="nav-number">4.</span> <span class="nav-text">csv模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#csv-write-text"><span class="nav-number">4.1.</span> <span class="nav-text">csv.write_text()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#csv-reader"><span class="nav-number">4.2.</span> <span class="nav-text">csv.reader()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#csv-writer"><span class="nav-number">4.3.</span> <span class="nav-text">csv.writer</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ini文件"><span class="nav-number">5.</span> <span class="nav-text">ini文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#configparser"><span class="nav-number">5.1.</span> <span class="nav-text">configparser</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取文件-read"><span class="nav-number">5.2.</span> <span class="nav-text">读取文件.read</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从字典中读取ini-read-dict"><span class="nav-number">5.2.1.</span> <span class="nav-text">从字典中读取ini.read_dict</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从类文件对象中读取-read-file"><span class="nav-number">5.2.2.</span> <span class="nav-text">从类文件对象中读取.read_file</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从字符串中读取-read-string"><span class="nav-number">5.2.3.</span> <span class="nav-text">从字符串中读取.read_string</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看方法"><span class="nav-number">5.3.</span> <span class="nav-text">查看方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#所有节-sections"><span class="nav-number">5.3.1.</span> <span class="nav-text">所有节.sections</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#返回节中的键值-items"><span class="nav-number">5.3.2.</span> <span class="nav-text">返回节中的键值.items</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#节视图-keys"><span class="nav-number">5.3.3.</span> <span class="nav-text">节视图.keys</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象视图-values"><span class="nav-number">5.3.4.</span> <span class="nav-text">对象视图.values</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#取得默认值-defaults"><span class="nav-number">5.3.5.</span> <span class="nav-text">取得默认值.defaults</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指定读取"><span class="nav-number">5.4.</span> <span class="nav-text">指定读取</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#获取指定option的键值-get"><span class="nav-number">5.4.1.</span> <span class="nav-text">获取指定option的键值.get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取指定节下的键-options"><span class="nav-number">5.4.2.</span> <span class="nav-text">获取指定节下的键.options</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检测方法"><span class="nav-number">5.5.</span> <span class="nav-text">检测方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#节存在性-has-section"><span class="nav-number">5.5.1.</span> <span class="nav-text">节存在性.has_section</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#键值对存在性-has-option"><span class="nav-number">5.5.2.</span> <span class="nav-text">键值对存在性.has_option</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改方法"><span class="nav-number">5.6.</span> <span class="nav-text">修改方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#增加节-add-section"><span class="nav-number">5.6.1.</span> <span class="nav-text">增加节.add_section</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#设定节中的键值-set"><span class="nav-number">5.6.2.</span> <span class="nav-text">设定节中的键值.set</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除节内键值-remove-option"><span class="nav-number">5.6.3.</span> <span class="nav-text">删除节内键值.remove_option</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#删除节-remove-section"><span class="nav-number">5.6.4.</span> <span class="nav-text">删除节.remove_section</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写入磁盘-write"><span class="nav-number">5.6.5.</span> <span class="nav-text">写入磁盘.write</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#清空文件-clear"><span class="nav-number">5.6.6.</span> <span class="nav-text">清空文件.clear</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#弹出-pop"><span class="nav-number">5.6.7.</span> <span class="nav-text">弹出.pop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#弹出节-popitem"><span class="nav-number">5.6.8.</span> <span class="nav-text">弹出节.popitem</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DEFAULT"><span class="nav-number">5.7.</span> <span class="nav-text">DEFAULT</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Xshell-配置文件读写"><span class="nav-number">5.8.</span> <span class="nav-text">Xshell 配置文件读写</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

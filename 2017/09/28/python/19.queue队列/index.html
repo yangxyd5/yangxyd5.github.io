@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="queue模块FIFO队列Queue创建队列语法：queue.Queue(maxsize=0) maxsize：队列的最大长度 In [1]: import queueIn [2]: q = queue.Queue() 写入数据.put语法：put(self, item, block=True, timeout=None) block：阻塞标志，表示当队列长度达到最大时是否阻塞。 timeout：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="queue队列">
+<meta property="og:url" content="https://yangjinheng.github.io/2017/09/28/python/19.queue队列/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="queue模块FIFO队列Queue创建队列语法：queue.Queue(maxsize=0) maxsize：队列的最大长度 In [1]: import queueIn [2]: q = queue.Queue() 写入数据.put语法：put(self, item, block=True, timeout=None) block：阻塞标志，表示当队列长度达到最大时是否阻塞。 timeout：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-09T10:55:27.248Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="queue队列">
+<meta name="twitter:description" content="queue模块FIFO队列Queue创建队列语法：queue.Queue(maxsize=0) maxsize：队列的最大长度 In [1]: import queueIn [2]: q = queue.Queue() 写入数据.put语法：put(self, item, block=True, timeout=None) block：阻塞标志，表示当队列长度达到最大时是否阻塞。 timeout：">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2017/09/28/python/19.queue队列/">
+
+
+
+
+
+  <title>queue队列 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2017/09/28/python/19.queue队列/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">queue队列</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-28T00:00:00+08:00">
+                2017-09-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="queue模块"><a href="#queue模块" class="headerlink" title="queue模块"></a>queue模块</h1><h2 id="FIFO队列Queue"><a href="#FIFO队列Queue" class="headerlink" title="FIFO队列Queue"></a>FIFO队列Queue</h2><h3 id="创建队列"><a href="#创建队列" class="headerlink" title="创建队列"></a>创建队列</h3><p>语法：<code>queue.Queue(maxsize=0)</code></p>
+<p><code>maxsize</code>：队列的最大长度</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">1</span>]: <span class="keyword">import</span> queue</span><br><span class="line"></span><br><span class="line">In [<span class="number">2</span>]: q = queue.Queue()</span><br></pre></td></tr></table></figure>
+<h3 id="写入数据-put"><a href="#写入数据-put" class="headerlink" title="写入数据.put"></a>写入数据.put</h3><p>语法：<code>put(self, item, block=True, timeout=None)</code></p>
+<p><code>block</code>：阻塞标志，表示当队列长度达到最大时是否阻塞。</p>
+<p><code>timeout</code>：阻塞时间，秒。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">2</span>]: q = Queue()</span><br><span class="line">    </span><br><span class="line">In [<span class="number">4</span>]: q.put(<span class="string">'d1'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: q.put(<span class="string">'d2'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">6</span>]: q.put(<span class="string">'d3'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="非阻塞写入-put-nowait"><a href="#非阻塞写入-put-nowait" class="headerlink" title="非阻塞写入.put_nowait"></a>非阻塞写入.put_nowait</h3><p>语法：<code>put_nowait(self, item)</code></p>
+<h3 id="读出数据-get"><a href="#读出数据-get" class="headerlink" title="读出数据.get"></a>读出数据.get</h3><p>阻塞读取并弹出数据</p>
+<p>语法：<code>get(self, block=True, timeout=None)</code></p>
+<p><code>block</code>：阻塞标志，表示是否阻塞。</p>
+<p><code>timeout</code>：阻塞时间，秒。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">2</span>]: q = Queue()</span><br><span class="line">    </span><br><span class="line">In [<span class="number">9</span>]: q.get()</span><br><span class="line">Out[<span class="number">9</span>]: <span class="string">'d1'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">10</span>]: q.get()</span><br><span class="line">Out[<span class="number">10</span>]: <span class="string">'d2'</span></span><br></pre></td></tr></table></figure>
+<h3 id="非阻塞读出-get-nowait"><a href="#非阻塞读出-get-nowait" class="headerlink" title="非阻塞读出.get_nowait"></a>非阻塞读出.get_nowait</h3><p>当弹出到最后一个元素时候，弹出异常。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">22</span>]: q.get_nowait()</span><br><span class="line">Out[<span class="number">22</span>]: <span class="string">'d1'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">23</span>]: q.get_nowait()</span><br><span class="line">Out[<span class="number">23</span>]: <span class="string">'d2'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">14</span>]: q.get_nowait()</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">Empty                                     Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-14</span>-aad002f32be5&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">----&gt; 1 q.get_nowait()</span><br><span class="line"></span><br><span class="line">c:\users\lenovo\appdata\local\programs\python\python36\lib\queue.py <span class="keyword">in</span> get_nowait(self)</span><br><span class="line">    <span class="number">190</span>         <span class="keyword">raise</span> the Empty exception.</span><br><span class="line">    <span class="number">191</span>         <span class="string">'''</span></span><br><span class="line"><span class="string">--&gt; 192         return self.get(block=False)</span></span><br><span class="line"><span class="string">    193</span></span><br><span class="line"><span class="string">    194     # Override these methods to implement other queue organizations</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">c:\users\lenovo\appdata\local\programs\python\python36\lib\queue.py in get(self, block, timeout)</span></span><br><span class="line"><span class="string">    159             if not block:</span></span><br><span class="line"><span class="string">    160                 if not self._qsize():</span></span><br><span class="line"><span class="string">--&gt; 161                     raise Empty</span></span><br><span class="line"><span class="string">    162             elif timeout is None:</span></span><br><span class="line"><span class="string">    163                 while not self._qsize():</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Empty:</span></span><br></pre></td></tr></table></figure>
+<h3 id="队列长度-qsize"><a href="#队列长度-qsize" class="headerlink" title="队列长度.qsize"></a>队列长度.qsize</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">8</span>]: q.qsize()</span><br><span class="line">Out[<span class="number">8</span>]: <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<h3 id="是否为空-empty"><a href="#是否为空-empty" class="headerlink" title="是否为空.empty"></a>是否为空.empty</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">4</span>]: q.put(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: q.empty()</span><br><span class="line">Out[<span class="number">5</span>]: <span class="literal">False</span></span><br><span class="line">    </span><br><span class="line">In [<span class="number">6</span>]: q.get()</span><br><span class="line">Out[<span class="number">6</span>]: <span class="number">1</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">7</span>]: q.empty()</span><br><span class="line">Out[<span class="number">7</span>]: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h3 id="是否为满-full"><a href="#是否为满-full" class="headerlink" title="是否为满.full"></a>是否为满.full</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">38</span>]: q=Queue(maxsize=<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">39</span>]: q.put(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">40</span>]: q.put(<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">41</span>]: q.put(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">43</span>]: q.full()</span><br><span class="line">Out[<span class="number">43</span>]: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h3 id="阻塞调用-join"><a href="#阻塞调用-join" class="headerlink" title="阻塞调用.join"></a>阻塞调用.join</h3><p>阻塞调用线程，直到队列中的所有任务被处理掉。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">3</span>]: q = queue.Queue()</span><br><span class="line"></span><br><span class="line">In [<span class="number">5</span>]: q.join()</span><br><span class="line"><span class="comment">#因队列为0返回</span></span><br><span class="line">In [<span class="number">5</span>]: q.join()</span><br><span class="line"><span class="comment">#因队列为0返回</span></span><br><span class="line">In [<span class="number">10</span>]: q.put(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">11</span>]: q.join()</span><br><span class="line"><span class="comment">#开始阻塞，直到队列被处理完毕</span></span><br></pre></td></tr></table></figure>
+<h3 id="报告进度-task-done"><a href="#报告进度-task-done" class="headerlink" title="报告进度.task_done"></a>报告进度.task_done</h3><p>主要是为 <code>join</code>配套使用，每次<code>get</code>后需要调用task_done，直到所有任务都task_done，join才取消阻塞。</p>
+<h2 id="后进先出LifoQueue"><a href="#后进先出LifoQueue" class="headerlink" title="后进先出LifoQueue"></a>后进先出LifoQueue</h2>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/27/python/18.multiprocessing多进程/" rel="next" title="Python多进程">
+                <i class="fa fa-chevron-left"></i> Python多进程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/29/python/20.Socket编程/" rel="prev" title="Socket网络编程">
+                Socket网络编程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#queue模块"><span class="nav-number">1.</span> <span class="nav-text">queue模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#FIFO队列Queue"><span class="nav-number">1.1.</span> <span class="nav-text">FIFO队列Queue</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建队列"><span class="nav-number">1.1.1.</span> <span class="nav-text">创建队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写入数据-put"><span class="nav-number">1.1.2.</span> <span class="nav-text">写入数据.put</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非阻塞写入-put-nowait"><span class="nav-number">1.1.3.</span> <span class="nav-text">非阻塞写入.put_nowait</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读出数据-get"><span class="nav-number">1.1.4.</span> <span class="nav-text">读出数据.get</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非阻塞读出-get-nowait"><span class="nav-number">1.1.5.</span> <span class="nav-text">非阻塞读出.get_nowait</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#队列长度-qsize"><span class="nav-number">1.1.6.</span> <span class="nav-text">队列长度.qsize</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#是否为空-empty"><span class="nav-number">1.1.7.</span> <span class="nav-text">是否为空.empty</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#是否为满-full"><span class="nav-number">1.1.8.</span> <span class="nav-text">是否为满.full</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#阻塞调用-join"><span class="nav-number">1.1.9.</span> <span class="nav-text">阻塞调用.join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#报告进度-task-done"><span class="nav-number">1.1.10.</span> <span class="nav-text">报告进度.task_done</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后进先出LifoQueue"><span class="nav-number">1.2.</span> <span class="nav-text">后进先出LifoQueue</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

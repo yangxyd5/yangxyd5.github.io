@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="新一代监控架构监控对象 node_expoerter 节点级别 收集主机的指标数据，如：平均负载、CPU、内存、磁盘、网络等等多个维度的数据。 使用 daemonset 在K8S每个节点上运行一个 POD。  kubelet(cAdivisor)容器级别   （kubelet内置），输出节点级别的核心指标，POD 的核心指标，例如：CPU、内存、限额、文件系统限额、网络报文发送接收速率  APIs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="prometheus">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/01/17/kubernetes/13.prometheus监控/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="新一代监控架构监控对象 node_expoerter 节点级别 收集主机的指标数据，如：平均负载、CPU、内存、磁盘、网络等等多个维度的数据。 使用 daemonset 在K8S每个节点上运行一个 POD。  kubelet(cAdivisor)容器级别   （kubelet内置），输出节点级别的核心指标，POD 的核心指标，例如：CPU、内存、限额、文件系统限额、网络报文发送接收速率  APIs">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-02-28T08:08:01.968Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="prometheus">
+<meta name="twitter:description" content="新一代监控架构监控对象 node_expoerter 节点级别 收集主机的指标数据，如：平均负载、CPU、内存、磁盘、网络等等多个维度的数据。 使用 daemonset 在K8S每个节点上运行一个 POD。  kubelet(cAdivisor)容器级别   （kubelet内置），输出节点级别的核心指标，POD 的核心指标，例如：CPU、内存、限额、文件系统限额、网络报文发送接收速率  APIs">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/01/17/kubernetes/13.prometheus监控/">
+
+
+
+
+
+  <title>prometheus | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/01/17/kubernetes/13.prometheus监控/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">prometheus</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-17T00:00:00+08:00">
+                2019-01-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Kubernetes/" itemprop="url" rel="index">
+                    <span itemprop="name">Kubernetes</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="新一代监控架构"><a href="#新一代监控架构" class="headerlink" title="新一代监控架构"></a>新一代监控架构</h1><h2 id="监控对象"><a href="#监控对象" class="headerlink" title="监控对象"></a>监控对象</h2><ul>
+<li><p>node_expoerter 节点级别</p>
+<p>收集主机的指标数据，如：平均负载、CPU、内存、磁盘、网络等等多个维度的数据。</p>
+<p>使用 daemonset 在K8S每个节点上运行一个 POD。</p>
+</li>
+<li><p>kubelet(cAdivisor)容器级别</p>
+</li>
+</ul>
+<p>（kubelet内置），输出节点级别的核心指标，POD 的核心指标，例如：CPU、内存、限额、文件系统限额、网络报文发送接收速率</p>
+<ul>
+<li>APIserver</li>
+</ul>
+<p>通过查询 APIserver 列出每个资源对象，作为监控对象。连入 API server 通过查询来了解有哪些 POD 需要被监控，并且自动把这些 POD 监控起来。是否能被监控取决于是否在 annotations 中定义了相关参数。</p>
+<ul>
+<li>etcd</li>
+</ul>
+<p>etcd 集群指标相关数据</p>
+<ul>
+<li>POD内部 RESTfull 风格接口。</li>
+</ul>
+<p>或者某些应用的专用接口，例如：mysql_exporter ，prometheus官方有提供这样的监控器</p>
+<ul>
+<li>kube-state-metrics</li>
+</ul>
+<p>主要是收集 K8S 工作指标数据的，主要和计数器有关：比如 kube-system 中有多少个 POD 这样的聚合计算，资源计数、资源配额、容器状态等数据，kube-state-metrics 收集完成这些数据然后进行聚合等处理，然后向外输出。</p>
+<h2 id="POD定义中"><a href="#POD定义中" class="headerlink" title="POD定义中"></a>POD定义中</h2><figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">annotations:</span></span><br><span class="line">    <span class="attr">prometheus.io/scrape:</span> <span class="literal">true</span>     <span class="comment"># 允许 prometheus 抓取数据</span></span><br><span class="line">    <span class="attr">prometheus.io/path:</span> <span class="string">/metrics</span>   <span class="comment"># 当前 POD 中能够输出指标数据的HTTP地址，默认为 /metrics</span></span><br><span class="line">    <span class="attr">prometheus.io/port:</span> <span class="number">80</span> <span class="string">or</span> <span class="number">443</span>  <span class="comment"># 抓取数据时使用的套接字端口</span></span><br></pre></td></tr></table></figure>
+<h2 id="部署prometheus"><a href="#部署prometheus" class="headerlink" title="部署prometheus"></a>部署prometheus</h2><p>prometheus 是个有状态的应用</p>
+<ul>
+<li>在 K8S 上的组成</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">kube-state-metrics:       # 部署为 deployment，收据聚合数据暴露给 prometheus</span><br><span class="line">node_expoerter:           # 部署为 daemonset 用于监控每个节点的节点级数据</span><br><span class="line">Altermanager:             # 部署为 deployment 用于报警</span><br><span class="line">prometheus-server         # 部署为 deployment、seatefullset ，用于收集 node_expoerter 等接口的数据</span><br><span class="line">k8s-prometheus-adapter    # 在 K8S 系统中使用监控数据时候需要将 proQL 数据转换为 K8S 的一个 API</span><br></pre></td></tr></table></figure>
+<h2 id="核心指标流水线"><a href="#核心指标流水线" class="headerlink" title="核心指标流水线"></a>核心指标流水线</h2><p>由 kubelet、metrics-server 以及由 apiserver 提供的 api 组成；主要 CPU累计使用率、内存实时使用率、POD 资源占用率及容器的磁盘占用率。</p>
+<ul>
+<li>metrics-server（新一代的资源指标获取方式）</li>
+</ul>
+<p>它是一个 apiserver ，它仅仅用于服务于核心指标服务的，它不是 k8s 的组成部分，仅仅是托管在 k8s 之上 POD。</p>
+<p>k8s 的 apiserver 和 metrics-server 的 apiserver 前端应该加一个代理服务器，它就是一个聚合器，把来自多个不同的 apiserver 聚合成一个。它就是 kube-aggregator，经过它聚合后的 api 我么将通过 /apis/metrics.k8s.io/v1/beta1 来获取。</p>
+<h2 id="监控流水线"><a href="#监控流水线" class="headerlink" title="监控流水线"></a>监控流水线</h2><p>用于从系统收集各种指标数据并提供终端用户、存储系统以及 HPA，它包含核心指标和非核心指标，非核心指标不能被 k8s 所理解，k8s-prometheus-adapter 就是转换为 k8s 所理解格式的一个插件</p>
+<ul>
+<li>prometheus</li>
+</ul>
+<p>CNCF下的第二大项目，收集各种维度的指标，它收集的信息，可以来作为是否进行 HPA（自动伸缩） 的一个标准，prometheus 既作为监控系统使用，也作为特殊指标的提供者来使用，但是如果想要作为特殊指标提供给 HPA 这样的机制使用，需要转换格式，而这个转换为特殊指标的一个插件叫：k8s-prometheus-adapter。</p>
+<h2 id="安装-metrics-server"><a href="#安装-metrics-server" class="headerlink" title="安装 metrics-server"></a>安装 metrics-server</h2><ul>
+<li>官方仓库，这里我使用第一个</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">https://github.com/kubernetes-incubator/metrics-server/tree/master/deploy/1.8%2B      <span class="comment"># 插件官方地址</span></span><br><span class="line">https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/metrics-server    <span class="comment"># k8s 官方插件示例</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装部署相关的文件：/tree/master/deploy/，修改 metrics-server-deployment.yaml 文件</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">containers:</span></span><br><span class="line"><span class="bullet">-</span> <span class="attr">name:</span> <span class="string">metrics-server</span></span><br><span class="line">  <span class="attr">image:</span> <span class="string">k8s.gcr.io/metrics-server-amd64:v0.3.1</span></span><br><span class="line">  <span class="attr">imagePullPolicy:</span> <span class="string">Always</span></span><br><span class="line">  <span class="attr">args:</span>                                               <span class="comment"># 添加参数</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">'--kubelet-preferred-address-types=InternalIP'</span>    <span class="comment"># 不使用主机名，使用 IP</span></span><br><span class="line">  <span class="bullet">-</span> <span class="string">'--kubelet-insecure-tls'</span>                          <span class="comment"># 不验证客户端证书</span></span><br><span class="line">  <span class="attr">volumeMounts:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">tmp-dir</span></span><br><span class="line">    <span class="attr">mountPath:</span> <span class="string">/tmp</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ kubectl apply -f ./</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 POD 和 Service 的启动情况</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ kubectl get pods -n kube-system</span><br><span class="line">$ kubectl get svc -n kube-system</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看 API 中是否存在，metrics.k8s.io/v1beta1</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ kubectl api-versions</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过测试接口获取监控数据，kubectl proxy –port 8080，kubectl top 也可以正常使用了</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ curl http://127.0.0.1:8080/apis/metrics.k8s.io/v1beta1</span><br><span class="line">$ kubectl top nodes</span><br></pre></td></tr></table></figure>
+<h2 id="安装-prometheus"><a href="#安装-prometheus" class="headerlink" title="安装 prometheus"></a>安装 prometheus</h2><ul>
+<li>工作原理</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- prometheus 通过 pull metrilcs 指令从每个 Jobs/exporters 拉取数据</span><br><span class="line">- 其他的 short-lived jobs 也可以通过向 pushgateway 主动发送数据，由 prometheus 被动接收</span><br><span class="line">- prometheus 自身实现了一个时间序列数据库，会将得到的数据存储到其中</span><br><span class="line">- 在 k8s 需要使用 service discovery 来发现服务取得需要监控的目标</span><br><span class="line">- 可以使用 apiclient、webui、Grafana、来将 prometheus 中的数据展示出来</span><br><span class="line">- 当需要报警的时候还会推送给 alertmanager 这个组件由这个组件来发送报警</span><br></pre></td></tr></table></figure>
+<ul>
+<li>部署文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">https://github.com/kubernetes/kubernetes/tree/master/cluster/addons/prometheus</span><br><span class="line">https://github.com/iKubernetes/k8s-prom</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/16/kubernetes/11.认证权限和dashboard/" rel="next" title="权限认证和dashboard">
+                <i class="fa fa-chevron-left"></i> 权限认证和dashboard
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/18/kubernetes/12.helm/" rel="prev" title="helm 包管理">
+                helm 包管理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#新一代监控架构"><span class="nav-number">1.</span> <span class="nav-text">新一代监控架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#监控对象"><span class="nav-number">1.1.</span> <span class="nav-text">监控对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#POD定义中"><span class="nav-number">1.2.</span> <span class="nav-text">POD定义中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署prometheus"><span class="nav-number">1.3.</span> <span class="nav-text">部署prometheus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#核心指标流水线"><span class="nav-number">1.4.</span> <span class="nav-text">核心指标流水线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监控流水线"><span class="nav-number">1.5.</span> <span class="nav-text">监控流水线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-metrics-server"><span class="nav-number">1.6.</span> <span class="nav-text">安装 metrics-server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-prometheus"><span class="nav-number">1.7.</span> <span class="nav-text">安装 prometheus</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

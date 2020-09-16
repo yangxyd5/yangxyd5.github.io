@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Bin(二进制) Oct(八进制) Dec(十进制) Hex(十六进制) 缩写/字符 解释     0000 0000 0 0 00 NUL(null) 空字符   0000 0001 1 1 01 SOH(start of headline) 标题开始   0000 0010 2 2 02 STX (start of text) 正文开始   0000 0011 3 3 03 ETX (e">
+<meta property="og:type" content="article">
+<meta property="og:title" content="默默">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/01/18/python/Ascii码表/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="Bin(二进制) Oct(八进制) Dec(十进制) Hex(十六进制) 缩写/字符 解释     0000 0000 0 0 00 NUL(null) 空字符   0000 0001 1 1 01 SOH(start of headline) 标题开始   0000 0010 2 2 02 STX (start of text) 正文开始   0000 0011 3 3 03 ETX (e">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-04-28T12:14:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="默默">
+<meta name="twitter:description" content="Bin(二进制) Oct(八进制) Dec(十进制) Hex(十六进制) 缩写/字符 解释     0000 0000 0 0 00 NUL(null) 空字符   0000 0001 1 1 01 SOH(start of headline) 标题开始   0000 0010 2 2 02 STX (start of text) 正文开始   0000 0011 3 3 03 ETX (e">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/01/18/python/Ascii码表/">
+
+
+
+
+
+  <title> | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/01/18/python/Ascii码表/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline"></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-01-18T17:40:00+08:00">
+                2019-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <table>
+<thead>
+<tr>
+<th>Bin(二进制)</th>
+<th>Oct(八进制)</th>
+<th>Dec(十进制)</th>
+<th>Hex(十六进制)</th>
+<th>缩写/字符</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0000 0000</td>
+<td>0</td>
+<td>0</td>
+<td>00</td>
+<td>NUL(null)</td>
+<td>空字符</td>
+</tr>
+<tr>
+<td>0000 0001</td>
+<td>1</td>
+<td>1</td>
+<td>01</td>
+<td>SOH(start of headline)</td>
+<td>标题开始</td>
+</tr>
+<tr>
+<td>0000 0010</td>
+<td>2</td>
+<td>2</td>
+<td>02</td>
+<td>STX (start of text)</td>
+<td>正文开始</td>
+</tr>
+<tr>
+<td>0000 0011</td>
+<td>3</td>
+<td>3</td>
+<td>03</td>
+<td>ETX (end of text)</td>
+<td>正文结束</td>
+</tr>
+<tr>
+<td>0000 0100</td>
+<td>4</td>
+<td>4</td>
+<td>04</td>
+<td>EOT (end of transmission)</td>
+<td>传输结束</td>
+</tr>
+<tr>
+<td>0000 0101</td>
+<td>5</td>
+<td>5</td>
+<td>05</td>
+<td>ENQ (enquiry)</td>
+<td>请求</td>
+</tr>
+<tr>
+<td>0000 0110</td>
+<td>6</td>
+<td>6</td>
+<td>06</td>
+<td>ACK (acknowledge)</td>
+<td>收到通知</td>
+</tr>
+<tr>
+<td>0000 0111</td>
+<td>7</td>
+<td>7</td>
+<td>07</td>
+<td>BEL (bell)</td>
+<td>响铃</td>
+</tr>
+<tr>
+<td>0000 1000</td>
+<td>10</td>
+<td>8</td>
+<td>08</td>
+<td>BS (backspace)</td>
+<td>退格</td>
+</tr>
+<tr>
+<td>0000 1001</td>
+<td>11</td>
+<td>9</td>
+<td>09</td>
+<td>HT (horizontal tab)</td>
+<td>水平制表符</td>
+</tr>
+<tr>
+<td>0000 1010</td>
+<td>12</td>
+<td>10</td>
+<td>0A</td>
+<td>LF (NL line feed, new line)</td>
+<td>换行键</td>
+</tr>
+<tr>
+<td>0000 1011</td>
+<td>13</td>
+<td>11</td>
+<td>0B</td>
+<td>VT (vertical tab)</td>
+<td>垂直制表符</td>
+</tr>
+<tr>
+<td>0000 1100</td>
+<td>14</td>
+<td>12</td>
+<td>0C</td>
+<td>FF (NP form feed, new page)</td>
+<td>换页键</td>
+</tr>
+<tr>
+<td>0000 1101</td>
+<td>15</td>
+<td>13</td>
+<td>0D</td>
+<td>CR (carriage return)</td>
+<td>回车键</td>
+</tr>
+<tr>
+<td>0000 1110</td>
+<td>16</td>
+<td>14</td>
+<td>0E</td>
+<td>SO (shift out)</td>
+<td>不用切换</td>
+</tr>
+<tr>
+<td>0000 1111</td>
+<td>17</td>
+<td>15</td>
+<td>0F</td>
+<td>SI (shift in)</td>
+<td>启用切换</td>
+</tr>
+<tr>
+<td>0001 0000</td>
+<td>20</td>
+<td>16</td>
+<td>10</td>
+<td>DLE (data link escape)</td>
+<td>数据链路转义</td>
+</tr>
+<tr>
+<td>0001 0001</td>
+<td>21</td>
+<td>17</td>
+<td>11</td>
+<td>DC1 (device control 1)</td>
+<td>设备控制1</td>
+</tr>
+<tr>
+<td>0001 0010</td>
+<td>22</td>
+<td>18</td>
+<td>12</td>
+<td>DC2 (device control 2)</td>
+<td>设备控制2</td>
+</tr>
+<tr>
+<td>0001 0011</td>
+<td>23</td>
+<td>19</td>
+<td>13</td>
+<td>DC3 (device control 3)</td>
+<td>设备控制3</td>
+</tr>
+<tr>
+<td>0001 0100</td>
+<td>24</td>
+<td>20</td>
+<td>14</td>
+<td>DC4 (device control 4)</td>
+<td>设备控制4</td>
+</tr>
+<tr>
+<td>0001 0101</td>
+<td>25</td>
+<td>21</td>
+<td>15</td>
+<td>NAK (negative acknowledge)</td>
+<td>拒绝接收</td>
+</tr>
+<tr>
+<td>0001 0110</td>
+<td>26</td>
+<td>22</td>
+<td>16</td>
+<td>SYN (synchronous idle)</td>
+<td>同步空闲</td>
+</tr>
+<tr>
+<td>0001 0111</td>
+<td>27</td>
+<td>23</td>
+<td>17</td>
+<td>ETB (end of trans. block)</td>
+<td>结束传输块</td>
+</tr>
+<tr>
+<td>0001 1000</td>
+<td>30</td>
+<td>24</td>
+<td>18</td>
+<td>CAN (cancel)</td>
+<td>取消</td>
+</tr>
+<tr>
+<td>0001 1001</td>
+<td>31</td>
+<td>25</td>
+<td>19</td>
+<td>EM (end of medium)</td>
+<td>媒介结束</td>
+</tr>
+<tr>
+<td>0001 1010</td>
+<td>32</td>
+<td>26</td>
+<td>1A</td>
+<td>SUB (substitute)</td>
+<td>代替</td>
+</tr>
+<tr>
+<td>0001 1011</td>
+<td>33</td>
+<td>27</td>
+<td>1B</td>
+<td>ESC (escape)</td>
+<td>换码(溢出)</td>
+</tr>
+<tr>
+<td>0001 1100</td>
+<td>34</td>
+<td>28</td>
+<td>1C</td>
+<td>FS (file separator)</td>
+<td>文件分隔符</td>
+</tr>
+<tr>
+<td>0001 1101</td>
+<td>35</td>
+<td>29</td>
+<td>1D</td>
+<td>GS (group separator)</td>
+<td>分组符</td>
+</tr>
+<tr>
+<td>0001 1110</td>
+<td>36</td>
+<td>30</td>
+<td>1E</td>
+<td>RS (record separator)</td>
+<td>记录分隔符</td>
+</tr>
+<tr>
+<td>0001 1111</td>
+<td>37</td>
+<td>31</td>
+<td>1F</td>
+<td>US (unit separator)</td>
+<td>单元分隔符</td>
+</tr>
+<tr>
+<td>0010 0000</td>
+<td>40</td>
+<td>32</td>
+<td>20</td>
+<td>(space)</td>
+<td>空格</td>
+</tr>
+<tr>
+<td>0010 0001</td>
+<td>41</td>
+<td>33</td>
+<td>21</td>
+<td>!</td>
+<td>叹号</td>
+</tr>
+<tr>
+<td>0010 0010</td>
+<td>42</td>
+<td>34</td>
+<td>22</td>
+<td>“</td>
+<td>双引号</td>
+</tr>
+<tr>
+<td>0010 0011</td>
+<td>43</td>
+<td>35</td>
+<td>23</td>
+<td>#</td>
+<td>井号</td>
+</tr>
+<tr>
+<td>0010 0100</td>
+<td>44</td>
+<td>36</td>
+<td>24</td>
+<td>$</td>
+<td>美元符</td>
+</tr>
+<tr>
+<td>0010 0101</td>
+<td>45</td>
+<td>37</td>
+<td>25</td>
+<td>%</td>
+<td>百分号</td>
+</tr>
+<tr>
+<td>0010 0110</td>
+<td>46</td>
+<td>38</td>
+<td>26</td>
+<td>&amp;</td>
+<td>和号</td>
+</tr>
+<tr>
+<td>0010 0111</td>
+<td>47</td>
+<td>39</td>
+<td>27</td>
+<td>‘</td>
+<td>闭单引号</td>
+</tr>
+<tr>
+<td>0010 1000</td>
+<td>50</td>
+<td>40</td>
+<td>28</td>
+<td>(</td>
+<td>开括号</td>
+</tr>
+<tr>
+<td>0010 1001</td>
+<td>51</td>
+<td>41</td>
+<td>29</td>
+<td>)</td>
+<td>闭括号</td>
+</tr>
+<tr>
+<td>0010 1010</td>
+<td>52</td>
+<td>42</td>
+<td>2A</td>
+<td>*</td>
+<td>星号</td>
+</tr>
+<tr>
+<td>0010 1011</td>
+<td>53</td>
+<td>43</td>
+<td>2B</td>
+<td>+</td>
+<td>加号</td>
+</tr>
+<tr>
+<td>0010 1100</td>
+<td>54</td>
+<td>44</td>
+<td>2C</td>
+<td>,</td>
+<td>逗号</td>
+</tr>
+<tr>
+<td>0010 1101</td>
+<td>55</td>
+<td>45</td>
+<td>2D</td>
+<td>-</td>
+<td>减号/破折号</td>
+</tr>
+<tr>
+<td>0010 1110</td>
+<td>56</td>
+<td>46</td>
+<td>2E</td>
+<td>.</td>
+<td>句号</td>
+</tr>
+<tr>
+<td>00101111</td>
+<td>57</td>
+<td>47</td>
+<td>2F</td>
+<td>/</td>
+<td>斜杠</td>
+</tr>
+<tr>
+<td>00110000</td>
+<td>60</td>
+<td>48</td>
+<td>30</td>
+<td>0</td>
+<td>数字0</td>
+</tr>
+<tr>
+<td>00110001</td>
+<td>61</td>
+<td>49</td>
+<td>31</td>
+<td>1</td>
+<td>数字1</td>
+</tr>
+<tr>
+<td>00110010</td>
+<td>62</td>
+<td>50</td>
+<td>32</td>
+<td>2</td>
+<td>数字2</td>
+</tr>
+<tr>
+<td>00110011</td>
+<td>63</td>
+<td>51</td>
+<td>33</td>
+<td>3</td>
+<td>数字3</td>
+</tr>
+<tr>
+<td>00110100</td>
+<td>64</td>
+<td>52</td>
+<td>34</td>
+<td>4</td>
+<td>数字4</td>
+</tr>
+<tr>
+<td>00110101</td>
+<td>65</td>
+<td>53</td>
+<td>35</td>
+<td>5</td>
+<td>数字5</td>
+</tr>
+<tr>
+<td>00110110</td>
+<td>66</td>
+<td>54</td>
+<td>36</td>
+<td>6</td>
+<td>数字6</td>
+</tr>
+<tr>
+<td>00110111</td>
+<td>67</td>
+<td>55</td>
+<td>37</td>
+<td>7</td>
+<td>数字7</td>
+</tr>
+<tr>
+<td>00111000</td>
+<td>70</td>
+<td>56</td>
+<td>38</td>
+<td>8</td>
+<td>数字8</td>
+</tr>
+<tr>
+<td>00111001</td>
+<td>71</td>
+<td>57</td>
+<td>39</td>
+<td>9</td>
+<td>数字9</td>
+</tr>
+<tr>
+<td>00111010</td>
+<td>72</td>
+<td>58</td>
+<td>3A</td>
+<td>:</td>
+<td>冒号</td>
+</tr>
+<tr>
+<td>00111011</td>
+<td>73</td>
+<td>59</td>
+<td>3B</td>
+<td>;</td>
+<td>分号</td>
+</tr>
+<tr>
+<td>00111100</td>
+<td>74</td>
+<td>60</td>
+<td>3C</td>
+<td>&lt;</td>
+<td>小于</td>
+</tr>
+<tr>
+<td>00111101</td>
+<td>75</td>
+<td>61</td>
+<td>3D</td>
+<td>=</td>
+<td>等号</td>
+</tr>
+<tr>
+<td>00111110</td>
+<td>76</td>
+<td>62</td>
+<td>3E</td>
+<td>&gt;</td>
+<td>大于</td>
+</tr>
+<tr>
+<td>00111111</td>
+<td>77</td>
+<td>63</td>
+<td>3F</td>
+<td>?</td>
+<td>问号</td>
+</tr>
+<tr>
+<td>01000000</td>
+<td>100</td>
+<td>64</td>
+<td>40</td>
+<td>@</td>
+<td>电子邮件符号</td>
+</tr>
+<tr>
+<td>01000001</td>
+<td>101</td>
+<td>65</td>
+<td>41</td>
+<td>A</td>
+<td>大写字母A</td>
+</tr>
+<tr>
+<td>01000010</td>
+<td>102</td>
+<td>66</td>
+<td>42</td>
+<td>B</td>
+<td>大写字母B</td>
+</tr>
+<tr>
+<td>01000011</td>
+<td>103</td>
+<td>67</td>
+<td>43</td>
+<td>C</td>
+<td>大写字母C</td>
+</tr>
+<tr>
+<td>01000100</td>
+<td>104</td>
+<td>68</td>
+<td>44</td>
+<td>D</td>
+<td>大写字母D</td>
+</tr>
+<tr>
+<td>01000101</td>
+<td>105</td>
+<td>69</td>
+<td>45</td>
+<td>E</td>
+<td>大写字母E</td>
+</tr>
+<tr>
+<td>01000110</td>
+<td>106</td>
+<td>70</td>
+<td>46</td>
+<td>F</td>
+<td>大写字母F</td>
+</tr>
+<tr>
+<td>01000111</td>
+<td>107</td>
+<td>71</td>
+<td>47</td>
+<td>G</td>
+<td>大写字母G</td>
+</tr>
+<tr>
+<td>01001000</td>
+<td>110</td>
+<td>72</td>
+<td>48</td>
+<td>H</td>
+<td>大写字母H</td>
+</tr>
+<tr>
+<td>01001001</td>
+<td>111</td>
+<td>73</td>
+<td>49</td>
+<td>I</td>
+<td>大写字母I</td>
+</tr>
+<tr>
+<td>01001010</td>
+<td>112</td>
+<td>74</td>
+<td>4A</td>
+<td>J</td>
+<td>大写字母J</td>
+</tr>
+<tr>
+<td>01001011</td>
+<td>113</td>
+<td>75</td>
+<td>4B</td>
+<td>K</td>
+<td>大写字母K</td>
+</tr>
+<tr>
+<td>01001100</td>
+<td>114</td>
+<td>76</td>
+<td>4C</td>
+<td>L</td>
+<td>大写字母L</td>
+</tr>
+<tr>
+<td>01001101</td>
+<td>115</td>
+<td>77</td>
+<td>4D</td>
+<td>M</td>
+<td>大写字母M</td>
+</tr>
+<tr>
+<td>01001110</td>
+<td>116</td>
+<td>78</td>
+<td>4E</td>
+<td>N</td>
+<td>大写字母N</td>
+</tr>
+<tr>
+<td>01001111</td>
+<td>117</td>
+<td>79</td>
+<td>4F</td>
+<td>O</td>
+<td>大写字母O</td>
+</tr>
+<tr>
+<td>01010000</td>
+<td>120</td>
+<td>80</td>
+<td>50</td>
+<td>P</td>
+<td>大写字母P</td>
+</tr>
+<tr>
+<td>01010001</td>
+<td>121</td>
+<td>81</td>
+<td>51</td>
+<td>Q</td>
+<td>大写字母Q</td>
+</tr>
+<tr>
+<td>01010010</td>
+<td>122</td>
+<td>82</td>
+<td>52</td>
+<td>R</td>
+<td>大写字母R</td>
+</tr>
+<tr>
+<td>01010011</td>
+<td>123</td>
+<td>83</td>
+<td>53</td>
+<td>S</td>
+<td>大写字母S</td>
+</tr>
+<tr>
+<td>01010100</td>
+<td>124</td>
+<td>84</td>
+<td>54</td>
+<td>T</td>
+<td>大写字母T</td>
+</tr>
+<tr>
+<td>01010101</td>
+<td>125</td>
+<td>85</td>
+<td>55</td>
+<td>U</td>
+<td>大写字母U</td>
+</tr>
+<tr>
+<td>01010110</td>
+<td>126</td>
+<td>86</td>
+<td>56</td>
+<td>V</td>
+<td>大写字母V</td>
+</tr>
+<tr>
+<td>01010111</td>
+<td>127</td>
+<td>87</td>
+<td>57</td>
+<td>W</td>
+<td>大写字母W</td>
+</tr>
+<tr>
+<td>01011000</td>
+<td>130</td>
+<td>88</td>
+<td>58</td>
+<td>X</td>
+<td>大写字母X</td>
+</tr>
+<tr>
+<td>01011001</td>
+<td>131</td>
+<td>89</td>
+<td>59</td>
+<td>Y</td>
+<td>大写字母Y</td>
+</tr>
+<tr>
+<td>01011010</td>
+<td>132</td>
+<td>90</td>
+<td>5A</td>
+<td>Z</td>
+<td>大写字母Z</td>
+</tr>
+<tr>
+<td>01011011</td>
+<td>133</td>
+<td>91</td>
+<td>5B</td>
+<td>[</td>
+<td>开方括号</td>
+</tr>
+<tr>
+<td>01011100</td>
+<td>134</td>
+<td>92</td>
+<td>5C</td>
+<td>\</td>
+<td>反斜杠</td>
+</tr>
+<tr>
+<td>01011101</td>
+<td>135</td>
+<td>93</td>
+<td>5D</td>
+<td>]</td>
+<td>闭方括号</td>
+</tr>
+<tr>
+<td>01011110</td>
+<td>136</td>
+<td>94</td>
+<td>5E</td>
+<td>^</td>
+<td>脱字符</td>
+</tr>
+<tr>
+<td>01011111</td>
+<td>137</td>
+<td>95</td>
+<td>5F</td>
+<td>_</td>
+<td>下划线</td>
+</tr>
+<tr>
+<td>01100000</td>
+<td>140</td>
+<td>96</td>
+<td>60</td>
+<td>`</td>
+<td>开单引号</td>
+</tr>
+<tr>
+<td>01100001</td>
+<td>141</td>
+<td>97</td>
+<td>61</td>
+<td>a</td>
+<td>小写字母a</td>
+</tr>
+<tr>
+<td>01100010</td>
+<td>142</td>
+<td>98</td>
+<td>62</td>
+<td>b</td>
+<td>小写字母b</td>
+</tr>
+<tr>
+<td>01100011</td>
+<td>143</td>
+<td>99</td>
+<td>63</td>
+<td>c</td>
+<td>小写字母c</td>
+</tr>
+<tr>
+<td>01100100</td>
+<td>144</td>
+<td>100</td>
+<td>64</td>
+<td>d</td>
+<td>小写字母d</td>
+</tr>
+<tr>
+<td>01100101</td>
+<td>145</td>
+<td>101</td>
+<td>65</td>
+<td>e</td>
+<td>小写字母e</td>
+</tr>
+<tr>
+<td>01100110</td>
+<td>146</td>
+<td>102</td>
+<td>66</td>
+<td>f</td>
+<td>小写字母f</td>
+</tr>
+<tr>
+<td>01100111</td>
+<td>147</td>
+<td>103</td>
+<td>67</td>
+<td>g</td>
+<td>小写字母g</td>
+</tr>
+<tr>
+<td>01101000</td>
+<td>150</td>
+<td>104</td>
+<td>68</td>
+<td>h</td>
+<td>小写字母h</td>
+</tr>
+<tr>
+<td>01101001</td>
+<td>151</td>
+<td>105</td>
+<td>69</td>
+<td>i</td>
+<td>小写字母i</td>
+</tr>
+<tr>
+<td>01101010</td>
+<td>152</td>
+<td>106</td>
+<td>6A</td>
+<td>j</td>
+<td>小写字母j</td>
+</tr>
+<tr>
+<td>01101011</td>
+<td>153</td>
+<td>107</td>
+<td>6B</td>
+<td>k</td>
+<td>小写字母k</td>
+</tr>
+<tr>
+<td>01101100</td>
+<td>154</td>
+<td>108</td>
+<td>6C</td>
+<td>l</td>
+<td>小写字母l</td>
+</tr>
+<tr>
+<td>01101101</td>
+<td>155</td>
+<td>109</td>
+<td>6D</td>
+<td>m</td>
+<td>小写字母m</td>
+</tr>
+<tr>
+<td>01101110</td>
+<td>156</td>
+<td>110</td>
+<td>6E</td>
+<td>n</td>
+<td>小写字母n</td>
+</tr>
+<tr>
+<td>01101111</td>
+<td>157</td>
+<td>111</td>
+<td>6F</td>
+<td>o</td>
+<td>小写字母o</td>
+</tr>
+<tr>
+<td>01110000</td>
+<td>160</td>
+<td>112</td>
+<td>70</td>
+<td>p</td>
+<td>小写字母p</td>
+</tr>
+<tr>
+<td>01110001</td>
+<td>161</td>
+<td>113</td>
+<td>71</td>
+<td>q</td>
+<td>小写字母q</td>
+</tr>
+<tr>
+<td>01110010</td>
+<td>162</td>
+<td>114</td>
+<td>72</td>
+<td>r</td>
+<td>小写字母r</td>
+</tr>
+<tr>
+<td>01110011</td>
+<td>163</td>
+<td>115</td>
+<td>73</td>
+<td>s</td>
+<td>小写字母s</td>
+</tr>
+<tr>
+<td>01110100</td>
+<td>164</td>
+<td>116</td>
+<td>74</td>
+<td>t</td>
+<td>小写字母t</td>
+</tr>
+<tr>
+<td>01110101</td>
+<td>165</td>
+<td>117</td>
+<td>75</td>
+<td>u</td>
+<td>小写字母u</td>
+</tr>
+<tr>
+<td>01110110</td>
+<td>166</td>
+<td>118</td>
+<td>76</td>
+<td>v</td>
+<td>小写字母v</td>
+</tr>
+<tr>
+<td>01110111</td>
+<td>167</td>
+<td>119</td>
+<td>77</td>
+<td>w</td>
+<td>小写字母w</td>
+</tr>
+<tr>
+<td>01111000</td>
+<td>170</td>
+<td>120</td>
+<td>78</td>
+<td>x</td>
+<td>小写字母x</td>
+</tr>
+<tr>
+<td>01111001</td>
+<td>171</td>
+<td>121</td>
+<td>79</td>
+<td>y</td>
+<td>小写字母y</td>
+</tr>
+<tr>
+<td>01111010</td>
+<td>172</td>
+<td>122</td>
+<td>7A</td>
+<td>z</td>
+<td>小写字母z</td>
+</tr>
+<tr>
+<td>01111011</td>
+<td>173</td>
+<td>123</td>
+<td>7B</td>
+<td>{</td>
+<td>开花括号</td>
+</tr>
+<tr>
+<td>01111100</td>
+<td>174</td>
+<td>124</td>
+<td>7C</td>
+<td>\</td>
+<td></td>
+<td>垂线</td>
+</tr>
+<tr>
+<td>01111101</td>
+<td>175</td>
+<td>125</td>
+<td>7D</td>
+<td>}</td>
+<td>闭花括号</td>
+</tr>
+<tr>
+<td>01111110</td>
+<td>176</td>
+<td>126</td>
+<td>7E</td>
+<td>~</td>
+<td>波浪号</td>
+</tr>
+<tr>
+<td>01111111</td>
+<td>177</td>
+<td>127</td>
+<td>7F</td>
+<td>DEL (delete)</td>
+<td>删除</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/18/kubernetes/12.helm/" rel="next" title="helm 包管理">
+                <i class="fa fa-chevron-left"></i> helm 包管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/01/21/web/react/" rel="prev" title="React学习笔记">
+                React学习笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

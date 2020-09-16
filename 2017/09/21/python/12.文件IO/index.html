@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="文件IO文件的操作创建文件.open()打开文件和创建文件对象，文件属于可迭代对象。 语法open(file, mode=&amp;#39;r&amp;#39;, buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None) 参数 file 文件路径或者打开文件的描述符，必须的参数。   mode 文件的打开模">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件I&#x2F;O">
+<meta property="og:url" content="https://yangjinheng.github.io/2017/09/21/python/12.文件IO/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="文件IO文件的操作创建文件.open()打开文件和创建文件对象，文件属于可迭代对象。 语法open(file, mode=&amp;#39;r&amp;#39;, buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None) 参数 file 文件路径或者打开文件的描述符，必须的参数。   mode 文件的打开模">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-09T10:51:51.976Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="文件I&#x2F;O">
+<meta name="twitter:description" content="文件IO文件的操作创建文件.open()打开文件和创建文件对象，文件属于可迭代对象。 语法open(file, mode=&amp;#39;r&amp;#39;, buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None) 参数 file 文件路径或者打开文件的描述符，必须的参数。   mode 文件的打开模">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2017/09/21/python/12.文件IO/">
+
+
+
+
+
+  <title>文件I/O | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2017/09/21/python/12.文件IO/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">文件I/O</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-21T00:00:00+08:00">
+                2017-09-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="文件IO"><a href="#文件IO" class="headerlink" title="文件IO"></a>文件IO</h1><h2 id="文件的操作"><a href="#文件的操作" class="headerlink" title="文件的操作"></a>文件的操作</h2><h3 id="创建文件-open"><a href="#创建文件-open" class="headerlink" title="创建文件.open()"></a>创建文件.open()</h3><p>打开文件和创建文件对象，文件属于可迭代对象。</p>
+<h4 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h4><p><code>open(file, mode=&#39;r&#39;, buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)</code></p>
+<h4 id="参数"><a href="#参数" class="headerlink" title="参数"></a>参数</h4><ul>
+<li><code>file</code> 文件路径或者打开文件的描述符，必须的参数。</li>
+</ul>
+<ul>
+<li><code>mode</code> 文件的打开模式</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r</td>
+<td>读模式（默认）</td>
+</tr>
+<tr>
+<td>w</td>
+<td>写模式，从首部直接覆盖文件</td>
+</tr>
+<tr>
+<td>x</td>
+<td>创建并写入一个新文件</td>
+</tr>
+<tr>
+<td>a</td>
+<td>追加模式</td>
+</tr>
+<tr>
+<td>b</td>
+<td>二进制模式，配合 <code>rw</code> 等参数使用</td>
+</tr>
+<tr>
+<td>t</td>
+<td>文本模式（默认）</td>
+</tr>
+<tr>
+<td>+</td>
+<td>读写模式，补全缺失的模式</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>buffering</code> 设置缓冲的策略，正数表示使用指定大小的缓冲</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>表示禁用缓冲</td>
+</tr>
+<tr>
+<td>负数</td>
+<td>表示使用系统默认缓冲</td>
+</tr>
+<tr>
+<td>1</td>
+<td>表示缓冲一行数据</td>
+</tr>
+<tr>
+<td>大于1</td>
+<td>表示指定大小的缓冲。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>encoding</code> 文本文件的编码设置，windows 默认：GBK，LINUX默认：UTF-8。</li>
+<li><code>errors</code> 指定编码错误的可选字符串。</li>
+<li><code>newline</code> 控制通用换行符的工作方式。</li>
+</ul>
+<p>在读文件的时候：<code>newline=None</code> 表示<code>\r、\n、\r\n</code>都会被转换为<code>\n</code></p>
+<p>在写文件的时候：<code>newline=None</code> 表示使用系统的分行符号。</p>
+<h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">214</span>]: f = open(<span class="string">'test'</span>,mode=<span class="string">'w+'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="打开模式"><a href="#打开模式" class="headerlink" title="打开模式"></a>打开模式</h3><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>r</td>
+<td>以只读方式打开文件。文件的指针将会放在文件的开头。这是默认模式。</td>
+</tr>
+<tr>
+<td>rb</td>
+<td>以二进制格式打开一个文件用于只读。文件指针将会放在文件的开头。这是默认模式。一般用于非文本文件如图片等。</td>
+</tr>
+<tr>
+<td>r+</td>
+<td>打开一个文件用于读写。文件指针将会放在文件的开头。</td>
+</tr>
+<tr>
+<td>rb+</td>
+<td>以二进制格式打开一个文件用于读写。文件指针将会放在文件的开头。一般用于非文本文件如图片等。</td>
+</tr>
+<tr>
+<td>w</td>
+<td>打开一个文件只用于写入。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。</td>
+</tr>
+<tr>
+<td>wb</td>
+<td>以二进制格式打开一个文件只用于写入。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。一般用于非文本文件如图片等。</td>
+</tr>
+<tr>
+<td>w+</td>
+<td>打开一个文件用于读写。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。</td>
+</tr>
+<tr>
+<td>wb+</td>
+<td>以二进制格式打开一个文件用于读写。如果该文件已存在则将其覆盖。如果该文件不存在，创建新文件。一般用于非文本文件如图片等。</td>
+</tr>
+<tr>
+<td>a</td>
+<td>打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。</td>
+</tr>
+<tr>
+<td>ab</td>
+<td>以二进制格式打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。也就是说，新的内容将会被写入到已有内容之后。如果该文件不存在，创建新文件进行写入。</td>
+</tr>
+<tr>
+<td>a+</td>
+<td>打开一个文件用于读写。如果该文件已存在，文件指针将会放在文件的结尾。文件打开时会是追加模式。如果该文件不存在，创建新文件用于读写。</td>
+</tr>
+<tr>
+<td>ab+</td>
+<td>以二进制格式打开一个文件用于追加。如果该文件已存在，文件指针将会放在文件的结尾。如果该文件不存在，创建新文件用于读写。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">31</span>]: f2 = open(<span class="string">'/tmp/1.jpg'</span>,<span class="string">'rb+'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">32</span>]: f2.read()</span><br><span class="line">Out[<span class="number">32</span>]: <span class="string">b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x0</span></span><br></pre></td></tr></table></figure>
+<h3 id="写入数据-write"><a href="#写入数据-write" class="headerlink" title="写入数据.write()"></a>写入数据.write()</h3><p>在写入模式下，向文件写入数据</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">215</span>]: f.write(<span class="string">'abcd'</span>)</span><br><span class="line">Out[<span class="number">215</span>]: <span class="number">4</span></span><br></pre></td></tr></table></figure>
+<h3 id="写入字符序列-writelines"><a href="#写入字符序列-writelines" class="headerlink" title="写入字符序列.writelines()"></a>写入字符序列.writelines()</h3><p>写入一个序列，只能是字符串，不自动添加换行，需要在序列中自己添加换行</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">82</span>]: <span class="keyword">import</span> os</span><br><span class="line"></span><br><span class="line">In [<span class="number">83</span>]: l1 = os.listdir(<span class="string">'/etc'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">85</span>]: f3.writelines(l1)</span><br><span class="line">    </span><br><span class="line">In [<span class="number">88</span>]: f3.flush()</span><br><span class="line"></span><br><span class="line">In [<span class="number">89</span>]: f3.read()</span><br><span class="line">Out[<span class="number">89</span>]: <span class="string">''</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">90</span>]: f3.seek(<span class="number">0</span>)</span><br><span class="line">Out[<span class="number">90</span>]: <span class="number">0</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">91</span>]: f3.read()</span><br><span class="line">Out[<span class="number">91</span>]: <span class="string">'fstabcrypttabmtabresolv.confgrub.dpkirpmyum.repos.dyummagiccentos-</span></span><br><span class="line"><span class="string">.........</span></span><br></pre></td></tr></table></figure>
+<h3 id="关闭文件-close"><a href="#关闭文件-close" class="headerlink" title="关闭文件.close()"></a>关闭文件.close()</h3><p>调用 <code>close</code> 方法以后文件对象还存在，但是不能再进行操作了，每次不需要对文件操作的时候需要显式执行关闭操作。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">216</span>]: f.close()</span><br></pre></td></tr></table></figure>
+<h3 id="读取内容-read"><a href="#读取内容-read" class="headerlink" title="读取内容.read()"></a>读取内容.read()</h3><p>从文件中读取指定个字符，指针会移动到读取后的位置，默认读取到文件尾部。</p>
+<p>参数：<code>read(size=-1)</code></p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">217</span>]: f = open(<span class="string">'test'</span>,mode=<span class="string">'r+'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">218</span>]: f.read()</span><br><span class="line">Out[<span class="number">218</span>]: <span class="string">'abcd'</span></span><br></pre></td></tr></table></figure>
+<h3 id="读取一行-readline"><a href="#读取一行-readline" class="headerlink" title="读取一行.readline()"></a>读取一行.readline()</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">238</span>]: f = open(<span class="string">'/etc/rc.local'</span>,<span class="string">'r+'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">244</span>]: f.readline()</span><br><span class="line">Out[<span class="number">244</span>]: <span class="string">'#!/bin/bash\n'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">245</span>]: f.readline()</span><br><span class="line">Out[<span class="number">245</span>]: <span class="string">'# THIS FILE IS ADDED FOR COMPATIBILITY PURPOSES\n'</span></span><br></pre></td></tr></table></figure>
+<h3 id="生成每行列表-readlines"><a href="#生成每行列表-readlines" class="headerlink" title="生成每行列表.readlines()"></a>生成每行列表.readlines()</h3><p>将文件内容的每一行当作列表的每一个元素</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">240</span>]: f.readlines()</span><br><span class="line">Out[<span class="number">240</span>]: </span><br><span class="line">[<span class="string">'#!/bin/bash\n'</span>,</span><br><span class="line"> <span class="string">'# THIS FILE IS ADDED FOR COMPATIBILITY PURPOSES\n'</span>,</span><br><span class="line"> <span class="string">'#\n'</span>,</span><br><span class="line"> <span class="string">'# It is highly advisable to create own systemd services or udev rules\n'</span>,</span><br><span class="line"> <span class="string">'# to run scripts during boot instead of using this file.\n'</span>,</span><br><span class="line"> <span class="string">'#\n'</span>,</span><br><span class="line"> <span class="string">'# In contrast to previous versions due to parallel execution during boot\n'</span>,</span><br><span class="line"> <span class="string">'# this script will NOT be run after all other services.\n'</span>,</span><br><span class="line"> <span class="string">'#\n'</span>,</span><br><span class="line"> <span class="string">"# Please note that you must run 'chmod +x /etc/rc.d/rc.local' to ensure\n"</span>,</span><br><span class="line"> <span class="string">'# that this script will be executed during boot.\n'</span>,</span><br><span class="line"> <span class="string">'\n'</span>,</span><br><span class="line"> <span class="string">'touch /var/lock/subsys/local\n'</span>,</span><br><span class="line"> <span class="string">"su - python -c 'cd /home/python/magedu/projects/test &amp;&amp; jupyter-notebook --ip=0.0.0.0'\n"</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="移动指针-seek"><a href="#移动指针-seek" class="headerlink" title="移动指针.seek()"></a>移动指针.seek()</h3><p>把当前的操作指针移动从<code>whence</code> 定义的位置开始偏移 <code>offset</code> 的字节量。 </p>
+<ul>
+<li>用法：<code>seek(offset [,whence])</code></li>
+</ul>
+<p><code>offset</code> 偏移量，（当 <code>whence</code> 为1时可以为负数）</p>
+<p><code>whence</code> 指定偏移的开始位置</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>whence的默认值，表示从文件的头部开始</td>
+</tr>
+<tr>
+<td>1</td>
+<td>表示从当前位置开始</td>
+</tr>
+<tr>
+<td>2</td>
+<td>表示从文件的尾部开始</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>示例<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">250</span>]: f = open(<span class="string">'/etc/rc.local'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">251</span>]: f.readlines()</span><br><span class="line">Out[<span class="number">251</span>]: </span><br><span class="line">[<span class="string">'#!/bin/bash\n'</span>,</span><br><span class="line"> <span class="string">'# THIS FILE IS ADDED FOR COMPATIBILITY PURPOSES\n'</span>,</span><br><span class="line"> <span class="string">'#\n'</span>,</span><br><span class="line"> <span class="string">'# It is highly advisable to create own systemd services or udev rules\n'</span>,</span><br><span class="line"> <span class="string">'# to run scripts during boot instead of using this file.\n'</span>,</span><br><span class="line"> <span class="string">'#\n'</span>,</span><br><span class="line"> <span class="string">'# In contrast to previous versions due to parallel execution during boot\n'</span>,</span><br><span class="line"> <span class="string">'# this script will NOT be run after all other services.\n'</span>,</span><br><span class="line"> <span class="string">'#\n'</span>,</span><br><span class="line"> <span class="string">"# Please note that you must run 'chmod +x /etc/rc.d/rc.local' to ensure\n"</span>,</span><br><span class="line"> <span class="string">'# that this script will be executed during boot.\n'</span>,</span><br><span class="line"> <span class="string">'\n'</span>,</span><br><span class="line"> <span class="string">'touch /var/lock/subsys/local\n'</span>,</span><br><span class="line"> <span class="string">"su - python -c 'cd /home/python/magedu/projects/test &amp;&amp; jupyter-notebook --ip=0.0.0.0'\n"</span>]</span><br><span class="line"></span><br><span class="line">In [<span class="number">252</span>]: f.readline()</span><br><span class="line">Out[<span class="number">252</span>]: <span class="string">''</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">253</span>]: f.seek(<span class="number">0</span>)</span><br><span class="line">Out[<span class="number">253</span>]: <span class="number">0</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">254</span>]: f.readline()</span><br><span class="line">Out[<span class="number">254</span>]: <span class="string">'#!/bin/bash\n'</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="指针位置-tell"><a href="#指针位置-tell" class="headerlink" title="指针位置.tell()"></a>指针位置.tell()</h3><p>显示当前指针所在的字节数</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">14</span>]: f.readline()</span><br><span class="line">Out[<span class="number">14</span>]: <span class="string">'# to run scripts during boot instead of using this file.\n'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">15</span>]: f.tell()</span><br><span class="line">Out[<span class="number">15</span>]: <span class="number">189</span></span><br></pre></td></tr></table></figure>
+<h3 id="写入磁盘-flush"><a href="#写入磁盘-flush" class="headerlink" title="写入磁盘.flush()"></a>写入磁盘.flush()</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">72</span>]: f1.flush()</span><br></pre></td></tr></table></figure>
+<h2 id="属性检测"><a href="#属性检测" class="headerlink" title="属性检测"></a>属性检测</h2><h3 id="可读检测-readable"><a href="#可读检测-readable" class="headerlink" title="可读检测.readable()"></a>可读检测.readable()</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">94</span>]: f3.readable()</span><br><span class="line">Out[<span class="number">94</span>]: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h3 id="可写检测-writable"><a href="#可写检测-writable" class="headerlink" title="可写检测.writable()"></a>可写检测.writable()</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">95</span>]: f3.writable()</span><br><span class="line">Out[<span class="number">95</span>]: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h3 id="是否为终端-isatty"><a href="#是否为终端-isatty" class="headerlink" title="是否为终端.isatty()"></a>是否为终端.isatty()</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">97</span>]: f3.isatty()</span><br><span class="line">Out[<span class="number">97</span>]: <span class="literal">False</span></span><br></pre></td></tr></table></figure>
+<h3 id="是否已关闭-closed"><a href="#是否已关闭-closed" class="headerlink" title="是否已关闭.closed"></a>是否已关闭.closed</h3><p>显示文件是否已经关闭</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">219</span>]: f.close()</span><br><span class="line"></span><br><span class="line">In [<span class="number">220</span>]: f.closed</span><br><span class="line">Out[<span class="number">220</span>]: <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h2 id="属性获取"><a href="#属性获取" class="headerlink" title="属性获取"></a>属性获取</h2><h3 id="文件描述符-fileno"><a href="#文件描述符-fileno" class="headerlink" title="文件描述符.fileno"></a>文件描述符.fileno</h3><p>是文件对象的属性，可以得到系统文件描述符，（是一个整数，用来引用的文件）。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">226</span>]: f.fileno()</span><br><span class="line">Out[<span class="number">226</span>]: <span class="number">13</span></span><br></pre></td></tr></table></figure>
+<h3 id="文件名称-name"><a href="#文件名称-name" class="headerlink" title="文件名称.name"></a>文件名称.name</h3><p>获取文件对象的名称</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">257</span>]: f.name</span><br><span class="line">Out[<span class="number">257</span>]: <span class="string">'/etc/rc.local'</span></span><br></pre></td></tr></table></figure>
+<h3 id="操作模式-mode"><a href="#操作模式-mode" class="headerlink" title="操作模式.mode"></a>操作模式.mode</h3><p>显示文件的操作模式</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">58</span>]: f1.mode</span><br><span class="line">Out[<span class="number">58</span>]: <span class="string">'r+'</span></span><br></pre></td></tr></table></figure>
+<h3 id="文件编码-encoding"><a href="#文件编码-encoding" class="headerlink" title="文件编码.encoding"></a>文件编码.encoding</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">103</span>]: f3.encoding</span><br><span class="line">Out[<span class="number">103</span>]: <span class="string">'UTF-8'</span></span><br></pre></td></tr></table></figure>
+<h3 id="换行符号-newlines"><a href="#换行符号-newlines" class="headerlink" title="换行符号.newlines"></a>换行符号.newlines</h3><p>显示从文件头到当前指针处所遇到的所有换行符</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">107</span>]: f1 = open(<span class="string">'test1'</span>,<span class="string">'w+'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">108</span>]: f1.write(<span class="string">'hello\nworld\r\nthis is a test\r'</span>)</span><br><span class="line">Out[<span class="number">108</span>]: <span class="number">28</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">109</span>]: f1.close()</span><br><span class="line"></span><br><span class="line">In [<span class="number">110</span>]: f1 = open(<span class="string">'test1'</span>,<span class="string">'r+'</span>)</span><br><span class="line"></span><br><span class="line">In [<span class="number">111</span>]: f1.read()</span><br><span class="line">Out[<span class="number">111</span>]: <span class="string">'hello\nworld\nthis is a test\n'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">112</span>]: f1.newlines</span><br><span class="line">Out[<span class="number">112</span>]: (<span class="string">'\r'</span>, <span class="string">'\n'</span>, <span class="string">'\r\n'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="异常处理"><a href="#异常处理" class="headerlink" title="异常处理"></a>异常处理</h2><p>无论如何保证文件被关闭。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">134</span>]: <span class="keyword">try</span>:</span><br><span class="line">     ...:     f3.write(<span class="string">'hello'</span>)</span><br><span class="line">     ...: <span class="keyword">finally</span>:</span><br><span class="line">     ...:     f3.close()</span><br><span class="line">     ...:     </span><br><span class="line"></span><br><span class="line">In [<span class="number">135</span>]: f3</span><br><span class="line">Out[<span class="number">135</span>]: &lt;_io.TextIOWrapper name=<span class="string">'test'</span> mode=<span class="string">'w+'</span> encoding=<span class="string">'UTF-8'</span>&gt;</span><br><span class="line"></span><br><span class="line">In [<span class="number">136</span>]: f3.read()</span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">ValueError                                Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-136</span><span class="number">-26180816</span>d387&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">----&gt; 1 f3.read()</span><br><span class="line"></span><br><span class="line">ValueError: I/O operation on closed file.</span><br></pre></td></tr></table></figure>
+<h2 id="上下文管理"><a href="#上下文管理" class="headerlink" title="上下文管理"></a>上下文管理</h2><p>文件对象打开的时候会获得一个系统的文件描述符，计算机的文件描述符资源是有限的，为了保护资源不被耗尽，所以可以使用with语句来自动关闭文件对象。</p>
+<p>上下文管理的语句块不会开启新的作用域，with语句块执行完的时候，会自动关闭文件对象。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">151</span>]: <span class="keyword">with</span> open(<span class="string">'test'</span>) <span class="keyword">as</span> f1:</span><br><span class="line">     ...:     f1.write(<span class="string">'world'</span>)</span><br><span class="line">     ...:     </span><br><span class="line">---------------------------------------------------------------------------</span><br><span class="line">UnsupportedOperation                      Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-151</span>-e8f2dd01d41e&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">      <span class="number">1</span> <span class="keyword">with</span> open(<span class="string">'test'</span>) <span class="keyword">as</span> f1:</span><br><span class="line">----&gt; 2     f1.write('world')</span><br><span class="line">      <span class="number">3</span> </span><br><span class="line"></span><br><span class="line">UnsupportedOperation: <span class="keyword">not</span> writable</span><br><span class="line"></span><br><span class="line">In [<span class="number">152</span>]: <span class="keyword">with</span> open(<span class="string">'test'</span>,<span class="string">'w+'</span>) <span class="keyword">as</span> f1:</span><br><span class="line">     ...:     f1.write(<span class="string">'world'</span>)</span><br><span class="line">     ...:</span><br></pre></td></tr></table></figure>
+<h2 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h2><ul>
+<li>按行迭代复制文件内容</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">copy</span><span class="params">(src,dst)</span>:</span></span><br><span class="line">    <span class="keyword">with</span> open(dst) <span class="keyword">as</span> file1:</span><br><span class="line">		<span class="keyword">with</span> open(src,<span class="string">'w+'</span>) <span class="keyword">as</span> file2:</span><br><span class="line">			<span class="keyword">for</span> i <span class="keyword">in</span> file1:</span><br><span class="line">				file2.write(i)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>统计文件的单词不区分大小写，显示重复最多的10个单词</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">makekey</span><span class="params">(s:str)</span>:</span></span><br><span class="line">    chars = set(<span class="string">r'''!@#$%^&amp;*()_+-='/\&lt;&gt;;[]|.,?&#123;&#125;~`:'''</span>)</span><br><span class="line">    key = s.lower()</span><br><span class="line">    ret = []</span><br><span class="line">    <span class="keyword">for</span> i,c <span class="keyword">in</span> enumerate(key):</span><br><span class="line">        <span class="keyword">if</span> c <span class="keyword">in</span> chars:</span><br><span class="line">            ret.append(<span class="string">' '</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            ret.append(c)</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span>.join(ret).split()</span><br><span class="line"></span><br><span class="line">d = &#123;&#125;</span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'sample.txt'</span>,encoding=<span class="string">'utf-8'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">        words = line.split()</span><br><span class="line">        <span class="keyword">for</span> wordlist <span class="keyword">in</span> map(makekey,words):</span><br><span class="line">            <span class="keyword">for</span> word <span class="keyword">in</span> wordlist:</span><br><span class="line">                d[word] = d.get(word,<span class="number">0</span>) + <span class="number">1</span></span><br><span class="line"><span class="keyword">for</span> k,v <span class="keyword">in</span> sorted(d.items(),key=<span class="keyword">lambda</span> item: item[<span class="number">1</span>],reverse=<span class="literal">True</span>):</span><br><span class="line">    print(k,v)</span><br></pre></td></tr></table></figure>
+<h1 id="StringIO"><a href="#StringIO" class="headerlink" title="StringIO"></a>StringIO</h1><p>StringIO 顾名思义就是在内存中以 I/O 流的方式读写 str，当文件关闭后内存释放。</p>
+<p>除了可以像文件一样对其读写，还支持下面的方法。</p>
+<h2 id="创建对象StringIO"><a href="#创建对象StringIO" class="headerlink" title="创建对象StringIO()"></a>创建对象StringIO()</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">In [4]: from io import StringIO</span><br><span class="line">In [8]: f = StringIO()</span><br></pre></td></tr></table></figure>
+<h2 id="读取文件内容-getvalue"><a href="#读取文件内容-getvalue" class="headerlink" title="读取文件内容.getvalue"></a>读取文件内容.getvalue</h2><p>无视指针的作用读取文件的所有内容</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">94</span>]: f.getvalue()</span><br><span class="line">Out[<span class="number">94</span>]: <span class="string">'abcdefghijklmn\nopqrst\n'</span></span><br></pre></td></tr></table></figure>
+<h2 id="从指针处删除-truncate"><a href="#从指针处删除-truncate" class="headerlink" title="从指针处删除.truncate"></a>从指针处删除.truncate</h2><p>用法：<code>truncate([size])</code> ，不指定 <code>size</code> 则删除到文件尾部</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">152</span>]: f.write(<span class="string">'0123456789'</span>)</span><br><span class="line">Out[<span class="number">152</span>]: <span class="number">10</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">153</span>]: f.write(<span class="string">'0123456789'</span>)</span><br><span class="line">Out[<span class="number">153</span>]: <span class="number">10</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">154</span>]: f.getvalue()</span><br><span class="line">Out[<span class="number">154</span>]: <span class="string">'01234567890123456789'</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">156</span>]: f.seek(<span class="number">10</span>)</span><br><span class="line">Out[<span class="number">156</span>]: <span class="number">10</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">157</span>]: f.truncate()</span><br><span class="line">Out[<span class="number">157</span>]: <span class="number">10</span></span><br><span class="line"></span><br><span class="line">In [<span class="number">158</span>]: f.getvalue()</span><br><span class="line">Out[<span class="number">158</span>]: <span class="string">'0123456789'</span></span><br></pre></td></tr></table></figure>
+<h2 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">with</span> StringIO <span class="keyword">as</span> f:</span><br><span class="line">    f.write (<span class="string">'yangjinheng'</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> io <span class="keyword">import</span> StringIO</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f = StringIO(<span class="string">'Hello!\nHi!\nGoodbye!'</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line"><span class="meta">... </span>    s = f.readline()</span><br><span class="line"><span class="meta">... </span>    <span class="keyword">if</span> s == <span class="string">''</span>:</span><br><span class="line"><span class="meta">... </span>        <span class="keyword">break</span></span><br><span class="line"><span class="meta">... </span>    print(s.strip())</span><br><span class="line">...</span><br><span class="line">Hello!</span><br><span class="line">Hi!</span><br><span class="line">Goodbye!</span><br></pre></td></tr></table></figure>
+<h1 id="BytesIO"><a href="#BytesIO" class="headerlink" title="BytesIO"></a>BytesIO</h1><p>内存中开辟的一个<strong>二进制</strong>模式的buffer，也可以像文件对象一样操作它，当close方法调用的时候，这个buffer也会被释放。</p>
+<h2 id="创建对象BytesIO"><a href="#创建对象BytesIO" class="headerlink" title="创建对象BytesIO"></a>创建对象BytesIO</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">167</span>]: <span class="keyword">from</span> io <span class="keyword">import</span> BytesIO</span><br><span class="line"></span><br><span class="line">In [<span class="number">168</span>]: f = BytesIO()</span><br></pre></td></tr></table></figure>
+<h2 id="读取文件内容-getvalue-1"><a href="#读取文件内容-getvalue-1" class="headerlink" title="读取文件内容.getvalue"></a>读取文件内容.getvalue</h2><p>无视文件指针读取文件内容</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">In [<span class="number">185</span>]: f.getvalue()</span><br><span class="line">Out[<span class="number">185</span>]: <span class="string">b'\xe4\xb8\xad\xe6\x96\x87'</span></span><br></pre></td></tr></table></figure>
+<h2 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h2><p>请注意，写入的不是str，而是经过UTF-8编码的bytes。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> io <span class="keyword">import</span> BytesIO</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f = BytesIO()</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>f.write(<span class="string">'中文'</span>.encode(<span class="string">'utf-8'</span>))</span><br><span class="line"><span class="number">12</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(f.getvalue())</span><br><span class="line"><span class="string">b'\xe6\x88\x91\xe6\x98\xaf\xe4\xb8\xad\xe6\x96\x87'</span></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/20/python/11.datetime日期时间/" rel="next" title="datetime日期时间模块">
+                <i class="fa fa-chevron-left"></i> datetime日期时间模块
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/22/python/13.pathlib和shutil/" rel="prev" title="pathlib和shutil">
+                pathlib和shutil <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#文件IO"><span class="nav-number">1.</span> <span class="nav-text">文件IO</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件的操作"><span class="nav-number">1.1.</span> <span class="nav-text">文件的操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建文件-open"><span class="nav-number">1.1.1.</span> <span class="nav-text">创建文件.open()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#语法"><span class="nav-number">1.1.1.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参数"><span class="nav-number">1.1.1.2.</span> <span class="nav-text">参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#示例"><span class="nav-number">1.1.1.3.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#打开模式"><span class="nav-number">1.1.2.</span> <span class="nav-text">打开模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写入数据-write"><span class="nav-number">1.1.3.</span> <span class="nav-text">写入数据.write()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写入字符序列-writelines"><span class="nav-number">1.1.4.</span> <span class="nav-text">写入字符序列.writelines()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关闭文件-close"><span class="nav-number">1.1.5.</span> <span class="nav-text">关闭文件.close()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读取内容-read"><span class="nav-number">1.1.6.</span> <span class="nav-text">读取内容.read()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读取一行-readline"><span class="nav-number">1.1.7.</span> <span class="nav-text">读取一行.readline()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#生成每行列表-readlines"><span class="nav-number">1.1.8.</span> <span class="nav-text">生成每行列表.readlines()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#移动指针-seek"><span class="nav-number">1.1.9.</span> <span class="nav-text">移动指针.seek()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指针位置-tell"><span class="nav-number">1.1.10.</span> <span class="nav-text">指针位置.tell()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写入磁盘-flush"><span class="nav-number">1.1.11.</span> <span class="nav-text">写入磁盘.flush()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#属性检测"><span class="nav-number">1.2.</span> <span class="nav-text">属性检测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#可读检测-readable"><span class="nav-number">1.2.1.</span> <span class="nav-text">可读检测.readable()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#可写检测-writable"><span class="nav-number">1.2.2.</span> <span class="nav-text">可写检测.writable()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#是否为终端-isatty"><span class="nav-number">1.2.3.</span> <span class="nav-text">是否为终端.isatty()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#是否已关闭-closed"><span class="nav-number">1.2.4.</span> <span class="nav-text">是否已关闭.closed</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#属性获取"><span class="nav-number">1.3.</span> <span class="nav-text">属性获取</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#文件描述符-fileno"><span class="nav-number">1.3.1.</span> <span class="nav-text">文件描述符.fileno</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件名称-name"><span class="nav-number">1.3.2.</span> <span class="nav-text">文件名称.name</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#操作模式-mode"><span class="nav-number">1.3.3.</span> <span class="nav-text">操作模式.mode</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件编码-encoding"><span class="nav-number">1.3.4.</span> <span class="nav-text">文件编码.encoding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#换行符号-newlines"><span class="nav-number">1.3.5.</span> <span class="nav-text">换行符号.newlines</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常处理"><span class="nav-number">1.4.</span> <span class="nav-text">异常处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#上下文管理"><span class="nav-number">1.5.</span> <span class="nav-text">上下文管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例-1"><span class="nav-number">1.6.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#StringIO"><span class="nav-number">2.</span> <span class="nav-text">StringIO</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建对象StringIO"><span class="nav-number">2.1.</span> <span class="nav-text">创建对象StringIO()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取文件内容-getvalue"><span class="nav-number">2.2.</span> <span class="nav-text">读取文件内容.getvalue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从指针处删除-truncate"><span class="nav-number">2.3.</span> <span class="nav-text">从指针处删除.truncate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例-2"><span class="nav-number">2.4.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BytesIO"><span class="nav-number">3.</span> <span class="nav-text">BytesIO</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建对象BytesIO"><span class="nav-number">3.1.</span> <span class="nav-text">创建对象BytesIO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取文件内容-getvalue-1"><span class="nav-number">3.2.</span> <span class="nav-text">读取文件内容.getvalue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#示例-3"><span class="nav-number">3.3.</span> <span class="nav-text">示例</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

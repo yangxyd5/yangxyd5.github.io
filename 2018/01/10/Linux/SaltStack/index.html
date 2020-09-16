@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Salt介绍SaltStack 是一种基于 C/S 架构的服务器基础架构集中化管理平台，管理端称为 Master，客户端称为 Minion。SaltStack 具备配置管理、远程执行、监控等功能，SaltStack 本身是基于 Python 语言开发实现，结合了轻量级的消息队列软件 ZeroMQ 与 Python 第三方模块（Pyzmq、PyCrypto、Pyjinjia2、python-msgp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SaltStack笔记整理">
+<meta property="og:url" content="https://yangjinheng.github.io/2018/01/10/Linux/SaltStack/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="Salt介绍SaltStack 是一种基于 C/S 架构的服务器基础架构集中化管理平台，管理端称为 Master，客户端称为 Minion。SaltStack 具备配置管理、远程执行、监控等功能，SaltStack 本身是基于 Python 语言开发实现，结合了轻量级的消息队列软件 ZeroMQ 与 Python 第三方模块（Pyzmq、PyCrypto、Pyjinjia2、python-msgp">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-19T09:21:04.479Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SaltStack笔记整理">
+<meta name="twitter:description" content="Salt介绍SaltStack 是一种基于 C/S 架构的服务器基础架构集中化管理平台，管理端称为 Master，客户端称为 Minion。SaltStack 具备配置管理、远程执行、监控等功能，SaltStack 本身是基于 Python 语言开发实现，结合了轻量级的消息队列软件 ZeroMQ 与 Python 第三方模块（Pyzmq、PyCrypto、Pyjinjia2、python-msgp">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2018/01/10/Linux/SaltStack/">
+
+
+
+
+
+  <title>SaltStack笔记整理 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2018/01/10/Linux/SaltStack/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SaltStack笔记整理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-10T00:00:00+08:00">
+                2018-01-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/运维笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">运维笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Salt介绍"><a href="#Salt介绍" class="headerlink" title="Salt介绍"></a>Salt介绍</h1><p>SaltStack 是一种基于 C/S 架构的服务器基础架构集中化管理平台，管理端称为 Master，客户端称为 Minion。SaltStack 具备配置管理、远程执行、监控等功能，SaltStack 本身是基于 Python 语言开发实现，结合了轻量级的消息队列软件 ZeroMQ 与 Python 第三方模块（Pyzmq、PyCrypto、Pyjinjia2、python-msgpack 和 PyYAML 等）构建。</p>
+<p>通过部署 SaltStack 环境，运维人员可以在成千上万台服务器上做到批量执行命令，根据不同的业务特性进行配置集中化管理、分发文件、采集系统数据及软件包的安装与管理等，</p>
+<ul>
+<li>SaltStack 具有以下特性</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1.  部署简单、管理方便；</span><br><span class="line">2.  支持大部分的操作系统，如 Unix／Linux／Windows 环境；</span><br><span class="line">3.  架构上使用C/S管理模式，易于扩展；</span><br><span class="line">4.  配置简单、功能覆盖广；</span><br><span class="line">5.  主控端（Master）与被控端（Minion）基于证书认证，确保安全可靠的通信；</span><br><span class="line">6.  支持 API 及自定义 Python 模块，轻松实现功能扩展；</span><br></pre></td></tr></table></figure>
+<ul>
+<li>三大功能</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>功能</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>远程执行</td>
+<td>在远程主机上并行的运行预定义或任意命令</td>
+</tr>
+<tr>
+<td>配置管理</td>
+<td>通过预先编写好的 “状态” 文件，对服务器进行管理</td>
+</tr>
+<tr>
+<td>云管理</td>
+<td>云管理支持阿里云、OpenStack、微软云、谷歌云、亚马逊、等各大云服务</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>运行方式</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>方式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local</td>
+<td>本地</td>
+</tr>
+<tr>
+<td>Master/Minion</td>
+<td>传统运行方式，Server 端 + Agent 端</td>
+</tr>
+<tr>
+<td>Salt SSH</td>
+<td>SSH，无客户端方式</td>
+</tr>
+</tbody>
+</table>
+<h2 id="安装-Salt"><a href="#安装-Salt" class="headerlink" title="安装 Salt"></a>安装 Salt</h2><ul>
+<li>官方安装地址</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https://repo.saltstack.com/#rhel</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装组件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum install salt-master</span><br><span class="line">yum install salt-minion</span><br><span class="line">yum install salt-ssh</span><br><span class="line">yum install salt-syndic</span><br><span class="line">yum install salt-cloud</span><br><span class="line">yum install salt-api</span><br></pre></td></tr></table></figure>
+<ul>
+<li>默认的配置文件目录，存放着 Master/Minion 的主配置文件，密钥等文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@node1 salt]# ll</span><br><span class="line">总用量 64</span><br><span class="line">-rw-r----- 1 root root 29536 8月  10 18:18 master</span><br><span class="line">-rw-r----- 1 root root 26369 8月   9 16:27 minion</span><br><span class="line">drwxr-xr-x 2 root root    28 8月   9 16:27 minion.d</span><br><span class="line">-rw-r--r-- 1 root root     5 8月   9 16:26 minion_id</span><br><span class="line">drwxr-xr-x 4 root root    34 8月   9 16:26 pki</span><br></pre></td></tr></table></figure>
+<h2 id="Minion-指定-Master"><a href="#Minion-指定-Master" class="headerlink" title="Minion 指定 Master"></a>Minion 指定 Master</h2><ul>
+<li><code>vim /etc/salt/minion</code>，指定 Master 的地址，可以指定端口，也可以配置多个 Master，使用 YAML 风格。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">master: 172.16.100.253</span><br></pre></td></tr></table></figure>
+<p>注意：如果设置了多个主服务器地址，Minion 可以同时连接到多个主服务器，如果连接主服务器，minion 将无法启动。</p>
+<h2 id="Minion-设置-Hosts"><a href="#Minion-设置-Hosts" class="headerlink" title="Minion 设置 Hosts"></a>Minion 设置 Hosts</h2><ul>
+<li><code>vim /etc/hosts</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">172.16.100.253 salt</span><br></pre></td></tr></table></figure>
+<h2 id="Master-认证-Minion"><a href="#Master-认证-Minion" class="headerlink" title="Master 认证 Minion"></a>Master 认证 Minion</h2><p>Minion 启动后会主动向 Master 发出密钥的申请，将其公钥发送给 Salt master，必须在 Master 上使用 <code>salt-key</code> 命令接受此密钥后 Master 才能控制该Minion，接受后 Master 会将自己的公钥发送给 Minion 端。</p>
+<ul>
+<li><code>salt-key</code> 命令用于管理 Salt 身份验证的密钥，客户端申请的状态一般有以下几种。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Accepted:     <span class="comment"># 密钥被接受，minion 可以与 master 通信</span></span><br><span class="line">Denied:       <span class="comment"># 密钥被自动拒绝，当 minion 有重复的ID，或一个 minion 生成了新的密钥且之前的密钥没有从Salt master中删除时，会发生这种情况</span></span><br><span class="line">Unaccepted:   <span class="comment"># 密钥等待被接受</span></span><br><span class="line">Rejected:     <span class="comment"># master 主动拒绝的密钥</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>常用指令</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-L arg, --list=ARG</code></td>
+<td>列出密钥，<code>arg</code> 可以是密钥的状态，<code>all</code> 为列出所有</td>
+</tr>
+<tr>
+<td><code>-a HOST, --accept=HOST</code></td>
+<td>接受一个密钥申请，可以使用通配符，接受后就可以控制该 minion。</td>
+</tr>
+<tr>
+<td><code>-A, --accept-all</code></td>
+<td>接受所有的密钥申请</td>
+</tr>
+<tr>
+<td><code>-r HOST, --reject=HOST</code></td>
+<td>拒绝指定的密钥申请</td>
+</tr>
+<tr>
+<td><code>-p HOST, --print=HOST</code></td>
+<td>打印指定的密钥</td>
+</tr>
+<tr>
+<td><code>-P, --print-all</code></td>
+<td>打印出所有的密钥</td>
+</tr>
+<tr>
+<td><code>-d HOST, --delete=HOST</code></td>
+<td>删除指定的密钥</td>
+</tr>
+<tr>
+<td><code>-D, --delete-all</code></td>
+<td>删除所有的密钥</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>示例：使用 <code>salt-key -a</code> 接受一个密钥申请</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@node1 master]<span class="comment"># salt-key -a node2</span></span><br><span class="line">The following keys are going to be accepted:</span><br><span class="line">Unaccepted Keys:</span><br><span class="line">node2</span><br><span class="line">Proceed? [n/Y] y</span><br><span class="line">Key <span class="keyword">for</span> minion node2 accepted.</span><br><span class="line">[root@node1 master]<span class="comment"># salt-key</span></span><br><span class="line">Accepted Keys:</span><br><span class="line">node2</span><br><span class="line">Denied Keys:</span><br><span class="line">Unaccepted Keys:</span><br><span class="line">Rejected Keys:</span><br></pre></td></tr></table></figure>
+<h1 id="入门使用"><a href="#入门使用" class="headerlink" title="入门使用"></a>入门使用</h1><h2 id="远程执行"><a href="#远程执行" class="headerlink" title="远程执行"></a>远程执行</h2><ul>
+<li>基础语法</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt &lt;target&gt; &lt;模块名&gt;.&lt;方法&gt; [参数...]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Hello World，单引号是为了防止字符被 Shell 展开，<code>*</code> 是目标主机的通配符。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;*&apos; test.echo &apos;Hello World&apos;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>测试联通性</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;*&apos; test.ping</span><br></pre></td></tr></table></figure>
+<ul>
+<li>远程执行命令</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;*&apos; cmd.run &apos;df -h&apos;</span><br></pre></td></tr></table></figure>
+<h2 id="配置管理"><a href="#配置管理" class="headerlink" title="配置管理"></a>配置管理</h2><p>SLS（代表SaLt State文件）是Salt State系统的核心。SLS描述了系统的目标状态，由格式简单的数据构成，这经常被称作配置管理。</p>
+<ul>
+<li><code>vim /etc/salt/master</code>，打开 <code>file_roots</code> 的注释，这表示在 <code>base</code> 环境的 SLS 文件在这个目录下寻找。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">file_roots:</span></span><br><span class="line">  <span class="attr">base:</span>                   <span class="comment"># 默认为base，可有有多个，格式为：YAML，例如：测试环境的、开发环境的</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">/srv/salt</span>           <span class="comment"># 表示配置管理的配置文件目录</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>vim /srv/salt/apache.sls</code>，编辑一个 <code>apache</code> 的状态文件，功能就是安装 <code>httpd</code>，并设置为开机启动。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apache-service:</span>           <span class="comment"># 定义标签，不能重复</span></span><br><span class="line">  <span class="attr">pkg.installed:</span>          <span class="comment"># 使用 pkg 模块的 installed 方法</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">names:</span>              <span class="comment"># 设置软件名称</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">httpd</span>             <span class="comment"># 安装名字为 httpd 的包</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">httpd-devel</span></span><br><span class="line">  <span class="attr">service.running:</span>        <span class="comment"># 使用 service 模块的 running 方法</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">httpd</span>         <span class="comment"># 设置软件名称</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">enable:</span> <span class="literal">True</span>        <span class="comment"># 将状态设置为开机启动</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>vim /srv/salt/top.sls</code>，配置 TOP 文件它是必不可少的，它用来描述环境、主机、状态之间的对应关系。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">base:</span>                     <span class="comment"># 在base环境</span></span><br><span class="line">  <span class="string">'*'</span><span class="string">:</span>                    <span class="comment"># 这一组机器</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">apache</span>              <span class="comment"># 执行 base 环境目录下的 apache 的状态文件，不包含扩展名</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>应用状态</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'*'</span> state.highstate</span><br></pre></td></tr></table></figure>
+<ul>
+<li>不在 TOP 内添加关联，直接应用状态文件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;node2&apos; state.sls init.history    # 表示执行 init 目录下的 history.sls</span><br></pre></td></tr></table></figure>
+<h1 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h1><h2 id="Grains"><a href="#Grains" class="headerlink" title="Grains"></a>Grains</h2><p>Salt 附带了一个接口，用于获取有关底层系统的信息，它被称作 Grains 接口，因为它含有 Salt 和 Grains 的信息，Grains 会收集操作系统：域名，IP地址，内核，操作系统类型，内存和许多其他系统属性。Grain 接口可用于 Salt 模块和组件，方便根据客户端的 Grain 数据筛选出正确的客户端，以执行远程命令，Grain 数据是相对静态的，但是如果系统信息发生了变化(例如，如果网络设置发生了变化)，或者为定制 Grain 分配了一个新值，Grain 数据就会被刷新。</p>
+<ul>
+<li>查看客户端 grains</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="string">salt</span> <span class="string">'node2'</span> <span class="string">grains.ls</span>            <span class="comment"># 查看客户端 grains 列表</span></span><br><span class="line"><span class="string">salt</span> <span class="string">'node2'</span> <span class="string">grains.items</span>         <span class="comment"># 查看客户端 grains 详细信息</span></span><br><span class="line"><span class="string">salt</span> <span class="string">'node2'</span> <span class="string">grains.get</span> <span class="string">fqdn</span>      <span class="comment"># 查看客户端 grains 单项信息</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>应用场景</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Grains 可以用于信息查询，Grains 保存着收集到的客户端详细信息。</span><br><span class="line">Grains 可以在 state 系统中使用，用于配置管理模块。</span><br><span class="line">Grains 可以在target中使用，在用来匹配Minion，比如匹配操作系统，使用 -G 选项。 例如在：所有Ubuntu 系统上安装软件</span><br></pre></td></tr></table></figure>
+<ul>
+<li>刷新Grains 信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt minion saltutil.refresh_grains</span><br></pre></td></tr></table></figure>
+<h3 id="自定义Grains"><a href="#自定义Grains" class="headerlink" title="自定义Grains"></a>自定义Grains</h3><ul>
+<li>方式一，在配置文件中指定 Grains 信息，定义完成后需要重启 minion 才能生效。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /etc/salt/minion</span><br><span class="line">grains:</span><br><span class="line">  role: nginx          <span class="comment"># 定义一个标签</span></span><br><span class="line">  env: <span class="built_in">test</span>            <span class="comment"># 定义第二个标签</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>方式二，编写单独的 Grains 文件，在文件内定义信息，定义完成后需要重启 minion 才能生效。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vim /etc/salt/grains</span><br><span class="line">flag: openstack</span><br><span class="line"></span><br><span class="line">service salt-minion restart</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在服务器端获取自定义的 Grains 信息</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@node1 salt]<span class="comment"># salt 'node2' grains.get env</span></span><br><span class="line">node2:</span><br><span class="line">    <span class="built_in">test</span></span><br><span class="line">[root@node1 salt]<span class="comment"># salt 'node2' grains.get role</span></span><br><span class="line">node2:</span><br><span class="line">    nginx</span><br><span class="line">[root@node1 salt]<span class="comment"># salt 'node2' grains.get flag</span></span><br><span class="line">node2:</span><br><span class="line">    openstack</span><br></pre></td></tr></table></figure>
+<h3 id="使用-Grains"><a href="#使用-Grains" class="headerlink" title="使用 Grains"></a>使用 Grains</h3><p>Grains 信息可以作为 Targeting，就是说可以根据 Grains 信息来过滤出符合条件的主机，来执行控制。</p>
+<ul>
+<li>根据原生 Grains 来匹配目标</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@node1 salt]<span class="comment"># salt -G os:CentOS cmd.run 'free -h'</span></span><br><span class="line">node2:</span><br><span class="line">                 total       used       free     shared    buffers     cached</span><br><span class="line">    Mem:          474M       371M       102M       292K        15M       215M</span><br><span class="line">    -/+ buffers/cache:       141M       333M</span><br><span class="line">    Swap:         511M         0B       511M</span><br><span class="line">node1:</span><br><span class="line">                  total        used        free      shared  buff/cache   available</span><br><span class="line">    Mem:           471M        237M         26M        1.6M        207M        178M</span><br><span class="line">    Swap:          511M         92M        419M</span><br></pre></td></tr></table></figure>
+<ul>
+<li>根据自定义的 Grains 来匹配目标</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[root@node1 salt]<span class="comment"># salt -G flag:openstack cmd.run 'free -h'</span></span><br><span class="line">node2:</span><br><span class="line">                 total       used       free     shared    buffers     cached</span><br><span class="line">    Mem:          474M       371M       102M       292K        15M       214M</span><br><span class="line">    -/+ buffers/cache:       141M       332M</span><br><span class="line">    Swap:         511M         0B       511M</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 SLS 文件中使用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">base:</span><br><span class="line">  &apos;role:nginx&apos;:</span><br><span class="line">    - match: grains</span><br><span class="line">    - web.nginx</span><br></pre></td></tr></table></figure>
+<h2 id="Pillar"><a href="#Pillar" class="headerlink" title="Pillar"></a>Pillar</h2><p>Pillar 是 Salt 的接口，它提供可以分发给 Minion 的全局键值，Pillar 数据的组织方式类似于 State 文件，Pillar 数据存放在 Master 端，每个 Minion 只能访问属于自己的键值数据，所以 Pillar 可以存储 Minion 需要的敏感信息。 </p>
+<h3 id="设置-Pillar-文件"><a href="#设置-Pillar-文件" class="headerlink" title="设置 Pillar 文件"></a>设置 Pillar 文件</h3><ul>
+<li><code>vim /etc/salt/master</code>，打开 pillar 的注释，创建 pillar 目录。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">pillar_roots:</span></span><br><span class="line">  <span class="attr">base:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">/srv/pillar</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>vim /srv/pillar/test.sls</code>，定义一条 Pillar 信息，其实就是一个变量。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">var: 172.16.100.252</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>vim /srv/pillar/top.sls</code> ，<code>pillar</code> 有自己的 <code>top</code> 文件，描述 <code>pillar</code> 属于哪个主机。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">base:</span><br><span class="line">  &apos;node2&apos;:       # 为 node2 指定pillar</span><br><span class="line">    - test       # pillar 文件为 test.sls</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 <code>pillar</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@node1 pillar]# salt &apos;*&apos; pillar.item var</span><br><span class="line">node1:</span><br><span class="line">    ----------</span><br><span class="line">node2:</span><br><span class="line">    ----------</span><br><span class="line">    var:</span><br><span class="line">        172.16.100.252</span><br></pre></td></tr></table></figure>
+<ul>
+<li>刷新 <code>pillar</code></li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@node1 pillar]# salt &apos;*&apos; saltutil.refresh_pillar</span><br><span class="line">node2:</span><br><span class="line">    True</span><br><span class="line">node1:</span><br><span class="line">    True</span><br></pre></td></tr></table></figure>
+<h3 id="使用-piller"><a href="#使用-piller" class="headerlink" title="使用 piller"></a>使用 piller</h3><ul>
+<li>使用 <code>piller</code> 匹配</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@node1 pillar]# salt -I &apos;var:172.16.100.252&apos; test.ping</span><br><span class="line">node2:</span><br><span class="line">    True</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 SLS 文件中使用</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="Targeting-Minion"><a href="#Targeting-Minion" class="headerlink" title="Targeting Minion"></a>Targeting Minion</h2><p>基本语法：<code>salt &lt;target&gt; &lt;模块名&gt;.&lt;方法&gt; [参数...]</code>，其中的 <code>target</code> 就是下面介绍的内容，Salt 命令首先要进行 <code>targeting</code> 。每个远程执行都需要指定一个匹配的 <code>target</code> （即需要那些Minion进行执行）。默认形况下，使用 <code>target</code> 类型是 <code>glob(通配)</code>，这与大多数的 Shell 命令中参数的模式匹配风格一致。其他类型的 <code>targeting</code> 需要通过添加对应的选项(flag)，进行指定。</p>
+<p>例如：想匹配一段特定子网中的一组主机，需要使用 -S 选项进行指定：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt -S 192.168.0.0/24 test.ping</span><br></pre></td></tr></table></figure>
+<p> 下面介绍常用的 <code>target</code> 类型。</p>
+<h3 id="通配符"><a href="#通配符" class="headerlink" title="通配符"></a>通配符</h3><p>Salt 默认的 <code>target</code> 类型，使用 Shell 的通配符指定一个或多个 Minion ID，多数情况下需要使用使用单引号方式通配符内容被 Shell 展开。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'*'</span> test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="正则表达式"><a href="#正则表达式" class="headerlink" title="正则表达式"></a>正则表达式</h3><p>Salt 还可以使用 Perl 风格的正则表达式，它需要使用 <code>-E --pcre</code> 选项来指定。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt -E <span class="string">'^[m|M]in.[e|o|u]n$'</span> test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h3><p>指定一个列表作为目标，它需要使用 <code>-L --list</code> 选项来指定。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt -L web1,web2,db1,db2 test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="子网"><a href="#子网" class="headerlink" title="子网"></a>子网</h3><p>使用 <code>-S</code> 选项来指定一个 IPV4 地址或者一个CIDR的IPV4子网作为目标。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt -S 192.168.0.42 test.ping</span><br><span class="line">salt -S 192.168.0.0/16 test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="Grain"><a href="#Grain" class="headerlink" title="Grain"></a>Grain</h3><p>Salt 可以通过 <code>-G</code> 选项来使用 Grain 信息的特征来作为目标，例如：操作系统、CPU架构、或者自定义的 Grain。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt -G <span class="string">'os:Ubuntu'</span> test.ping</span><br><span class="line">salt -G <span class="string">'os_family:Debian'</span> test.ping</span><br></pre></td></tr></table></figure>
+<p>一些 Grain 是多级字典，可以通过冒号(:)，进行分隔字典中的每一级键名称</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt -G <span class="string">'ip_interfaces:eth0:192.168.11.38'</span> test.ping</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可以使用长选项：<code>--grain-pcre</code>，来使用正则表达式进行更复杂的 Grain 匹配</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt --grain-pcre <span class="string">'os:red(hat|flag)'</span> test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="Pillar-1"><a href="#Pillar-1" class="headerlink" title="Pillar"></a>Pillar</h3><p>使用 <code>-I --pillar</code> 选项支持通过 pillar 的数据进行匹配目标。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt -I <span class="string">'var:test'</span> test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="混合"><a href="#混合" class="headerlink" title="混合"></a>混合</h3><p>使用 <code>-C --compound</code> 可以混合多种匹配模式来进行目标的匹配，需要在不同的匹配模式前加 <code>@</code> 符号。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt -C <span class="string">'G@os:Ubuntu,I@role:web'</span> test.ping</span><br></pre></td></tr></table></figure>
+<p>混合模式中也可以使用逻辑运算符 <code>and or not</code> 来表达模式，例如：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt -C <span class="string">'min* or *ion'</span> test.ping</span><br><span class="line">salt -C <span class="string">'web* or G@os:Arch'</span> test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="节点组"><a href="#节点组" class="headerlink" title="节点组"></a>节点组</h3><p>使用 <code>-N --nodegroup</code>，在 Matser 的配置文件中创建一个节点组的定义，然后就在可以命令行中使用了。</p>
+<ul>
+<li><code>vim /etc/salt/master</code>，创建节点组。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nodegroups:</span><br><span class="line">  group1: &apos;L@foo.domain.com,bar.domain.com,baz.domain.com and bl*.domain.com&apos;</span><br><span class="line">  group2: &apos;G@os:Debian and foo.domain.com&apos;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用节点组</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt -N group1 test.ping</span><br></pre></td></tr></table></figure>
+<h1 id="SLS文件"><a href="#SLS文件" class="headerlink" title="SLS文件"></a>SLS文件</h1><p>SLS（代表SaLt State文件）是Salt State系统的核心。SLS描述了系统的目标状态，由格式简单的数据构成，这经常被称作配置管理。</p>
+<h2 id="环境目录"><a href="#环境目录" class="headerlink" title="环境目录"></a>环境目录</h2><ul>
+<li><code>vim /etc/salt/master</code>，编辑 Master 的配置文件，设置 SLS 文件存放的目录。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">file_roots:</span></span><br><span class="line">  <span class="attr">base:</span>                                <span class="comment"># 表示 base 环境</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">/srv/salt/</span>                       <span class="comment"># SLS 文件存放路径</span></span><br><span class="line">  <span class="attr">dev:</span>                                 <span class="comment"># 表示开发环境</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">/srv/salt/dev</span>                    <span class="comment"># 可以是多个目录</span></span><br></pre></td></tr></table></figure>
+<h2 id="TOP文件"><a href="#TOP文件" class="headerlink" title="TOP文件"></a>TOP文件</h2><p><code>top.sls</code> 是配置管理的入口文件，一切都是从这里开始，在 master 主机上，默认存放在 <code>base</code> 环境目录</p>
+<ul>
+<li>TOP文件有三个组成部分：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">环境:                     # 即 file_roots 配置的环境</span><br><span class="line">  目标:                   # 一组机器</span><br><span class="line">    - 状态文件            # 要应用于目标的状态文件列表，每个状态文件都描述了要在目标计算机上配置和实施的一个或多个状态。</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>cat /srv/salt/top.sls</code></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">base:                    <span class="comment"># 指定 base 环境，在 base 环境目录下，必须有 apache.sls 的状态文件</span></span><br><span class="line">  <span class="string">'node1'</span>:               <span class="comment"># 指定 node1 主机</span></span><br><span class="line">    - apache             <span class="comment"># 应用 apache 的状态文件</span></span><br><span class="line"></span><br><span class="line">dev:                    <span class="comment"># 指定 dev 环境，在 dev 环境目录下，必须有 nginx.sls 的状态文件</span></span><br><span class="line">  <span class="string">'node2'</span>:              <span class="comment"># 指定 node2 主机</span></span><br><span class="line">    - nginx             <span class="comment"># 应用 nginx 的状态文件</span></span><br></pre></td></tr></table></figure>
+<h1 id="模块详解"><a href="#模块详解" class="headerlink" title="模块详解"></a>模块详解</h1><ul>
+<li>获取模块帮助</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> sys.doc cmd</span><br></pre></td></tr></table></figure>
+<ul>
+<li>列出所有模块</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> sys.list_modules</span><br></pre></td></tr></table></figure>
+<ul>
+<li>官方模块文档</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http://docs.saltstack.cn/ref/</span><br><span class="line">http://docs.saltstack.cn/ref/modules/all/index.html#all-salt-modules</span><br></pre></td></tr></table></figure>
+<h2 id="stateTODO"><a href="#stateTODO" class="headerlink" title="stateTODO"></a>stateTODO</h2><p>控制 Minion 的状态系统</p>
+<h2 id="Archive压缩"><a href="#Archive压缩" class="headerlink" title="Archive压缩"></a>Archive压缩</h2><p>实现系统层面的压缩包调用，支持gzip、gunzip、rar、tar、unrar、unzip等。</p>
+<ul>
+<li>提取压缩文件</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">archive.extracted(</span><br><span class="line">    name, </span><br><span class="line">    source, </span><br><span class="line">    source_hash=<span class="literal">None</span>, </span><br><span class="line">    source_hash_name=<span class="literal">None</span>, </span><br><span class="line">    source_hash_update=<span class="literal">False</span>, </span><br><span class="line">    skip_verify=<span class="literal">False</span>, </span><br><span class="line">    password=<span class="literal">None</span>, </span><br><span class="line">    options=<span class="literal">None</span>, </span><br><span class="line">    list_options=<span class="literal">None</span>, </span><br><span class="line">    force=<span class="literal">False</span>, </span><br><span class="line">    overwrite=<span class="literal">False</span>, </span><br><span class="line">    clean=<span class="literal">False</span>, </span><br><span class="line">    user=<span class="literal">None</span>,</span><br><span class="line">    group=<span class="literal">None</span>, </span><br><span class="line">    if_missing=<span class="literal">None</span>,</span><br><span class="line">    trim_output=<span class="literal">False</span>, </span><br><span class="line">    use_cmd_unzip=<span class="literal">None</span>,</span><br><span class="line">    extract_perms=<span class="literal">True</span>,</span><br><span class="line">    enforce_toplevel=<span class="literal">True</span>, </span><br><span class="line">    enforce_ownership_on=<span class="literal">None</span>, </span><br><span class="line">    archive_format=<span class="literal">None</span>,</span><br><span class="line">    **kwargs</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>archive.tar，-P选项，不从文件名中移除 /。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">archive.tar(</span><br><span class="line">    options, </span><br><span class="line">    tarfile, </span><br><span class="line">    sources=None, </span><br><span class="line">    dest=None, </span><br><span class="line">    cwd=None, </span><br><span class="line">    template=None, </span><br><span class="line">    runas=None</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">salt <span class="string">'node2'</span> archive.tar Pczvf /tmp/salt.tar.gz /tmp/yum.log,/tmp/set_ip.sh</span><br><span class="line">salt <span class="string">'node2'</span> archive.tar Pxvf /tmp/salt.tar.gz dest=/tmp</span><br></pre></td></tr></table></figure>
+<ul>
+<li>archive.cmd_zip，需要安装zip,unzip</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">archive.zip(</span><br><span class="line">    zip_file, </span><br><span class="line">    sources, </span><br><span class="line">    template=None, </span><br><span class="line">    cwd=None, </span><br><span class="line">    runas=None</span><br><span class="line">)</span><br><span class="line">salt <span class="string">'node2'</span> archive.cmd_zip /tmp/salt.zip /etc/hosts,/etc/sysconfig/network</span><br></pre></td></tr></table></figure>
+<ul>
+<li>archive.unzip，解压zip</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">archive.unzip(</span><br><span class="line">    zip_file, </span><br><span class="line">    dest, </span><br><span class="line">    excludes=<span class="literal">None</span>, </span><br><span class="line">    options=<span class="literal">None</span>, </span><br><span class="line">    template=<span class="literal">None</span>, </span><br><span class="line">    runas=<span class="literal">None</span>, </span><br><span class="line">    trim_output=<span class="literal">False</span>, </span><br><span class="line">    password=<span class="literal">None</span>, </span><br><span class="line">    extract_perms=<span class="literal">True</span></span><br><span class="line">)</span><br><span class="line">salt <span class="string">'node2'</span> archive.cmd_unzip /tmp/salt.zip /tmp</span><br></pre></td></tr></table></figure>
+<h2 id="cmd命令行"><a href="#cmd命令行" class="headerlink" title="cmd命令行"></a>cmd命令行</h2><p>实现远程的命令行调用执行(默认具备root操作权限，使用时需评估风险)</p>
+<ul>
+<li>cmd.run，远程执行命令，返回命令的执行结果的字符串</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt.states.cmd.run(</span><br><span class="line">    name, </span><br><span class="line">    onlyif=None,          <span class="comment"># 指令返回True，才执行 name，例如 onlyif: ping 192.168.1.1</span></span><br><span class="line">    unless=None,          <span class="comment"># 指令返回False，才执行 name，例如 unless: test -d /opt/docker</span></span><br><span class="line">    creates=None, </span><br><span class="line">    cwd=None, </span><br><span class="line">    runas=None, </span><br><span class="line">    shell=None, </span><br><span class="line">    env=None, </span><br><span class="line">    stateful=False, </span><br><span class="line">    <span class="built_in">umask</span>=None, </span><br><span class="line">    output_loglevel=<span class="string">'debug'</span>, </span><br><span class="line">    quiet=False, </span><br><span class="line">    timeout=None, </span><br><span class="line">    ignore_timeout=False, </span><br><span class="line">    use_vt=False, </span><br><span class="line">    **kwargs</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">salt <span class="string">'node2'</span> cmd.run <span class="string">'free -m'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>状态间关系</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>关系</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>onlyif</code></td>
+<td>指令返回True，才执行 name，例如 <code>onlyif: ping 192.168.1.1</code></td>
+</tr>
+<tr>
+<td><code>unless</code></td>
+<td>指令返回False，才执行 name，例如 <code>unless: test -d /opt/docker</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>cmd.run_all，远程执行命令，返回命令的标准输出，标准错误，PID，和返回码</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cmd.run_all <span class="string">'free -h'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>cmd.exec_code_all，接受两个参数，一个是可执行的语言，第二个是执行的代码，返回：标准错误、标准输出、PID</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cmd.exec_code_all <span class="string">'bash'</span> <span class="string">'echo ok'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>cmd.has_exec，可执行性检查</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cmd.has_exec nginx</span><br></pre></td></tr></table></figure>
+<ul>
+<li>执行shell命令并返回命令的返回码</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cmd.retcode <span class="string">'echo ok'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>从远程位置下载脚本并在本地执行脚本，该脚本可以位于salt主文件服务器上，也可以位于HTTP / FTP服务器。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'*'</span> cmd.script salt://scripts/runme.sh <span class="string">'arg1 arg2 "arg 3"'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回可执行文件的路径</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cmd.which <span class="string">'free'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>cmd.wait，当监控的其他状态改变时才执行</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="cp远程复制"><a href="#cp远程复制" class="headerlink" title="cp远程复制"></a>cp远程复制</h2><ul>
+<li>cp.list_master，列出 Matser 可用的文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.list_master</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cp.cache_dir，从 Matser 的 SLS 目录递归复制目录，到 Minion 的<code>/var/cache/salt/minion/files/base/</code> 下</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.cache_dir salt://<span class="built_in">test</span>/</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cp.cache_file，从 Master 的 SLS 目录复制文件，到 Minion 的<code>/var/cache/salt/minion/files/base/</code> 下</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.cache_file salt://<span class="built_in">test</span>/hosts</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cp.cache_file，从 Master 的 SLS 目录复制多个文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.cache_files salt://<span class="built_in">test</span>/hosts,salt://<span class="built_in">test</span>/network</span><br></pre></td></tr></table></figure>
+<ul>
+<li>将 Minion 本地文件复制到 Minion 的 <code>/var/cache/salt/minion/localfiles/</code> 下</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.cache_local_file /etc/hosts</span><br></pre></td></tr></table></figure>
+<ul>
+<li>从 Master 的 SLS 目录复制所有文件到 Minion 的 /var/cache/salt/minion/files/base 下</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.cache_master</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cp.cache_dir，从 Matser 的 SLS 目录复制目录及内容，到 Minion 的指定位置</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.get_dir salt://<span class="built_in">test</span>/ /tmp</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cp.get_file，从 Matser 的 SLS 目录复制文件，到 Minion 的的指定位置并命名</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.get_file salt://<span class="built_in">test</span>/hosts /tmp/hosts.txt</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cp.get_url，用于从URL获取单个文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.get_url http://www.slashdot.org /tmp/index.html</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cp.hash_file，获取文件的hash值</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cp.hash_file /etc/hosts</span><br></pre></td></tr></table></figure>
+<h2 id="cron定时任务"><a href="#cron定时任务" class="headerlink" title="cron定时任务"></a>cron定时任务</h2><ul>
+<li>cron.raw_cron，查看 Minion 指定用户的原始定时任务</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cron.raw_cron root</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cron.set_job，为 Minion 指定用户添加定时任务</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cron.set_job root <span class="string">'*'</span> <span class="string">'*'</span> <span class="string">'*'</span> <span class="string">'*'</span> <span class="string">'1'</span> /usr/<span class="built_in">local</span>/weekly</span><br></pre></td></tr></table></figure>
+<ul>
+<li>cron.rm_job，删除 Minion 指定用户的一个定时任务</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> cron.rm_job root /usr/<span class="built_in">local</span>/weekly</span><br></pre></td></tr></table></figure>
+<h2 id="dnsutil域名解析"><a href="#dnsutil域名解析" class="headerlink" title="dnsutil域名解析"></a>dnsutil域名解析</h2><ul>
+<li>dnsutil.hosts_append，添加域名解析</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> dnsutil.hosts_append /etc/hosts 1.1.1.1 www.abc.com,www.bcd.com</span><br><span class="line">salt <span class="string">'node2'</span> dnsutil.hosts_append /etc/hosts 3.3.3.3 www.aini.com</span><br></pre></td></tr></table></figure>
+<ul>
+<li>dnsutil.hosts_remove，删除一项域名解析</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> dnsutil.hosts_remove /etc/hosts www.aini.com</span><br></pre></td></tr></table></figure>
+<h2 id="file文件操作"><a href="#file文件操作" class="headerlink" title="file文件操作"></a>file文件操作</h2><ul>
+<li>file.managed，从服务器下载文件并放到目标主机</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt.states.file.managed(</span><br><span class="line">	name, </span><br><span class="line">	<span class="built_in">source</span>=None, </span><br><span class="line">	source_hash=<span class="string">''</span></span><br><span class="line">	source_hash_name=None, </span><br><span class="line">	user=None, </span><br><span class="line">	group=None,</span><br><span class="line">	mode=None, </span><br><span class="line">	template=None, </span><br><span class="line">	makedirs=False, </span><br><span class="line">	dir_mode=None, </span><br><span class="line">	context=None, </span><br><span class="line">	replace=True, </span><br><span class="line">	defaults=None, </span><br><span class="line">	backup=<span class="string">''</span>, </span><br><span class="line">	show_changes=True, </span><br><span class="line">	create=True, </span><br><span class="line">	contents=None, </span><br><span class="line">	tmp_ext=<span class="string">', </span></span><br><span class="line"><span class="string">	contents_pillar=None, </span></span><br><span class="line"><span class="string">	contents_grains=None, </span></span><br><span class="line"><span class="string">	contents_newline=True, </span></span><br><span class="line"><span class="string">	contents_delimiter='</span>:<span class="string">',</span></span><br><span class="line"><span class="string">    encoding=None, </span></span><br><span class="line"><span class="string">    encoding_errors='</span>strict<span class="string">', </span></span><br><span class="line"><span class="string">    allow_empty=True, </span></span><br><span class="line"><span class="string">    follow_symlinks=True, </span></span><br><span class="line"><span class="string">    check_cmd=None, </span></span><br><span class="line"><span class="string">    skip_verify=False, </span></span><br><span class="line"><span class="string">    win_owner=None, </span></span><br><span class="line"><span class="string">    win_perms=None, </span></span><br><span class="line"><span class="string">    win_deny_perms=None, </span></span><br><span class="line"><span class="string">    win_inheritance=True, </span></span><br><span class="line"><span class="string">    **kwargs</span></span><br><span class="line"><span class="string">)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">/etc/resolv.conf:                            # 任务ID，可以作为缺省的 -name 参数使用</span></span><br><span class="line"><span class="string">  file.managed:                              # 文件管理模块</span></span><br><span class="line"><span class="string">    - name: /etc/resolv.conf                 # 要管理的 minion 目标文件位置</span></span><br><span class="line"><span class="string">    - source: salt://init/files/resolv.conf  # 源文件来自 salt 服务器，文件可用模板代码</span></span><br><span class="line"><span class="string">    - user: root                             # minion 上该文件的属主</span></span><br><span class="line"><span class="string">    - group: root                            # minion 上该文件的属组</span></span><br><span class="line"><span class="string">    - mode: 644                              # minion 上该文件的权限</span></span><br><span class="line"><span class="string">    - template: jinja                        # 将服务器的文件视作模板，渲染后给客户端</span></span><br><span class="line"><span class="string">    - makedirs: True                         # 如果为True，则自动创建不存在的父目录</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.append，向文本文件内追加内容</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt.states.file.append(</span><br><span class="line">    name,                     <span class="comment"># 文件名称</span></span><br><span class="line">    text=None,                <span class="comment"># 追加的文本内容</span></span><br><span class="line">    makedirs=False, </span><br><span class="line">    <span class="built_in">source</span>=None, </span><br><span class="line">    source_hash=None, </span><br><span class="line">    template=<span class="string">'jinja'</span>, </span><br><span class="line">    sources=None, </span><br><span class="line">    source_hashes=None, </span><br><span class="line">    defaults=None, </span><br><span class="line">    context=None, </span><br><span class="line">    ignore_whitespace=True</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.basename，取得路径中的文件名部分，编写脚本时候用</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.basename /not/exist/file.txt</span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.chown，修改属主和属组</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.chown /tmp/test.txt root root</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 Minion 上进行文件拷贝</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.copy /root/filename /tmp/filename</span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.directory_exists，目录存在性</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.directory_exists /etc</span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.directory,创建一个文件目录 </li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">file.directory(</span><br><span class="line">    name, </span><br><span class="line">    user=<span class="literal">None</span>, </span><br><span class="line">    group=<span class="literal">None</span>, </span><br><span class="line">    recurse=<span class="literal">None</span>, </span><br><span class="line">    max_depth=<span class="literal">None</span>, </span><br><span class="line">    dir_mode=<span class="literal">None</span>, </span><br><span class="line">    file_mode=<span class="literal">None</span>, </span><br><span class="line">    makedirs=<span class="literal">False</span>, </span><br><span class="line">    clean=<span class="literal">False</span>, </span><br><span class="line">    require=<span class="literal">None</span>, </span><br><span class="line">    exclude_pat=<span class="literal">None</span>, </span><br><span class="line">    follow_symlinks=<span class="literal">False</span>, </span><br><span class="line">    force=<span class="literal">False</span>, </span><br><span class="line">    backupname=<span class="literal">None</span>, </span><br><span class="line">    allow_symlink=<span class="literal">True</span>, </span><br><span class="line">    children_only=<span class="literal">False</span>, </span><br><span class="line">    win_owner=<span class="literal">None</span>, </span><br><span class="line">    win_perms=<span class="literal">None</span>, </span><br><span class="line">    win_deny_perms=<span class="literal">None</span>, </span><br><span class="line">    win_inheritance=<span class="literal">True</span>, </span><br><span class="line">    **kwargs</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.stats，取得文件的状态信息</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.stats /etc/passwd</span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.get_mode，取得文件的权限信息</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.get_mode /etc/passwd</span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.mkdir，创建目录</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.mkdir /opt/<span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.remove，删除文件或者目录</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.remove /opt/<span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.sed，修改文件内容</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.sed /etc/hosts <span class="string">'google.com'</span> <span class="string">'www.google.com'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>file.get_sum，取得文件的校验和，支持md5、sha1、sha224、sha256、sha384、sha512加密算法</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> file.get_sum /etc/passwd sha1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查找文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'*'</span> file.find / <span class="built_in">type</span>=f name=\*.bak size=+10m</span><br><span class="line">salt <span class="string">'*'</span> file.find /var mtime=+30d size=+10m <span class="built_in">print</span>=path,size,mtime</span><br><span class="line">salt <span class="string">'*'</span> file.find /var/<span class="built_in">log</span> name=\*.[0-9] mtime=+30d size=+10m delete</span><br></pre></td></tr></table></figure>
+<h2 id="network网络信息"><a href="#network网络信息" class="headerlink" title="network网络信息"></a>network网络信息</h2><ul>
+<li>取得网卡MAC信息</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> network.hwaddr eth0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>取得网卡配置信息</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> network.interfaces</span><br></pre></td></tr></table></figure>
+<ul>
+<li>取得IP地址信息</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> network.ip_addrs</span><br></pre></td></tr></table></figure>
+<ul>
+<li>取得子网的信息</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> network.subnets</span><br></pre></td></tr></table></figure>
+<ul>
+<li>检查子网范围</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> network.in_subnet 10.0.0.0/16</span><br></pre></td></tr></table></figure>
+<h2 id="pkg包管理"><a href="#pkg包管理" class="headerlink" title="pkg包管理"></a>pkg包管理</h2><ul>
+<li>包管理</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">salt.states.pkg.installed(</span><br><span class="line">	name, </span><br><span class="line">	version=<span class="literal">None</span>, </span><br><span class="line">	refresh=<span class="literal">None</span>, </span><br><span class="line">	fromrepo=<span class="literal">None</span>, </span><br><span class="line">	skip_verify=<span class="literal">False</span>, </span><br><span class="line">	skip_suggestions=<span class="literal">False</span>,</span><br><span class="line">	pkgs=<span class="literal">None</span>, </span><br><span class="line">    sources=<span class="literal">None</span>, </span><br><span class="line">	allow_updates=<span class="literal">False</span>, </span><br><span class="line">	pkg_verify=<span class="literal">False</span>, </span><br><span class="line">	normalize=<span class="literal">True</span>, </span><br><span class="line">	ignore_epoch=<span class="literal">False</span>,</span><br><span class="line">	reinstall=<span class="literal">False</span>, </span><br><span class="line">	update_holds=<span class="literal">False</span>, </span><br><span class="line">	**kwargs</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">lamp-pkg-install:</span></span><br><span class="line">  <span class="attr">pkg.installed:</span>            <span class="comment"># 确保软件包已经安装，如果没有安装就安装</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">names:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">httpd</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">php</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">php-cli</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">php-common</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">php-mysql</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">php-pdo</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">mysql</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">mysql-server</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装软件包</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> pkg.install tree</span><br></pre></td></tr></table></figure>
+<ul>
+<li>卸载软件包</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt.states.pkg.removed(</span><br><span class="line">    name, </span><br><span class="line">    version=None, </span><br><span class="line">    pkgs=None, </span><br><span class="line">    normalize=True, </span><br><span class="line">    ignore_epoch=False, </span><br><span class="line">    **kwargs</span><br><span class="line">)</span><br><span class="line">salt <span class="string">'node2'</span> pkg.remove tree</span><br></pre></td></tr></table></figure>
+<ul>
+<li>卸载软件包并删除配置</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pkg.purge</span><br></pre></td></tr></table></figure>
+<ul>
+<li>升级软件包</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'*'</span> pkg.upgrade</span><br></pre></td></tr></table></figure>
+<h2 id="service服务管理"><a href="#service服务管理" class="headerlink" title="service服务管理"></a>service服务管理</h2><ul>
+<li>服务管理</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">service.running(</span><br><span class="line">    name, </span><br><span class="line">    enable=<span class="literal">None</span>, </span><br><span class="line">    sig=<span class="literal">None</span>, </span><br><span class="line">    init_delay=<span class="literal">None</span>, </span><br><span class="line">    no_block=<span class="literal">False</span>, </span><br><span class="line">    unmask=<span class="literal">False</span>, </span><br><span class="line">    unmask_runtime=<span class="literal">False</span>, </span><br><span class="line">    **kwargs</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>开机启动与禁用</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> service.enable nginx</span><br><span class="line">salt <span class="string">'node2'</span> service.disable nginx</span><br></pre></td></tr></table></figure>
+<ul>
+<li>确保服务没有运行，如果运行就停止</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">service.dead</span><br></pre></td></tr></table></figure>
+<ul>
+<li>服务的状态管理</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'*'</span> service.reload nginx</span><br><span class="line">salt <span class="string">'*'</span> service.restart nginx</span><br><span class="line">salt <span class="string">'*'</span> service.start nginx</span><br><span class="line">salt <span class="string">'*'</span> service.stop nginx</span><br><span class="line">salt <span class="string">'*'</span> service.status nginx</span><br></pre></td></tr></table></figure>
+<h2 id="user用户管理"><a href="#user用户管理" class="headerlink" title="user用户管理"></a>user用户管理</h2><ul>
+<li>添加用户</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> user.add yangjinheng</span><br></pre></td></tr></table></figure>
+<ul>
+<li>删除用户</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> user.delete yangjinheng</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看全部用户</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> user.list_users</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看用户详细信息</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> user.info nginx</span><br></pre></td></tr></table></figure>
+<h2 id="iptables防火墙"><a href="#iptables防火墙" class="headerlink" title="iptables防火墙"></a>iptables防火墙</h2><ul>
+<li>追加规则</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> iptables.append filter INPUT rule=<span class="string">'-m state --state RELATED,ESTABLISHED -j ACCEPT'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>插入规则</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'*'</span> iptables.insert filter INPUT position=3 rule=<span class="string">'-m state --state RELATED,ESTABLISHED -j ACCEPT'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>检查规则存在性</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> iptables.check filter INPUT rule=<span class="string">'-m state --state RELATED,ESTABLISHED -j ACCEPT'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>删除规则</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> iptables.delete filter INPUT position=3</span><br><span class="line">salt <span class="string">'node2'</span> iptables.delete filter INPUT rule=<span class="string">'-m state --state RELATED,ESTABLISHED -j ACCEPT'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看规则</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> iptables.get_policy filter INPUT</span><br></pre></td></tr></table></figure>
+<ul>
+<li>保存规则</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">salt <span class="string">'node2'</span> iptables.save /etc/sysconfig/iptables</span><br></pre></td></tr></table></figure>
+<h2 id="sysctl-内核参数"><a href="#sysctl-内核参数" class="headerlink" title="sysctl 内核参数"></a>sysctl 内核参数</h2><ul>
+<li>调整内核参数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sysctl.present(</span><br><span class="line">    name, </span><br><span class="line">    value, </span><br><span class="line">    config=None</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h2 id="status系统状态"><a href="#status系统状态" class="headerlink" title="status系统状态"></a>status系统状态</h2><ul>
+<li>获取系统状态</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">- status.all_status</span><br><span class="line">- status.cpuinfo</span><br><span class="line">- status.cpustats</span><br><span class="line">- status.custom</span><br><span class="line">- status.diskstats</span><br><span class="line">- status.diskusage</span><br><span class="line">- status.loadavg</span><br><span class="line">- status.master</span><br><span class="line">- status.meminfo</span><br><span class="line">- status.netdev</span><br><span class="line">- status.netstats</span><br><span class="line">- status.nproc</span><br><span class="line">- status.pid</span><br><span class="line">- status.ping_master</span><br><span class="line">- status.procs</span><br><span class="line">- status.time</span><br><span class="line">- status.uptime</span><br><span class="line">- status.version</span><br><span class="line">- status.vmstats</span><br><span class="line">- status.w</span><br></pre></td></tr></table></figure>
+<h2 id="ACL访问控制"><a href="#ACL访问控制" class="headerlink" title="ACL访问控制"></a>ACL访问控制</h2><ul>
+<li>白名单</li>
+</ul>
+<p><code>vim /etc/salt/master</code>，限制用户使用的模块和方法，*表示所有方法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">client_acl:</span><br><span class="line">  demo:</span><br><span class="line">    - test.ping</span><br><span class="line">    - network.*</span><br></pre></td></tr></table></figure>
+<ul>
+<li>黑名单</li>
+</ul>
+<p><code>vim /etc/salt/master</code>，在黑名单的用户和模块将不能被使用，下面禁止了root、和sudo用户，以及cmd模块。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">client_acl_blacklist:</span><br><span class="line">  users:</span><br><span class="line">    - root</span><br><span class="line">    - &apos;^(?!sudo).*$&apos;</span><br><span class="line">  modules:</span><br><span class="line">    - cmd</span><br></pre></td></tr></table></figure>
+<h1 id="返回程序"><a href="#返回程序" class="headerlink" title="返回程序"></a>返回程序</h1><h2 id="Minion结果返回数据库"><a href="#Minion结果返回数据库" class="headerlink" title="Minion结果返回数据库"></a>Minion结果返回数据库</h2><h3 id="配置Master"><a href="#配置Master" class="headerlink" title="配置Master"></a>配置Master</h3><ul>
+<li>在 Minion 端安装 MySQL-python</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum install MySQL-python</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>vim /etc/salt/master</code> ，在Master 的配置文件中添加 My-SQL相关配置</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mysql.host: &apos;salt&apos;</span><br><span class="line">mysql.user: &apos;salt&apos;</span><br><span class="line">mysql.pass: &apos;salt&apos;</span><br><span class="line">mysql.db: &apos;salt&apos;</span><br><span class="line">mysql.port: 3306</span><br></pre></td></tr></table></figure>
+<h3 id="创建表结构"><a href="#创建表结构" class="headerlink" title="创建表结构"></a>创建表结构</h3><p>如果希望每隔一段时间清理一次这些返回的数据，请将 <code>keep_jobs</code> 设置 为作业在数据库表中生存的小时数。将其设置为0或保持未设置将导致数据保留在表中，如果您希望将作业存档在不同的表中以供以后处理，请将 <code>archive_jobs</code> 设置为True。Salt将创建3个归档表。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">CREATE DATABASE  `salt`</span><br><span class="line">  DEFAULT CHARACTER SET utf8</span><br><span class="line">  DEFAULT COLLATE utf8_general_ci;</span><br><span class="line"></span><br><span class="line">USE `salt`;</span><br><span class="line"></span><br><span class="line">--</span><br><span class="line">-- Table structure for table `jids`</span><br><span class="line">--</span><br><span class="line"></span><br><span class="line">DROP TABLE IF EXISTS `jids`;</span><br><span class="line">CREATE TABLE `jids` (</span><br><span class="line">  `jid` varchar(255) NOT NULL,</span><br><span class="line">  `load` mediumtext NOT NULL,</span><br><span class="line">  UNIQUE KEY `jid` (`jid`)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br><span class="line">CREATE INDEX jid ON jids(jid) USING BTREE;</span><br><span class="line"></span><br><span class="line">--</span><br><span class="line">-- Table structure for table `salt_returns`</span><br><span class="line">--</span><br><span class="line"></span><br><span class="line">DROP TABLE IF EXISTS `salt_returns`;</span><br><span class="line">CREATE TABLE `salt_returns` (</span><br><span class="line">  `fun` varchar(50) NOT NULL,</span><br><span class="line">  `jid` varchar(255) NOT NULL,</span><br><span class="line">  `return` mediumtext NOT NULL,</span><br><span class="line">  `id` varchar(255) NOT NULL,</span><br><span class="line">  `success` varchar(10) NOT NULL,</span><br><span class="line">  `full_ret` mediumtext NOT NULL,</span><br><span class="line">  `alter_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,</span><br><span class="line">  KEY `id` (`id`),</span><br><span class="line">  KEY `jid` (`jid`),</span><br><span class="line">  KEY `fun` (`fun`)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br><span class="line"></span><br><span class="line">--</span><br><span class="line">-- Table structure for table `salt_events`</span><br><span class="line">--</span><br><span class="line"></span><br><span class="line">DROP TABLE IF EXISTS `salt_events`;</span><br><span class="line">CREATE TABLE `salt_events` (</span><br><span class="line">`id` BIGINT NOT NULL AUTO_INCREMENT,</span><br><span class="line">`tag` varchar(255) NOT NULL,</span><br><span class="line">`data` mediumtext NOT NULL,</span><br><span class="line">`alter_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,</span><br><span class="line">`master_id` varchar(255) NOT NULL,</span><br><span class="line">PRIMARY KEY (`id`),</span><br><span class="line">KEY `tag` (`tag`)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure>
+<h3 id="创建授权"><a href="#创建授权" class="headerlink" title="创建授权"></a>创建授权</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">GRANT ALL ON salt.* TO salt@&apos;%&apos; IDENTIFIED BY &apos;salt&apos;;</span><br></pre></td></tr></table></figure>
+<h3 id="返回结果My-SQL"><a href="#返回结果My-SQL" class="headerlink" title="返回结果My-SQL"></a>返回结果My-SQL</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;*&apos; test.ping --return mysql</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">可能出现的问题：minion 的日志显示，无法连接到名字为 salt 的MySQL服务器</span><br><span class="line"></span><br><span class="line">配置 Minion 端的 Hosts 文件，写入 MySQL 的连接地址解析，例如：</span><br><span class="line"></span><br><span class="line">172.16.100.253 salt</span><br></pre></td></tr></table></figure>
+<h2 id="Master结果返回数据库"><a href="#Master结果返回数据库" class="headerlink" title="Master结果返回数据库"></a>Master结果返回数据库</h2><ul>
+<li><code>vim /etc/salt/master</code>，需要保证配置文件内有数据库的配置，数据库内有数据库的表。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">master_job_cache: mysql       # 这表示所有客户端返回的结果，由 Master 存储到mysql</span><br></pre></td></tr></table></figure>
+<h1 id="配置管理-1"><a href="#配置管理-1" class="headerlink" title="配置管理"></a>配置管理</h1><h2 id="状态间关系"><a href="#状态间关系" class="headerlink" title="状态间关系"></a>状态间关系</h2><ul>
+<li>直接的必要条件</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>关系</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>require</code></td>
+<td>本状态依赖于指定的状态的成功</td>
+</tr>
+<tr>
+<td><code>watch</code></td>
+<td>监视某个状态的改变，例如：服务监视文件，文件变动就重启，监视软件安装重启</td>
+</tr>
+<tr>
+<td><code>prereq</code></td>
+<td>如果本状态执行成功且结果有变化，则先执行他的状态，再执行我的状态</td>
+</tr>
+<tr>
+<td><code>use</code></td>
+<td>参数的复用，指定复用某个状态内的参数，例如文件管理，复用自己没有的</td>
+</tr>
+<tr>
+<td><code>onchanges</code></td>
+<td>如果目标执行结果成功且目标有变化，则执行状态</td>
+</tr>
+<tr>
+<td><code>onfail</code></td>
+<td>如果目标执行结果失败，则执行状态</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>直接必要条件向对语义</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>关系</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>require_in</code></td>
+<td>本状态的执行成功，被指定状态依赖</td>
+</tr>
+<tr>
+<td><code>watch_in</code></td>
+<td>被某个状态关注，例如：文件被服务监视，文件变动服务重启</td>
+</tr>
+<tr>
+<td><code>prereq_in</code></td>
+<td>TODO</td>
+</tr>
+<tr>
+<td><code>use_in</code></td>
+<td>TODO</td>
+</tr>
+<tr>
+<td><code>onchanges_in</code></td>
+<td>TODO</td>
+</tr>
+<tr>
+<td><code>onfail_in</code></td>
+<td>TODO</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>状态间关系</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>关系</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>require_any</code></td>
+<td>TODO</td>
+</tr>
+<tr>
+<td><code>watch_any</code></td>
+<td>TODO</td>
+</tr>
+<tr>
+<td><code>onchanges_any</code></td>
+<td>TODO</td>
+</tr>
+<tr>
+<td><code>onfail_any</code></td>
+<td>TODO</td>
+</tr>
+</tbody>
+</table>
+<h2 id="模板的使用"><a href="#模板的使用" class="headerlink" title="模板的使用"></a>模板的使用</h2><ul>
+<li>模板使用流程</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1. 再 file 状态中使用 template: jinja 参数，来说明这个文件是一个模板文件，需要渲染后发送给客户端</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2.在 file 状态中使用 defaults: 参数，来向模板文件传递变量，可用 grains、pillar、和远程执行结果</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">3.在模板文件中使用变量，格式为 &#123;&#123; 变量名 &#125;&#125;，例如：&#123;&#123; PORT &#125;&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>模板使用示例</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">apache-service:</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">pkg.installed:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">httpd</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">require_in:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">file:</span> <span class="string">apache-service</span></span><br><span class="line"></span><br><span class="line">  <span class="attr">file.managed:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">/etc/httpd/conf/httpd.conf</span>                          <span class="comment"># 目标文件</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">source:</span> <span class="string">salt://files/httpd.conf</span>                           <span class="comment"># 源文件，这里是一个模板文件</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">user:</span> <span class="string">root</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">group:</span> <span class="string">root</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">mode:</span> <span class="number">644</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">template:</span> <span class="string">jinja</span>                                           <span class="comment"># 说明这是一个模板文件</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">defaults:</span></span><br><span class="line">      <span class="attr">HOST:</span> <span class="string">&#123;&#123;</span> <span class="string">grains['ip4_interfaces']['eth0'][0]</span> <span class="string">&#125;&#125;</span>           <span class="comment"># 向模板传递的数据来自 grains 信息</span></span><br><span class="line">      <span class="attr">PORT:</span> <span class="number">9528</span>                                                <span class="comment"># 向模板传递一个数字</span></span><br><span class="line">      <span class="attr">MAC:</span> <span class="string">&#123;&#123;</span> <span class="string">salt['network.hw_addr']('eth0')</span> <span class="string">&#125;&#125;</span>                <span class="comment"># 模板的数据来自远程执行的结果</span></span><br><span class="line">      <span class="attr">PILLAR1:</span> <span class="string">&#123;&#123;</span> <span class="string">pillar['apache']['HOST']</span> <span class="string">&#125;&#125;</span>                   <span class="comment"># 模板的数据来自 pillar 信息</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>在状态文件中嵌入模板语言，来一个模板对多台主机使用不同配置。</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">keepaliveed-service:</span></span><br><span class="line">  <span class="attr">file.managed:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">/etc/keepalived/keepalived.conf</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">source:</span> <span class="string">salt://cluster/files/haproxy.conf</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">template:</span> <span class="string">jinja</span></span><br><span class="line">    <span class="string">&#123;%</span> <span class="string">if</span> <span class="string">grains['fqdn']</span> <span class="string">==</span> <span class="string">'node1'</span> <span class="string">%&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">ROUTEID:</span> <span class="string">haproxy_ha</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">STATEID:</span> <span class="string">MASTER</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">PRIORITYID:</span> <span class="number">150</span></span><br><span class="line">    <span class="string">&#123;%</span> <span class="string">if</span> <span class="string">grains['fqdn']</span> <span class="string">==</span> <span class="string">'node2'</span> <span class="string">%&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">ROUTEID:</span> <span class="string">haproxy_ha</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">STATEID:</span> <span class="string">BACKUP</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">PRIORITYID:</span> <span class="number">100</span></span><br><span class="line">    <span class="string">&#123;%</span> <span class="string">endif</span> <span class="string">%&#125;</span></span><br></pre></td></tr></table></figure>
+<h2 id="状态文件示例"><a href="#状态文件示例" class="headerlink" title="状态文件示例"></a>状态文件示例</h2><ul>
+<li>自动安装LNMP</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">jdk-install:</span></span><br><span class="line">  <span class="attr">archive.extracted:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">/opt/</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">source:</span> <span class="string">salt://dev/files/blogdata/jdk-8u144-linux-x64.tar.gz</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">archive_format:</span> <span class="string">tar</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">force:</span> <span class="literal">True</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">if_missing:</span> <span class="string">/opt/jdk1.8.0_144</span></span><br><span class="line">  <span class="attr">file.managed:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">/tmp/jdkenv.sh</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">source:</span> <span class="string">salt://dev/files/blogdata/jdkenv.sh</span></span><br><span class="line">  <span class="attr">cmd.run:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">'source /tmp/jdkenv.sh'</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">unless:</span> <span class="string">grep</span> <span class="string">-q</span> <span class="string">'JAVA_HOME'</span> <span class="string">/etc/profile</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">require:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">file:</span> <span class="string">jdk-env</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jdk-tomcat:</span></span><br><span class="line">  <span class="attr">archive.extracted:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">/opt/blog/</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">source:</span> <span class="string">salt://dev/files/blogdata/apache-tomcat-9.0.10.tar.gz</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">archive_format:</span> <span class="string">tar</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">force:</span> <span class="literal">True</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">if_missing:</span> <span class="string">/opt/blog/apache-tomcat-9.0.10</span></span><br><span class="line">  <span class="attr">file.managed:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">/opt/blog/apache-tomcat-9.0.10/conf/server.xml</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">source:</span> <span class="string">salt://dev/files/blogdata/server.xml</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">require:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">archive:</span> <span class="string">jdk-tomcat</span></span><br><span class="line"></span><br><span class="line"><span class="attr">mysql-install:</span></span><br><span class="line">  <span class="attr">pkg.installed:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">mariadb-server</span></span><br><span class="line">  <span class="attr">service.running:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">mariadb</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">enable:</span> <span class="literal">True</span></span><br><span class="line">  <span class="attr">cmd.run:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">mysql</span> <span class="string">-e</span> <span class="string">"UPDATE mysql.user SET password=PASSWORD('Jinheng890821') WHERE user='root';FLUSH PRIVILEGES;"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">unless:</span> <span class="string">mysql</span> <span class="string">-uroot</span> <span class="string">-pJinheng890821</span> <span class="string">-e</span> <span class="string">"SHOW DATABASES;"</span></span><br><span class="line"></span><br><span class="line"><span class="attr">blog_db_install:</span></span><br><span class="line">  <span class="attr">cmd.run:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">mysql</span> <span class="string">-uroot</span> <span class="string">-pJinheng890821</span> <span class="string">-e</span> <span class="string">"CREATE DATABASE zrlog;GRANT ALL ON *.* TO 'zrlog'@'172.16.100.%' IDENTIFIED BY '123456';"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">unless:</span> <span class="string">mysql</span> <span class="string">-uroot</span> <span class="string">-pJinheng890821</span> <span class="string">-e</span> <span class="string">"SELECT user FROM mysql.user WHERE user='zrlog';"</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">require:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">cmd:</span> <span class="string">mysql-install</span></span><br><span class="line"></span><br><span class="line"><span class="attr">blog-install:</span></span><br><span class="line">  <span class="attr">archive.extracted:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">/opt/blog/blog</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">source:</span> <span class="string">salt://dev/files/blogdata/ROOT.war</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">archive_format:</span> <span class="string">zip</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">force:</span> <span class="literal">True</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">enforce_toplevel:</span> <span class="literal">False</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">if_missing:</span> <span class="string">/opt/blog/blog</span></span><br><span class="line">  <span class="attr">cmd.run:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">source</span> <span class="string">/etc/profile;sh</span> <span class="string">/opt/blog/apache-tomcat-9.0.10/bin/catalina.sh</span> <span class="string">start</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">unless:</span> <span class="string">ss</span> <span class="string">-tunlp|grep</span> <span class="string">-q</span> <span class="number">80</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">require:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">archive:</span> <span class="string">blog-install</span></span><br><span class="line"></span><br><span class="line"><span class="attr">nginx_install:</span></span><br><span class="line">  <span class="attr">pkg.installed:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br><span class="line">  <span class="attr">file.managed:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">/etc/nginx/nginx.conf</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">source:</span> <span class="string">salt://dev/files/blogdata/nginx.conf</span></span><br><span class="line">  <span class="attr">service.running:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">nginx</span></span><br></pre></td></tr></table></figure>
+<h1 id="salt-run"><a href="#salt-run" class="headerlink" title="salt-run"></a>salt-run</h1><p>在Master执行一些命令</p>
+<h2 id="runners-manage"><a href="#runners-manage" class="headerlink" title="runners.manage"></a>runners.manage</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt-run manage.up 显示活着的minion</span><br><span class="line">salt-run manage.down 显示未存活的minion</span><br><span class="line">salt-run manage.down removekeys=True 显示未存活的minion并将其删除</span><br><span class="line">salt-run manage.status 显示当前 up 和 down 的 minion</span><br><span class="line">salt-run manage.version 显示 Matser 和所有 minion 的版本</span><br></pre></td></tr></table></figure>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@template ~]# salt-run manage.up</span><br><span class="line">- node1</span><br></pre></td></tr></table></figure>
+<ul>
+<li>其他模块</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https://docs.saltstack.com/en/latest/ref/runners/all/#runner-modules</span><br></pre></td></tr></table></figure>
+<h1 id="salt-ssh"><a href="#salt-ssh" class="headerlink" title="salt-ssh"></a>salt-ssh</h1><p>没有 <code>minion</code> 端的执行方式，类似 <code>ansible</code> 的默认模式，由于所有与 Salt SSH 的通信都是通过 SSH 执行的，因此它比使用 ZeroMQ 的标准 Salt 慢得多。</p>
+<h2 id="roster"><a href="#roster" class="headerlink" title="roster"></a>roster</h2><p>为 <code>salt-ssh</code> 提供一个主机的花名册。</p>
+<ul>
+<li><code>vim /etc/salt/roster</code>，示例性配置文件</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">node2:</span></span><br><span class="line">  <span class="attr">host:</span> <span class="number">172.16</span><span class="number">.100</span><span class="number">.102</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">22</span></span><br><span class="line">  <span class="attr">user:</span> <span class="string">root</span></span><br><span class="line">  <span class="attr">passwd:</span> <span class="number">123456</span>                  <span class="comment"># 如果不提供密码，则使用 key 连接</span></span><br><span class="line"><span class="attr">node3:</span></span><br><span class="line">  <span class="attr">host:</span> <span class="number">172.16</span><span class="number">.100</span><span class="number">.103</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">22</span></span><br><span class="line">  <span class="attr">user:</span> <span class="string">root</span></span><br><span class="line">  <span class="attr">passwd:</span> <span class="number">123456</span>                  <span class="comment"># 不提供密码，第一次连接的时候会提示部署 key</span></span><br><span class="line"><span class="string">node4</span></span><br><span class="line">  <span class="attr">host:</span> <span class="number">172.16</span><span class="number">.100</span><span class="number">.104</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">22</span></span><br><span class="line">  <span class="attr">user:</span> <span class="string">salt</span></span><br><span class="line">  <span class="attr">passwd:</span> <span class="number">654321</span></span><br><span class="line">  <span class="attr">sudo:</span> <span class="literal">True</span>                      <span class="comment"># ＃是否为sudo到root，默认情况下不启用，需要目标主机 /etc/sudoers: 有：salt ALL=(ALL) NOPASSWD: ALL</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>第一次连接，如果没有建立 key 的通信，则会提示将公钥加入客户端主机，下次连接不再需要</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt-ssh &apos;node2&apos; cmd.run &apos;ls&apos;  --output json</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Permission denied for host node2, do you want to deploy the salt-ssh key? (password required):</span><br><span class="line">[Y/n] y</span><br><span class="line">Password for root@node2: </span><br><span class="line">&#123;</span><br><span class="line">    &quot;node2&quot;: &quot;anaconda-ks.cfg&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过 salt-ssh 执行状态</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt-ssh &apos;node2&apos; state.highstate</span><br></pre></td></tr></table></figure>
+<ul>
+<li>执行原始的 Shell 命令</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[root@template ~]# salt-ssh &apos;node2&apos; -r &apos;ip a&apos;</span><br><span class="line">node2:</span><br><span class="line">    ----------</span><br><span class="line">    retcode:</span><br><span class="line">        0</span><br><span class="line">    stderr:</span><br><span class="line">    stdout:</span><br><span class="line">        1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000</span><br><span class="line">            link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00</span><br><span class="line">            inet 127.0.0.1/8 scope host lo</span><br><span class="line">               valid_lft forever preferred_lft forever</span><br><span class="line">            inet6 ::1/128 scope host </span><br><span class="line">               valid_lft forever preferred_lft forever</span><br><span class="line">        2: ens33: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000</span><br><span class="line">            link/ether 00:0c:29:4b:07:2f brd ff:ff:ff:ff:ff:ff</span><br><span class="line">            inet 172.16.100.102/24 brd 172.16.100.255 scope global noprefixroute ens33</span><br><span class="line">               valid_lft forever preferred_lft forever</span><br><span class="line">            inet6 fe80::20c:29ff:fe4b:72f/64 scope link </span><br><span class="line">               valid_lft forever preferred_lft forever</span><br></pre></td></tr></table></figure>
+<h1 id="salt-job"><a href="#salt-job" class="headerlink" title="salt-job"></a>salt-job</h1><p>salt 执行每次指令的时候，都会产生一个 JID ，能够唯一标识这个任务，每当minion端接受到一个任务，就会在：<code>/var/cache/salt/minion/proc</code>，目录下生成一个 JID 同名的文件，执行完成后就删除，而 Matser 端会把 mimion 返回的执行结果存储在：<code>/var/cache/salt/master/jobs</code> 这个目录下的子目录下，默认存储24小时。</p>
+<ul>
+<li>查看执行任务的 JID</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;node1&apos; test.ping -v</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Executing job with jid 20180817154546720551</span><br><span class="line">-------------------------------------------</span><br><span class="line"></span><br><span class="line">node1:</span><br><span class="line">    True</span><br></pre></td></tr></table></figure>
+<h2 id="saltutil管理job"><a href="#saltutil管理job" class="headerlink" title="saltutil管理job"></a>saltutil管理job</h2><ul>
+<li>查看当前 salt-master 正在执行的任务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;*&apos; saltutil.running</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">node1:</span><br><span class="line">    |_</span><br><span class="line">      ----------</span><br><span class="line">      arg:</span><br><span class="line">          - sleep 60</span><br><span class="line">      fun:</span><br><span class="line">          cmd.run</span><br><span class="line">      jid:</span><br><span class="line">          20180817155456455414</span><br><span class="line">      pid:</span><br><span class="line">          2708</span><br><span class="line">      ret:</span><br><span class="line">      tgt:</span><br><span class="line">          node1</span><br><span class="line">      tgt_type:</span><br><span class="line">          glob</span><br><span class="line">      user:</span><br><span class="line">          root</span><br></pre></td></tr></table></figure>
+<ul>
+<li>停止指定 JID 的任务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;*&apos; saltutil.kill_job 20180817155456455414</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">node1:</span><br><span class="line">    Signal 9 sent to job 20180817155456455414 at pid 2708</span><br></pre></td></tr></table></figure>
+<h2 id="runner管理job"><a href="#runner管理job" class="headerlink" title="runner管理job"></a>runner管理job</h2><ul>
+<li>查看所有 minin 当前正在运行的 jobs，（在所有minion端执行 saltutil.running）</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt-run jobs.active</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">20180817160114914099:</span><br><span class="line">    ----------</span><br><span class="line">    Arguments:</span><br><span class="line">        - sleep 60</span><br><span class="line">    Function:</span><br><span class="line">        cmd.run</span><br><span class="line">    Returned:</span><br><span class="line">    Running:</span><br><span class="line">        |_</span><br><span class="line">          ----------</span><br><span class="line">          node1:</span><br><span class="line">              2755</span><br><span class="line">    StartTime:</span><br><span class="line">        2018, Aug 17 16:01:14.914099</span><br><span class="line">    Target:</span><br><span class="line">        node1</span><br><span class="line">    Target-type:</span><br><span class="line">        glob</span><br><span class="line">    User:</span><br><span class="line">        root</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查询指定 JID 的执行结果</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt-run jobs.lookup_jid 20180817160114914099</span><br></pre></td></tr></table></figure>
+<ul>
+<li>列出当前 matser cache 中的所有 job</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">20180816204228470639:</span><br><span class="line">    ----------</span><br><span class="line">    Arguments:</span><br><span class="line">    Function:</span><br><span class="line">        test.ping</span><br><span class="line">    StartTime:</span><br><span class="line">        2018, Aug 16 20:42:28.470639</span><br><span class="line">    Target:</span><br><span class="line">        unknown-target</span><br><span class="line">    Target-type:</span><br><span class="line">        list</span><br><span class="line">    User:</span><br><span class="line">        root</span><br><span class="line">20180816204440888494:</span><br><span class="line">    ----------</span><br><span class="line">    Arguments:</span><br><span class="line">    Function:</span><br><span class="line">        state.sls</span><br><span class="line">    StartTime:</span><br><span class="line">        2018, Aug 16 20:44:40.888494</span><br><span class="line">    Target:</span><br><span class="line">        unknown-target</span><br><span class="line">    Target-type:</span><br><span class="line">        list</span><br><span class="line">    User:</span><br><span class="line">        root</span><br><span class="line">20180816204552986762:</span><br><span class="line">    ----------</span><br><span class="line">    Arguments:</span><br><span class="line">    Function:</span><br><span class="line">        state.sls</span><br><span class="line">    StartTime:</span><br><span class="line">        2018, Aug 16 20:45:52.986762</span><br><span class="line">    Target:</span><br><span class="line">        unknown-target</span><br><span class="line">    Target-type:</span><br><span class="line">        list</span><br><span class="line">    User:</span><br><span class="line">        root</span><br><span class="line">.....省略</span><br></pre></td></tr></table></figure>
+<h1 id="schedule"><a href="#schedule" class="headerlink" title="schedule"></a>schedule</h1><h2 id="在-pillar-中定义"><a href="#在-pillar-中定义" class="headerlink" title="在 pillar 中定义"></a>在 pillar 中定义</h2><ul>
+<li><code>vim /srv/pillar/schedule.sls</code>，定义每小时执行一次状态</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">schedule:</span></span><br><span class="line">  <span class="attr">job1:</span></span><br><span class="line">    <span class="attr">function:</span> <span class="string">state.sls</span></span><br><span class="line">    <span class="attr">seconds:</span> <span class="number">3600</span></span><br><span class="line">    <span class="attr">args:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">httpd</span></span><br><span class="line">    <span class="attr">kwargs:</span></span><br><span class="line">      <span class="attr">test:</span> <span class="literal">True</span></span><br><span class="line">    <span class="attr">splay:</span> <span class="number">15</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>vim /srv/pillar/top.sls</code>，定义 top 文件</li>
+</ul>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="attr">base:</span></span><br><span class="line">  <span class="attr">'node1':</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">schedule</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>刷新 pillar 状态，获取客户端的 pillar 信息</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;node1&apos; saltutil.refresh_pillar</span><br><span class="line"></span><br><span class="line">salt &apos;node1&apos; pillar.get schedule</span><br></pre></td></tr></table></figure>
+<ul>
+<li>删除 schedule 任务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">注释 pillar 内的 schedule 信息，并刷新 pillar 信息就可以删除客户端上的 schedule了</span><br></pre></td></tr></table></figure>
+<h2 id="调试schedue"><a href="#调试schedue" class="headerlink" title="调试schedue"></a>调试schedue</h2><ul>
+<li>在客户端设置日志级别为 info 就可以看到schedule的日志输出了</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim /var/log/salt/minion</span><br></pre></td></tr></table></figure>
+<ul>
+<li>服务器端，可以直接查看日志</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">tailf /var/log/salt/master</span><br></pre></td></tr></table></figure>
+<h2 id="schedule模块"><a href="#schedule模块" class="headerlink" title="schedule模块"></a>schedule模块</h2><ul>
+<li>查看客户端的所有 schedule</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;*&apos; schedule.list</span><br></pre></td></tr></table></figure>
+<ul>
+<li>删除客户端所有的 schedule，它只能暂时禁用 pillar 内的 schedule ，重启依然执</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt &apos;*&apos; schedule.purge</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>schedule.present(name, **kwargs)</code>，增加一个 schedule 任务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 每1小时候后执行</span><br><span class="line">job3:</span><br><span class="line">  schedule.present:</span><br><span class="line">    - function: test.ping</span><br><span class="line">    - seconds: 3600</span><br><span class="line">    - splay: 10</span><br><span class="line"></span><br><span class="line"># 每15秒执行一次</span><br><span class="line">job2:</span><br><span class="line">  schedule.present:</span><br><span class="line">    - function: test.ping</span><br><span class="line">    - seconds: 15</span><br><span class="line">    - splay:</span><br><span class="line">        start: 10</span><br><span class="line">        end: 20</span><br><span class="line"></span><br><span class="line"># 这将安排命令： state.sls httpd test = True，周一下午5点，周三和周五，周二和周四下午3点。需要在 minion上安装python-dateutil。</span><br><span class="line">job1:</span><br><span class="line">  schedule.present:</span><br><span class="line">    - function: state.sls</span><br><span class="line">    - job_args:</span><br><span class="line">      - httpd</span><br><span class="line">    - job_kwargs:</span><br><span class="line">        test: True</span><br><span class="line">    - cron: &apos;*/5 * * * *&apos;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>schedule.present(name, **kwargs)</code>，参数列表</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">name: 为 schedule 指定的唯一名称</span><br><span class="line">seconds: 在指定的秒数后执行</span><br><span class="line">minutes: 在指定的分钟后执行</span><br><span class="line">hours：在指定的小时后执行</span><br><span class="line">days：在指定的天后执行</span><br><span class="line">when：在指定的时间执行，需要客户端安装python-dateutil</span><br><span class="line">cron：使用 crontab 格式指定时间执行，需要 python-croniter</span><br><span class="line">run_on_start：在Salt Minion开始时，这项工作是否会开始。 值应该是布尔值</span><br><span class="line">function：需要执行的模块或状态</span><br><span class="line">job_args：function 使用的参数</span><br><span class="line">job_kwargs：function 使用的关键字参数</span><br><span class="line">maxrunning：确保运行的特定作业的副本不超过N个</span><br><span class="line">jid_include：将作业包含在作业缓存中。</span><br><span class="line">splay：运行 function 的时间（以秒为单位）或指定为具有“开始”和“结束”值的字典范围</span><br><span class="line">range：在指定的范围内安排命令，range参数必须是使用dateutil格式的日期字符串的字典</span><br><span class="line">once：这将安排作业在指定日期运行一次</span><br><span class="line">once_fmt：默认日期格式为ISO 8601，但也可以通过指定once_fmt选项来覆盖</span><br><span class="line">enabled：是否应启用或禁用作业。值应该是布尔值</span><br><span class="line">return_job：是否在完成工作时将信息返回给Salt master</span><br><span class="line">metadata：使用元数据参数，特殊值可以与计划作业相关联。</span><br><span class="line">returner：返回者用于返回预定作业的结果</span><br><span class="line">return_config：用于返回者配置选项的备用配置</span><br><span class="line">return_kwargs：要覆盖的任何单个返回者配置项。 应该作为字典传递</span><br><span class="line">persist：作业是否应该在 minion 重启后仍然持续，默认为True</span><br><span class="line">skip_during_range：这将确保计划的命令不在指定的范围内运行，dateutil格式</span><br><span class="line">run_after_skip_range：作业是否应在skip_during_range时间段结束后立即运行</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/10/Linux/minio/" rel="next" title="minio 对象存储">
+                <i class="fa fa-chevron-left"></i> minio 对象存储
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/11/Linux/Salt-API/" rel="prev" title="SaltStack_API部署和简单使用">
+                SaltStack_API部署和简单使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Salt介绍"><span class="nav-number">1.</span> <span class="nav-text">Salt介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装-Salt"><span class="nav-number">1.1.</span> <span class="nav-text">安装 Salt</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Minion-指定-Master"><span class="nav-number">1.2.</span> <span class="nav-text">Minion 指定 Master</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Minion-设置-Hosts"><span class="nav-number">1.3.</span> <span class="nav-text">Minion 设置 Hosts</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Master-认证-Minion"><span class="nav-number">1.4.</span> <span class="nav-text">Master 认证 Minion</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#入门使用"><span class="nav-number">2.</span> <span class="nav-text">入门使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#远程执行"><span class="nav-number">2.1.</span> <span class="nav-text">远程执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置管理"><span class="nav-number">2.2.</span> <span class="nav-text">配置管理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基础概念"><span class="nav-number">3.</span> <span class="nav-text">基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Grains"><span class="nav-number">3.1.</span> <span class="nav-text">Grains</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义Grains"><span class="nav-number">3.1.1.</span> <span class="nav-text">自定义Grains</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-Grains"><span class="nav-number">3.1.2.</span> <span class="nav-text">使用 Grains</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Pillar"><span class="nav-number">3.2.</span> <span class="nav-text">Pillar</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#设置-Pillar-文件"><span class="nav-number">3.2.1.</span> <span class="nav-text">设置 Pillar 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-piller"><span class="nav-number">3.2.2.</span> <span class="nav-text">使用 piller</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Targeting-Minion"><span class="nav-number">3.3.</span> <span class="nav-text">Targeting Minion</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通配符"><span class="nav-number">3.3.1.</span> <span class="nav-text">通配符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#正则表达式"><span class="nav-number">3.3.2.</span> <span class="nav-text">正则表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#列表"><span class="nav-number">3.3.3.</span> <span class="nav-text">列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#子网"><span class="nav-number">3.3.4.</span> <span class="nav-text">子网</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Grain"><span class="nav-number">3.3.5.</span> <span class="nav-text">Grain</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Pillar-1"><span class="nav-number">3.3.6.</span> <span class="nav-text">Pillar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#混合"><span class="nav-number">3.3.7.</span> <span class="nav-text">混合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#节点组"><span class="nav-number">3.3.8.</span> <span class="nav-text">节点组</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SLS文件"><span class="nav-number">4.</span> <span class="nav-text">SLS文件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#环境目录"><span class="nav-number">4.1.</span> <span class="nav-text">环境目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TOP文件"><span class="nav-number">4.2.</span> <span class="nav-text">TOP文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#模块详解"><span class="nav-number">5.</span> <span class="nav-text">模块详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#stateTODO"><span class="nav-number">5.1.</span> <span class="nav-text">stateTODO</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Archive压缩"><span class="nav-number">5.2.</span> <span class="nav-text">Archive压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cmd命令行"><span class="nav-number">5.3.</span> <span class="nav-text">cmd命令行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cp远程复制"><span class="nav-number">5.4.</span> <span class="nav-text">cp远程复制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cron定时任务"><span class="nav-number">5.5.</span> <span class="nav-text">cron定时任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dnsutil域名解析"><span class="nav-number">5.6.</span> <span class="nav-text">dnsutil域名解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#file文件操作"><span class="nav-number">5.7.</span> <span class="nav-text">file文件操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#network网络信息"><span class="nav-number">5.8.</span> <span class="nav-text">network网络信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pkg包管理"><span class="nav-number">5.9.</span> <span class="nav-text">pkg包管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#service服务管理"><span class="nav-number">5.10.</span> <span class="nav-text">service服务管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#user用户管理"><span class="nav-number">5.11.</span> <span class="nav-text">user用户管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#iptables防火墙"><span class="nav-number">5.12.</span> <span class="nav-text">iptables防火墙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sysctl-内核参数"><span class="nav-number">5.13.</span> <span class="nav-text">sysctl 内核参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#status系统状态"><span class="nav-number">5.14.</span> <span class="nav-text">status系统状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ACL访问控制"><span class="nav-number">5.15.</span> <span class="nav-text">ACL访问控制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#返回程序"><span class="nav-number">6.</span> <span class="nav-text">返回程序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Minion结果返回数据库"><span class="nav-number">6.1.</span> <span class="nav-text">Minion结果返回数据库</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置Master"><span class="nav-number">6.1.1.</span> <span class="nav-text">配置Master</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建表结构"><span class="nav-number">6.1.2.</span> <span class="nav-text">创建表结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建授权"><span class="nav-number">6.1.3.</span> <span class="nav-text">创建授权</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#返回结果My-SQL"><span class="nav-number">6.1.4.</span> <span class="nav-text">返回结果My-SQL</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Master结果返回数据库"><span class="nav-number">6.2.</span> <span class="nav-text">Master结果返回数据库</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置管理-1"><span class="nav-number">7.</span> <span class="nav-text">配置管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#状态间关系"><span class="nav-number">7.1.</span> <span class="nav-text">状态间关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模板的使用"><span class="nav-number">7.2.</span> <span class="nav-text">模板的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#状态文件示例"><span class="nav-number">7.3.</span> <span class="nav-text">状态文件示例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#salt-run"><span class="nav-number">8.</span> <span class="nav-text">salt-run</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#runners-manage"><span class="nav-number">8.1.</span> <span class="nav-text">runners.manage</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#salt-ssh"><span class="nav-number">9.</span> <span class="nav-text">salt-ssh</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#roster"><span class="nav-number">9.1.</span> <span class="nav-text">roster</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#salt-job"><span class="nav-number">10.</span> <span class="nav-text">salt-job</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#saltutil管理job"><span class="nav-number">10.1.</span> <span class="nav-text">saltutil管理job</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#runner管理job"><span class="nav-number">10.2.</span> <span class="nav-text">runner管理job</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#schedule"><span class="nav-number">11.</span> <span class="nav-text">schedule</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#在-pillar-中定义"><span class="nav-number">11.1.</span> <span class="nav-text">在 pillar 中定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调试schedue"><span class="nav-number">11.2.</span> <span class="nav-text">调试schedue</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#schedule模块"><span class="nav-number">11.3.</span> <span class="nav-text">schedule模块</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="引发异常raise语法raise &amp;lt;Exception class&amp;gt;(&apos;error readme&apos;) try示例raise NameError(&apos;this is a name error&apos;)  结果---------------------------------------------------------------------------NameError">
+<meta property="og:type" content="article">
+<meta property="og:title" content="异常">
+<meta property="og:url" content="https://yangjinheng.github.io/2017/09/17/python/8.异常/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="引发异常raise语法raise &amp;lt;Exception class&amp;gt;(&apos;error readme&apos;) try示例raise NameError(&apos;this is a name error&apos;)  结果---------------------------------------------------------------------------NameError">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-09T10:49:54.715Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="异常">
+<meta name="twitter:description" content="引发异常raise语法raise &amp;lt;Exception class&amp;gt;(&apos;error readme&apos;) try示例raise NameError(&apos;this is a name error&apos;)  结果---------------------------------------------------------------------------NameError">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2017/09/17/python/8.异常/">
+
+
+
+
+
+  <title>异常 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2017/09/17/python/8.异常/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">异常</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-17T00:00:00+08:00">
+                2017-09-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="引发异常"><a href="#引发异常" class="headerlink" title="引发异常"></a>引发异常</h2><h3 id="raise语法"><a href="#raise语法" class="headerlink" title="raise语法"></a>raise语法</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">raise</span> &lt;Exception <span class="class"><span class="keyword">class</span>&gt;<span class="params">(<span class="string">'error readme'</span>)</span></span></span><br></pre></td></tr></table></figure>
+<h3 id="try示例"><a href="#try示例" class="headerlink" title="try示例"></a>try示例</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">raise</span> NameError(<span class="string">'this is a name error'</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">---------------------------------------------------------------------------</span><br><span class="line">NameError                                 Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-15</span><span class="number">-1234765</span>fb48c&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">----&gt; 1 raise NameError('this is a name error')</span><br><span class="line"></span><br><span class="line">NameError: this <span class="keyword">is</span> a name error</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="异常捕获"><a href="#异常捕获" class="headerlink" title="异常捕获"></a>异常捕获</h2><h3 id="try语法"><a href="#try语法" class="headerlink" title="try语法"></a>try语法</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    try_stuite                    <span class="comment">#监控此处的代码异常，如果发生异常则进入except匹配</span></span><br><span class="line"><span class="keyword">except</span> &lt;Exception <span class="class"><span class="keyword">class</span>&gt; <span class="title">as</span> <span class="title">err</span>:</span></span><br><span class="line">    except_suite                  <span class="comment">#如果异常匹配这个except字句，则执行此处</span></span><br><span class="line"><span class="keyword">except</span> &lt;Exception <span class="class"><span class="keyword">class</span>&gt; <span class="title">as</span> <span class="title">err</span>:</span>  <span class="comment">#将捕获到的错误内容赋值给err</span></span><br><span class="line">    except_suite</span><br><span class="line"><span class="keyword">else</span>:                             <span class="comment">#没有捕获异常执行的代码</span></span><br><span class="line">    else_suite</span><br><span class="line"><span class="keyword">finally</span>:                          <span class="comment">#在任何情况下都会执行的代码</span></span><br><span class="line">    finally_suite</span><br></pre></td></tr></table></figure>
+<h3 id="try过程"><a href="#try过程" class="headerlink" title="try过程"></a>try过程</h3><ul>
+<li><code>try</code> 会开启一个上下文，然后执行 <code>try</code> 与 <code>except</code> 之间的语句，语句将决定控制流能否正常通过<code>try</code></li>
+<li>如果  <code>try</code> 与 <code>except</code> 之间的语句发生异常，则立即从异常处跳出到 <code>try</code> 上下文，<code>try</code> 语句捕获异常后，将异常交给第一个匹配的 <code>except</code> 子句，执行<code>except</code>子句的代码，完毕后返回 <code>try</code> ，然后控制流正常通过 <code>try</code> 语句</li>
+<li>如果  <code>try</code> 与 <code>except</code> 之间的语句发生异常，则立即从异常处跳出到 <code>try</code> 上下文，<code>try</code> 语句捕获异常后，没有找到匹配的 <code>except</code> 子句，则 <code>try</code> 会将异常向上层抛出，并且不再向后执行同级代码。</li>
+<li>如果  <code>try</code> 与 <code>except</code> 之间的语句没有发生异常，则 <code>try</code> 语句会执行 <code>else</code> 子句的代码，然后控制流正常通过 <code>try</code> 语句</li>
+<li>无论程序控制流是否正常通过<code>try</code>语句，都会在最后执行<code>finally</code> 子句</li>
+</ul>
+<h2 id="代码示例"><a href="#代码示例" class="headerlink" title="代码示例"></a>代码示例</h2><h3 id="捕捉一个异常时"><a href="#捕捉一个异常时" class="headerlink" title="捕捉一个异常时"></a>捕捉一个异常时</h3><ul>
+<li>try-except 捕捉一个异常</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">raise</span> NameError(<span class="string">'this is a name error'</span>)</span><br><span class="line"><span class="keyword">except</span> NameError <span class="keyword">as</span> err:</span><br><span class="line">    print(err)               <span class="comment">#except捕获到的错误将被赋值给as后的变量</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">this <span class="keyword">is</span> a name error</span><br></pre></td></tr></table></figure>
+<h3 id="没有异常发生时"><a href="#没有异常发生时" class="headerlink" title="没有异常发生时"></a>没有异常发生时</h3><ul>
+<li>try-except-else</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    print(<span class="number">1</span>+<span class="number">1</span>)</span><br><span class="line"><span class="keyword">except</span> NameError <span class="keyword">as</span> err:</span><br><span class="line">    print(<span class="string">'err'</span>)</span><br><span class="line"><span class="keyword">else</span>:                         <span class="comment">#没有发生异常则执行</span></span><br><span class="line">    print(<span class="string">'no error'</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="number">2</span></span><br><span class="line">no error</span><br></pre></td></tr></table></figure>
+<h3 id="有无异常始终都会执行"><a href="#有无异常始终都会执行" class="headerlink" title="有无异常始终都会执行"></a>有无异常始终都会执行</h3><ul>
+<li>try-except-else-finally</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">raise</span> NameError(<span class="string">'this is a name error'</span>)</span><br><span class="line"><span class="keyword">except</span> NameError <span class="keyword">as</span> err:</span><br><span class="line">    print(<span class="string">'except error'</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'no error'</span>)</span><br><span class="line"><span class="keyword">finally</span>:                      <span class="comment">#无论异常是否发生都要执行</span></span><br><span class="line">    print(<span class="string">'must exec'</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">except</span> error</span><br><span class="line">must <span class="keyword">exec</span></span><br></pre></td></tr></table></figure>
+<h3 id="捕捉多个异常"><a href="#捕捉多个异常" class="headerlink" title="捕捉多个异常"></a>捕捉多个异常</h3><ul>
+<li>捕捉多个异常，方法1</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="comment">#raise NameError('this is a name error')</span></span><br><span class="line">    <span class="keyword">raise</span> KeyError(<span class="string">'this is a key error'</span>)</span><br><span class="line"><span class="keyword">except</span> NameError <span class="keyword">as</span> err:              <span class="comment">#多条except分支形式捕获</span></span><br><span class="line">    print(<span class="string">'except error is:'</span>,err)</span><br><span class="line"><span class="keyword">except</span> KeyError <span class="keyword">as</span> err:               <span class="comment">#多条except分支形式捕获</span></span><br><span class="line">    print(<span class="string">'except error is:'</span>,err)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'no error'</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">except</span> error <span class="keyword">is</span>: <span class="string">'this is a key error'</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>捕捉多个异常，方法2</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">raise</span> NameError(<span class="string">'this is a name error'</span>)</span><br><span class="line">    <span class="comment">#raise KeyError('this is a key error')</span></span><br><span class="line"><span class="keyword">except</span> (NameError,KeyError) <span class="keyword">as</span> err:      <span class="comment">#用括号将多个异常括起来，表示捕获多个</span></span><br><span class="line">    print(<span class="string">'except error is:'</span>,err)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'no error'</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>结果</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">except</span> error <span class="keyword">is</span>: this <span class="keyword">is</span> a name error</span><br></pre></td></tr></table></figure>
+<h3 id="捕获任何异常"><a href="#捕获任何异常" class="headerlink" title="捕获任何异常"></a>捕获任何异常</h3><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">raise</span> NameError(<span class="string">'this is a name error'</span>)</span><br><span class="line"><span class="keyword">except</span>:                                 <span class="comment">#捕获任何异常</span></span><br><span class="line">    print(<span class="string">'except error'</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">except</span> error</span><br></pre></td></tr></table></figure>
+<h3 id="再次抛出异常"><a href="#再次抛出异常" class="headerlink" title="再次抛出异常"></a>再次抛出异常</h3><p>捕捉到了异常，但是又想重新引发它(传递异常)，可以使用不带参数的raise语句即可： </p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    var = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">raise</span> NameError(<span class="string">'this is a name error'</span>)</span><br><span class="line"><span class="keyword">except</span> (NameError,KeyError) <span class="keyword">as</span> err:</span><br><span class="line">    <span class="keyword">if</span> var:</span><br><span class="line">        print(<span class="string">'except error'</span>,err)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">raise</span>                     <span class="comment">#在捕捉到的异常内，再次抛出此异常</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">---------------------------------------------------------------------------</span><br><span class="line">NameError                                 Traceback (most recent call last)</span><br><span class="line">&lt;ipython-input<span class="number">-25</span>-b59c336b9253&gt; <span class="keyword">in</span> &lt;module&gt;()</span><br><span class="line">      <span class="number">1</span> <span class="keyword">try</span>:</span><br><span class="line">      <span class="number">2</span>     var = <span class="literal">False</span></span><br><span class="line">----&gt; 3     raise NameError('this is a name error')</span><br><span class="line">      <span class="number">4</span> <span class="keyword">except</span> (NameError,KeyError) <span class="keyword">as</span> err:</span><br><span class="line">      <span class="number">5</span>     <span class="keyword">if</span> var:</span><br><span class="line"></span><br><span class="line">NameError: this <span class="keyword">is</span> a name error</span><br></pre></td></tr></table></figure>
+<h2 id="自定义异常"><a href="#自定义异常" class="headerlink" title="自定义异常"></a>自定义异常</h2><h3 id="内建异常"><a href="#内建异常" class="headerlink" title="内建异常"></a>内建异常</h3><table>
+<thead>
+<tr>
+<th>异常名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BaseException</td>
+<td>所有异常的基类</td>
+</tr>
+<tr>
+<td>SystemExit</td>
+<td>解释器请求退出</td>
+</tr>
+<tr>
+<td>KeyboardInterrupt</td>
+<td>用户中断执行(通常是输入^C)</td>
+</tr>
+<tr>
+<td>Exception</td>
+<td>常规错误的基类</td>
+</tr>
+<tr>
+<td>StopIteration</td>
+<td>迭代器没有更多的值</td>
+</tr>
+<tr>
+<td>GeneratorExit</td>
+<td>生成器(generator)发生异常来通知退出</td>
+</tr>
+<tr>
+<td>SystemExit</td>
+<td>Python 解释器请求退出</td>
+</tr>
+<tr>
+<td>StandardError</td>
+<td>所有的内建标准异常的基类</td>
+</tr>
+<tr>
+<td>ArithmeticError</td>
+<td>所有数值计算错误的基类</td>
+</tr>
+<tr>
+<td>FloatingPointError</td>
+<td>浮点计算错误</td>
+</tr>
+<tr>
+<td>OverflowError</td>
+<td>数值运算超出最大限制</td>
+</tr>
+<tr>
+<td>ZeroDivisionError</td>
+<td>除(或取模)零 (所有数据类型)</td>
+</tr>
+<tr>
+<td>AssertionError</td>
+<td>断言语句失败</td>
+</tr>
+<tr>
+<td>AttributeError</td>
+<td>对象没有这个属性</td>
+</tr>
+<tr>
+<td>EOFError</td>
+<td>没有内建输入,到达EOF 标记</td>
+</tr>
+<tr>
+<td>EnvironmentError</td>
+<td>操作系统错误的基类</td>
+</tr>
+<tr>
+<td>IOError</td>
+<td>输入/输出操作失败</td>
+</tr>
+<tr>
+<td>OSError</td>
+<td>操作系统错误</td>
+</tr>
+<tr>
+<td>WindowsError</td>
+<td>系统调用失败</td>
+</tr>
+<tr>
+<td>ImportError</td>
+<td>导入模块/对象失败</td>
+</tr>
+<tr>
+<td>KeyboardInterrupt</td>
+<td>用户中断执行(通常是输入^C)</td>
+</tr>
+<tr>
+<td>LookupError</td>
+<td>无效数据查询的基类</td>
+</tr>
+<tr>
+<td>IndexError</td>
+<td>序列中没有没有此索引(index)</td>
+</tr>
+<tr>
+<td>KeyError</td>
+<td>映射中没有这个键</td>
+</tr>
+<tr>
+<td>MemoryError</td>
+<td>内存溢出错误(对于Python 解释器不是致命的)</td>
+</tr>
+<tr>
+<td>NameError</td>
+<td>未声明/初始化对象 (没有属性)</td>
+</tr>
+<tr>
+<td>UnboundLocalError</td>
+<td>访问未初始化的本地变量</td>
+</tr>
+<tr>
+<td>ReferenceError</td>
+<td>弱引用(Weak reference)试图访问已经垃圾回收了的对象</td>
+</tr>
+<tr>
+<td>RuntimeError</td>
+<td>一般的运行时错误</td>
+</tr>
+<tr>
+<td>NotImplementedError</td>
+<td>尚未实现的方法</td>
+</tr>
+<tr>
+<td>SyntaxError</td>
+<td>Python 语法错误</td>
+</tr>
+<tr>
+<td>IndentationError</td>
+<td>缩进错误</td>
+</tr>
+<tr>
+<td>TabError</td>
+<td>Tab 和空格混用</td>
+</tr>
+<tr>
+<td>SystemError</td>
+<td>一般的解释器系统错误</td>
+</tr>
+<tr>
+<td>TypeError</td>
+<td>对类型无效的操作</td>
+</tr>
+<tr>
+<td>ValueError</td>
+<td>传入无效的参数</td>
+</tr>
+<tr>
+<td>UnicodeError</td>
+<td>Unicode 相关的错误</td>
+</tr>
+<tr>
+<td>UnicodeDecodeError</td>
+<td>Unicode 解码时的错误</td>
+</tr>
+<tr>
+<td>UnicodeEncodeError</td>
+<td>Unicode 编码时错误</td>
+</tr>
+<tr>
+<td>UnicodeTranslateError</td>
+<td>Unicode 转换时错误</td>
+</tr>
+<tr>
+<td>Warning</td>
+<td>警告的基类</td>
+</tr>
+<tr>
+<td>DeprecationWarning</td>
+<td>关于被弃用的特征的警告</td>
+</tr>
+<tr>
+<td>FutureWarning</td>
+<td>关于构造将来语义会有改变的警告</td>
+</tr>
+<tr>
+<td>OverflowWarning</td>
+<td>旧的关于自动提升为长整型(long)的警告</td>
+</tr>
+<tr>
+<td>PendingDeprecationWarning</td>
+<td>关于特性将会被废弃的警告</td>
+</tr>
+<tr>
+<td>RuntimeWarning</td>
+<td>可疑的运行时行为(runtime behavior)的警告</td>
+</tr>
+<tr>
+<td>SyntaxWarning</td>
+<td>可疑的语法的警告</td>
+</tr>
+<tr>
+<td>UserWarning</td>
+<td>用户代码生成的警告</td>
+</tr>
+</tbody>
+</table>
+<h3 id="自定义异常-1"><a href="#自定义异常-1" class="headerlink" title="自定义异常"></a>自定义异常</h3><p>Python中也可以自定义自己的特殊类型的异常，只需要要从Exception类继承(直接或间接)即可： </p>
+<ul>
+<li>自定义一个异常</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">JinhengException</span><span class="params">(Exception)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,msg)</span>:</span>         <span class="comment">#接收一个异常的描述内容</span></span><br><span class="line">        self.msg = msg</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span>              <span class="comment">#异常的可视化描述</span></span><br><span class="line">        <span class="keyword">return</span> self.msg</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用自定义异常</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    <span class="keyword">raise</span> JinhengException(<span class="string">'this is a JinhengException'</span>)</span><br><span class="line"><span class="keyword">except</span> JinhengException <span class="keyword">as</span> err:</span><br><span class="line">    print(<span class="string">'except error'</span>,err)     <span class="comment">#此处err是 this is a JinhengException，也就是自定义异常类的参数</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>结果</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">except</span> error this <span class="keyword">is</span> a JinhengException</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/16/python/7.装饰器/" rel="next" title="装饰器">
+                <i class="fa fa-chevron-left"></i> 装饰器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/18/python/9.面向对象/" rel="prev" title="面向对象">
+                面向对象 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引发异常"><span class="nav-number">1.</span> <span class="nav-text">引发异常</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#raise语法"><span class="nav-number">1.1.</span> <span class="nav-text">raise语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#try示例"><span class="nav-number">1.2.</span> <span class="nav-text">try示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#异常捕获"><span class="nav-number">2.</span> <span class="nav-text">异常捕获</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#try语法"><span class="nav-number">2.1.</span> <span class="nav-text">try语法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#try过程"><span class="nav-number">2.2.</span> <span class="nav-text">try过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码示例"><span class="nav-number">3.</span> <span class="nav-text">代码示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#捕捉一个异常时"><span class="nav-number">3.1.</span> <span class="nav-text">捕捉一个异常时</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#没有异常发生时"><span class="nav-number">3.2.</span> <span class="nav-text">没有异常发生时</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有无异常始终都会执行"><span class="nav-number">3.3.</span> <span class="nav-text">有无异常始终都会执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#捕捉多个异常"><span class="nav-number">3.4.</span> <span class="nav-text">捕捉多个异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#捕获任何异常"><span class="nav-number">3.5.</span> <span class="nav-text">捕获任何异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#再次抛出异常"><span class="nav-number">3.6.</span> <span class="nav-text">再次抛出异常</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义异常"><span class="nav-number">4.</span> <span class="nav-text">自定义异常</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#内建异常"><span class="nav-number">4.1.</span> <span class="nav-text">内建异常</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义异常-1"><span class="nav-number">4.2.</span> <span class="nav-text">自定义异常</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

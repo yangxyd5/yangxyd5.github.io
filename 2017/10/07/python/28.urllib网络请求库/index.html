@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="urlliburllib 是 Python3 标准库中的模块，无需额外安装，Python3 中的 urllib 综合了 Python2 中 urllib 和 urllib2 的一些功能，发生了较大变化。另外：Requests 库是一个第三方库，它基于 urllib3 编写，比 urllib 更方便，但要额外安装。  组成     库 作用     urllib.request 请求模块   url">
+<meta property="og:type" content="article">
+<meta property="og:title" content="urllib网络请求库">
+<meta property="og:url" content="https://yangjinheng.github.io/2017/10/07/python/28.urllib网络请求库/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="urlliburllib 是 Python3 标准库中的模块，无需额外安装，Python3 中的 urllib 综合了 Python2 中 urllib 和 urllib2 的一些功能，发生了较大变化。另外：Requests 库是一个第三方库，它基于 urllib3 编写，比 urllib 更方便，但要额外安装。  组成     库 作用     urllib.request 请求模块   url">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-09T10:59:51.849Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="urllib网络请求库">
+<meta name="twitter:description" content="urlliburllib 是 Python3 标准库中的模块，无需额外安装，Python3 中的 urllib 综合了 Python2 中 urllib 和 urllib2 的一些功能，发生了较大变化。另外：Requests 库是一个第三方库，它基于 urllib3 编写，比 urllib 更方便，但要额外安装。  组成     库 作用     urllib.request 请求模块   url">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2017/10/07/python/28.urllib网络请求库/">
+
+
+
+
+
+  <title>urllib网络请求库 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2017/10/07/python/28.urllib网络请求库/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">urllib网络请求库</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-07T00:00:00+08:00">
+                2017-10-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Python/" itemprop="url" rel="index">
+                    <span itemprop="name">Python</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="urllib"><a href="#urllib" class="headerlink" title="urllib"></a>urllib</h2><p>urllib 是 Python3 标准库中的模块，无需额外安装，Python3 中的 urllib 综合了 Python2 中 urllib 和 urllib2 的一些功能，发生了较大变化。另外：Requests 库是一个第三方库，它基于 urllib3 编写，比 urllib 更方便，但要额外安装。</p>
+<ul>
+<li>组成</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>库</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>urllib.request</code></td>
+<td>请求模块</td>
+</tr>
+<tr>
+<td><code>urllib.error</code></td>
+<td>异常处理模块</td>
+</tr>
+<tr>
+<td><code>urllib.parse</code></td>
+<td>URL解析模块</td>
+</tr>
+<tr>
+<td><code>urllib.robotparser</code></td>
+<td>robots.txt 解析模块</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>导入需要的模块<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib.request</span><br><span class="line"><span class="keyword">import</span> urllib.parse</span><br><span class="line"><span class="keyword">import</span> urllib.error</span><br><span class="line"><span class="keyword">import</span> http.cookiejar</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="urllib-request"><a href="#urllib-request" class="headerlink" title="urllib.request"></a>urllib.request</h2><ul>
+<li>请求打开URL地址，data 参数为 POST 请求时的参数，其余为CA证书相关。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">语法：urlopen(url, data=None, timeout=TIME, *, cafile=None, capath=None, cadefault=False, context=None)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>GET请求</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">response = urllib.request.urlopen(<span class="string">'http://httpbin.org/get'</span>)</span><br><span class="line">ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>POST请求</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">data = &#123;<span class="string">'hello'</span>: <span class="string">'world'</span>&#125;</span><br><span class="line">body = bytes(urllib.parse.urlencode(data),encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">response = urllib.request.urlopen(<span class="string">'http://httpbin.org/post'</span>,data=body)</span><br><span class="line">ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>请求 HTTPS 网站，取消全局证书</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> urllib.request</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> ssl</span><br><span class="line">ssl._create_default_https_context = ssl._create_unverified_context</span><br><span class="line"></span><br><span class="line">url = <span class="string">'https://172.16.100.253:9527/jobs'</span></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'Accept'</span>: <span class="string">'application/x-yaml'</span>,</span><br><span class="line">    <span class="string">'X-Auth-Token'</span>: <span class="string">'546df529e7f55afaaeb2d11ae98bd9155cceab57'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Request = urllib.request.Request(url=url, headers=headers, method=<span class="string">'GET'</span>)</span><br><span class="line">response = urllib.request.urlopen(Request)</span><br><span class="line"></span><br><span class="line">print(response.status)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置请求的超时</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    response = urllib.request.urlopen(<span class="string">'http://httpbin.org/get'</span>,timeout=<span class="number">0.1</span>)</span><br><span class="line">    ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">    print(ret)</span><br><span class="line"><span class="keyword">except</span> urllib.error.URLError <span class="keyword">as</span> e:</span><br><span class="line">    <span class="keyword">import</span> socket</span><br><span class="line">    <span class="keyword">if</span> isinstance(e.reason,socket.timeout):</span><br><span class="line">        print(<span class="string">'request timeout'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="response"><a href="#response" class="headerlink" title="response"></a>response</h3><ul>
+<li>获得响应码，响应头信息</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">response = urllib.request.urlopen(<span class="string">'http://httpbin.org/get'</span>)</span><br><span class="line">print(response.status)</span><br><span class="line">print(response.getheaders())</span><br><span class="line">print(response.getheader(<span class="string">'Server'</span>))</span><br><span class="line">ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="Request"><a href="#Request" class="headerlink" title="Request"></a>Request</h3><p>Request 子类，它能够构造一个请求，自定义请求头信息，和请求体的 POST 表单信息。</p>
+<ul>
+<li>自定义请求头，POST表单，构造请求</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">url = <span class="string">'http://httpbin.org/post'</span></span><br><span class="line"></span><br><span class="line">headers = &#123;</span><br><span class="line">    <span class="string">'User-Agent'</span>:<span class="string">'Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5'</span>,</span><br><span class="line">    <span class="string">'Host'</span>:<span class="string">'httpbin.org'</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">data = &#123;</span><br><span class="line">    <span class="string">'hello'</span>: <span class="string">'world'</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">body = bytes(urllib.parse.urlencode(data), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">Request = urllib.request.Request(url=url, data=body, headers=headers, method=<span class="string">'POST'</span>)</span><br><span class="line"></span><br><span class="line">response = urllib.request.urlopen(Request)</span><br><span class="line"></span><br><span class="line">print(response.status)</span><br><span class="line">print(response.getheaders())</span><br><span class="line">ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>Request 类的 add_header 方法，可以向构造的请求添加头信息。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">url = <span class="string">'http://httpbin.org/post'</span></span><br><span class="line">data = &#123;<span class="string">'hello'</span>: <span class="string">'world'</span>,&#125;</span><br><span class="line">header = (<span class="string">'User-Agent'</span>,<span class="string">'Mozilla/5.0 (iPhone; U; CPU iPhone OS 4_3_3 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8J2 Safari/6533.18.5'</span>)</span><br><span class="line"></span><br><span class="line">body = bytes(urllib.parse.urlencode(data), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">Request = urllib.request.Request(url=url, data=body, method=<span class="string">'POST'</span>)</span><br><span class="line">Request.add_header(*header)</span><br><span class="line"></span><br><span class="line">response = urllib.request.urlopen(Request)</span><br><span class="line"></span><br><span class="line">print(response.status)</span><br><span class="line">print(response.getheaders())</span><br><span class="line">ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+<h3 id="Handler"><a href="#Handler" class="headerlink" title="Handler"></a>Handler</h3><ul>
+<li>设置请求线路代理，本机需要安装代理线路程序，例如：监听在 9743。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ips = &#123;</span><br><span class="line">    <span class="string">'http'</span>:<span class="string">'http://127.0.0.1:9743'</span>,</span><br><span class="line">    <span class="string">'https'</span>:<span class="string">'https://127.0.0.1:9743'</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">proxy_handler = urllib.request.ProxyHandler(ips)</span><br><span class="line">opener = urllib.request.build_opener(proxy_handler)</span><br><span class="line">response = opener.open(<span class="string">'http://www.baidu.com'</span>)</span><br><span class="line">ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+<h3 id="HTTPCookieProcessor"><a href="#HTTPCookieProcessor" class="headerlink" title="HTTPCookieProcessor"></a>HTTPCookieProcessor</h3><ul>
+<li>使用 Mozilla 类型 Cookie</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># --- 在本地保存为 MozillaCookiejar</span></span><br><span class="line">filename = <span class="string">'cookie.txt'</span></span><br><span class="line">cookie = http.cookiejar.MozillaCookieJar(filename)</span><br><span class="line">handler = urllib.request.HTTPCookieProcessor(cookie)</span><br><span class="line">opener = urllib.request.build_opener(handler)</span><br><span class="line"></span><br><span class="line">response = opener.open(<span class="string">'https://baidu.com'</span>)</span><br><span class="line">cookie.save(ignore_discard=<span class="literal">True</span>,ignore_expires=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># --- 使用本地已有的 Cookie 请求</span></span><br><span class="line">cookie = http.cookiejar.MozillaCookieJar()</span><br><span class="line">cookie.load(<span class="string">'cookie.txt'</span>,ignore_discard=<span class="literal">True</span>,ignore_expires=<span class="literal">True</span>)</span><br><span class="line">handler = urllib.request.HTTPCookieProcessor(cookie)</span><br><span class="line">opener = urllib.request.build_opener(handler)</span><br><span class="line"></span><br><span class="line">response = opener.open(<span class="string">'https://baidu.com'</span>)</span><br><span class="line"></span><br><span class="line">ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>使用 LWP 类型 Cookie</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">--- Cookie 在本地保存为 LWPCookiejar</span><br><span class="line">filename = <span class="string">'cookie.txt'</span></span><br><span class="line">cookie = http.cookiejar.LWPCookieJar(filename)</span><br><span class="line">handler = urllib.request.HTTPCookieProcessor(cookie)</span><br><span class="line">opener = urllib.request.build_opener(handler)</span><br><span class="line"></span><br><span class="line">response = opener.open(<span class="string">'https://baidu.com'</span>)</span><br><span class="line">cookie.save(ignore_discard=<span class="literal">True</span>,ignore_expires=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">--- Cookie 使用本地已有的 Cookie 请求</span><br><span class="line">cookie = http.cookiejar.LWPCookieJar()</span><br><span class="line">cookie.load(<span class="string">'cookie.txt'</span>,ignore_discard=<span class="literal">True</span>,ignore_expires=<span class="literal">True</span>)</span><br><span class="line">handler = urllib.request.HTTPCookieProcessor(cookie)</span><br><span class="line">opener = urllib.request.build_opener(handler)</span><br><span class="line"></span><br><span class="line">response = opener.open(<span class="string">'https://baidu.com'</span>)</span><br><span class="line"></span><br><span class="line">ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="urllib-error"><a href="#urllib-error" class="headerlink" title="urllib.error"></a>urllib.error</h2><p>异常分为两个字类：URLError 它只有 reason，而它的子类 HTTPError 有 reason code headers 属性。</p>
+<ul>
+<li>URLError</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    response = urllib.request.urlopen(<span class="string">'http://httpbin.org/test.html'</span>)</span><br><span class="line">    ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">    print(ret)</span><br><span class="line"><span class="keyword">except</span> urllib.error.URLError <span class="keyword">as</span> e:</span><br><span class="line">    print(e.reason)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>HTTPError</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    response = urllib.request.urlopen(<span class="string">'http://httpbin.org/test.html'</span>)</span><br><span class="line">    ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">    print(ret)</span><br><span class="line"><span class="keyword">except</span> urllib.error.HTTPError <span class="keyword">as</span> e:</span><br><span class="line">    print(e.reason,e.code,e.headers,sep=<span class="string">'\n'</span>)</span><br><span class="line"><span class="keyword">except</span> urllib.error.URLError <span class="keyword">as</span> e:</span><br><span class="line">    print(e.reason)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">'Requet Successfuly'</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>异常原因的判断</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    response = urllib.request.urlopen(<span class="string">'http://httpbin.org/get'</span>,timeout=<span class="number">0.1</span>)</span><br><span class="line">    ret = str(response.read(), encoding=<span class="string">'utf-8'</span>)</span><br><span class="line">    print(ret)</span><br><span class="line"><span class="keyword">except</span> urllib.error.URLError <span class="keyword">as</span> e:</span><br><span class="line">    <span class="keyword">import</span> socket</span><br><span class="line">    <span class="keyword">if</span> isinstance(e.reason,socket.timeout):</span><br><span class="line">        print(<span class="string">'request timeout'</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="urllib-parse"><a href="#urllib-parse" class="headerlink" title="urllib.parse"></a>urllib.parse</h2><p>封装了对URL地址的处理，能对URL地址进行拆分，和拼接，等操作。</p>
+<h3 id="urlparse"><a href="#urlparse" class="headerlink" title="urlparse"></a>urlparse</h3><ul>
+<li>urlparse 将分解 url</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ret = urllib.parse.urlparse(<span class="string">'https://www.baidu.com/index.html;user?id=5#conetnt'</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ParseResult(scheme=<span class="string">'https'</span>, netloc=<span class="string">'www.baidu.com'</span>, path=<span class="string">'/index.html'</span>, params=<span class="string">'user'</span>, query=<span class="string">'id=5'</span>, fragment=<span class="string">'conetnt'</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>指定URL中的协议部分，原始协议信息优先级最高，如果原始信息没有协议的信息，则使用 scheme。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ret = urllib.parse.urlparse(<span class="string">'http://www.baidu.com/index.html;user?id=5#conetnt'</span>,scheme=<span class="string">'https'</span>)</span><br><span class="line">print(ret)</span><br><span class="line">ret = urllib.parse.urlparse(<span class="string">'www.baidu.com/index.html;user?id=5#conetnt'</span>,scheme=<span class="string">'https'</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ParseResult(scheme=<span class="string">'http'</span>, netloc=<span class="string">'www.baidu.com'</span>, path=<span class="string">'/index.html'</span>, params=<span class="string">'user'</span>, query=<span class="string">'id=5'</span>, fragment=<span class="string">'conetnt'</span>)</span><br><span class="line">ParseResult(scheme=<span class="string">'https'</span>, netloc=<span class="string">''</span>, path=<span class="string">'www.baidu.com/index.html'</span>, params=<span class="string">'user'</span>, query=<span class="string">'id=5'</span>, fragment=<span class="string">'conetnt'</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>指定是否解析锚点信息为锚点</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ret = urllib.parse.urlparse(<span class="string">'http://www.baidu.com/index.html;user?id=5#conetnt'</span>,allow_fragments=<span class="literal">False</span>)</span><br><span class="line">print(ret)</span><br><span class="line">ret = urllib.parse.urlparse(<span class="string">'http://www.baidu.com/index.html#conetnt'</span>,allow_fragments=<span class="literal">False</span>)</span><br><span class="line">print(ret)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ParseResult(scheme=<span class="string">'http'</span>, netloc=<span class="string">'www.baidu.com'</span>, path=<span class="string">'/index.html'</span>, params=<span class="string">'user'</span>, query=<span class="string">'id=5#conetnt'</span>, fragment=<span class="string">''</span>)</span><br><span class="line">ParseResult(scheme=<span class="string">'http'</span>, netloc=<span class="string">'www.baidu.com'</span>, path=<span class="string">'/index.html#conetnt'</span>, params=<span class="string">''</span>, query=<span class="string">''</span>, fragment=<span class="string">''</span>)</span><br></pre></td></tr></table></figure>
+<h3 id="urljoin"><a href="#urljoin" class="headerlink" title="urljoin"></a>urljoin</h3><ul>
+<li>组装一个 URL</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">data = [<span class="string">'http'</span>,<span class="string">'www.baidu.com'</span>,<span class="string">'index.html'</span>,<span class="string">'user'</span>,<span class="string">'a=6'</span>,<span class="string">'content'</span>]</span><br><span class="line">print(urllib.parse.urlunparse(data))</span><br></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://www.baidu.com/index.html;user?a=6#content</span><br></pre></td></tr></table></figure>
+<ul>
+<li>拼接一个 URL</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">print(urllib.parse.urljoin(<span class="string">'http://www.baidu.com'</span>,<span class="string">'FAQ.html'</span>))</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">http://www.baidu.com/FAQ.html</span><br></pre></td></tr></table></figure>
+<h3 id="urlencode"><a href="#urlencode" class="headerlink" title="urlencode"></a>urlencode</h3><ul>
+<li>转换字典为请求的参数</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">base_url = <span class="string">'http://www.baidu.com/index.html;user?'</span></span><br><span class="line"></span><br><span class="line">params = &#123;</span><br><span class="line">    <span class="string">'name'</span>:<span class="string">'yangjinheng'</span>,</span><br><span class="line">    <span class="string">'age'</span>:<span class="string">'18'</span>,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">args = urllib.parse.urlencode(params)</span><br><span class="line">url = base_url + args</span><br><span class="line"></span><br><span class="line">print(url)</span><br></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">http://www.baidu.com/index.html;user?name=yangjinheng&amp;age=18</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/06/python/27.Django笔记/" rel="next" title="Django">
+                <i class="fa fa-chevron-left"></i> Django
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/08/python/29.hashlib加密解密/" rel="prev" title="hashlib加密解密">
+                hashlib加密解密 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#urllib"><span class="nav-number">1.</span> <span class="nav-text">urllib</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#urllib-request"><span class="nav-number">2.</span> <span class="nav-text">urllib.request</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#response"><span class="nav-number">2.1.</span> <span class="nav-text">response</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Request"><span class="nav-number">2.2.</span> <span class="nav-text">Request</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Handler"><span class="nav-number">2.3.</span> <span class="nav-text">Handler</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HTTPCookieProcessor"><span class="nav-number">2.4.</span> <span class="nav-text">HTTPCookieProcessor</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#urllib-error"><span class="nav-number">3.</span> <span class="nav-text">urllib.error</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#urllib-parse"><span class="nav-number">4.</span> <span class="nav-text">urllib.parse</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#urlparse"><span class="nav-number">4.1.</span> <span class="nav-text">urlparse</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#urljoin"><span class="nav-number">4.2.</span> <span class="nav-text">urljoin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#urlencode"><span class="nav-number">4.3.</span> <span class="nav-text">urlencode</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

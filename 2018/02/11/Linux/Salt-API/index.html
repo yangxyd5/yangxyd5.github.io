@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="REST API依赖组件 依赖组件  Python CherryPy 模块。注意：CherryPy版本3.2.5到3.7.x有一个已知的SSL跟踪，请使用版本3.2.3或最新的10.x版本。  可选依赖  ws4py 用于支持 websockets 的 Python模块。  客户端库  Java: https://github.com/SUSE/salt-netapi-clientPython:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SaltStack_API部署和简单使用">
+<meta property="og:url" content="https://yangjinheng.github.io/2018/02/11/Linux/Salt-API/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="REST API依赖组件 依赖组件  Python CherryPy 模块。注意：CherryPy版本3.2.5到3.7.x有一个已知的SSL跟踪，请使用版本3.2.3或最新的10.x版本。  可选依赖  ws4py 用于支持 websockets 的 Python模块。  客户端库  Java: https://github.com/SUSE/salt-netapi-clientPython:">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-02-09T16:29:28.165Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SaltStack_API部署和简单使用">
+<meta name="twitter:description" content="REST API依赖组件 依赖组件  Python CherryPy 模块。注意：CherryPy版本3.2.5到3.7.x有一个已知的SSL跟踪，请使用版本3.2.3或最新的10.x版本。  可选依赖  ws4py 用于支持 websockets 的 Python模块。  客户端库  Java: https://github.com/SUSE/salt-netapi-clientPython:">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2018/02/11/Linux/Salt-API/">
+
+
+
+
+
+  <title>SaltStack_API部署和简单使用 | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2018/02/11/Linux/Salt-API/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SaltStack_API部署和简单使用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-11T00:00:00+08:00">
+                2018-02-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/运维笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">运维笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="REST-API"><a href="#REST-API" class="headerlink" title="REST API"></a>REST API</h2><h3 id="依赖组件"><a href="#依赖组件" class="headerlink" title="依赖组件"></a>依赖组件</h3><ul>
+<li>依赖组件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Python CherryPy 模块。</span><br><span class="line"></span><br><span class="line">注意：CherryPy版本3.2.5到3.7.x有一个已知的SSL跟踪，请使用版本3.2.3或最新的10.x版本。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>可选依赖</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ws4py 用于支持 websockets 的 Python模块。</span><br></pre></td></tr></table></figure>
+<ul>
+<li>客户端库</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Java: https://github.com/SUSE/salt-netapi-client</span><br><span class="line">Python: https://github.com/saltstack/pepper</span><br></pre></td></tr></table></figure>
+<h3 id="部署API"><a href="#部署API" class="headerlink" title="部署API"></a>部署API</h3><p>以下所有步骤都在 Salt Master 的计算机上执行，相关配置需要写入 Master 配置文件。</p>
+<ul>
+<li>安装 salt-api，确保 salt-api –version 输出与 salt –version 输出匹配。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">yum install salt-api salt-minion</span><br></pre></td></tr></table></figure>
+<ul>
+<li>安装 CherryPy PyOpenSSL。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip install CherryPy</span><br><span class="line">pip install PyOpenSSL</span><br></pre></td></tr></table></figure>
+<ul>
+<li>使用 <code>minion</code>  服务下 <code>salt-call</code> 工具的  <code>create_self_signed_cert()</code> 生成自签名证书。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">salt-call --local tls.create_self_signed_cert</span><br></pre></td></tr></table></figure>
+<ul>
+<li>执行 <code>salt-call --local tls.create_self_signed_cert</code> 可能遇到的问题</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">执行 salt-call --local tls.create_self_signed_cert 报错：</span><br><span class="line">AttributeError: &apos;module&apos; object has no attribute &apos;SSL_ST_INIT&apos;</span><br><span class="line">Module &apos;tls&apos; is not available.</span><br><span class="line"></span><br><span class="line">解决方法：把之前的pyopenssl 卸载掉，从新安装</span><br><span class="line">pip uninstall pyopenssl</span><br><span class="line">pip install pyopenssl</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在Linux系统上新建用户</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">useradd -r saltapi</span><br></pre></td></tr></table></figure>
+<ul>
+<li>编辑 Master 的主配置文件，创建至少一个外部身份验证的用户或组，这里使用Linux系统用户验证（PAM）。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">external_auth:</span><br><span class="line">  pam:</span><br><span class="line">    saltapi:</span><br><span class="line">      - &apos;*&apos;:</span><br><span class="line">        - test.*</span><br><span class="line">        - network.*</span><br><span class="line">    saltadmin:</span><br><span class="line">      - .*</span><br></pre></td></tr></table></figure>
+<p>上面的示例，允许 <code>saltapi</code> 用户在 <code>&#39;*&#39;</code> 的客户端上运行 <code>&#39;test</code> 和 <code>network</code> 模块的指令，允许 <code>saltadmin</code> 用户不受任何限制。</p>
+<p>但需要注意：PAM模不允许 <code>root</code> 用户进行身份验证。</p>
+<ul>
+<li>编辑 Master 的主配置文件，使用 <code>rest_cherrypy</code> 模块配置 SSL 的相关验证配置。 </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">rest_cherrypy:</span><br><span class="line">  port: 9527</span><br><span class="line">  ssl_crt: /etc/pki/tls/certs/localhost.crt</span><br><span class="line">  ssl_key: /etc/pki/tls/certs/localhost.key</span><br></pre></td></tr></table></figure>
+<p>下面是 CherryPy HTTP 的详细可用配配置</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>port</code></td>
+<td>监听的端口</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td>监听的地址，默认 0.0.0.0</td>
+</tr>
+<tr>
+<td><code>debug</code></td>
+<td>以调试模式启动 WEB 服务器，会有大量的调试信息</td>
+</tr>
+<tr>
+<td><code>log_access_file</code></td>
+<td>HTTP访问日志的文件的路径</td>
+</tr>
+<tr>
+<td><code>log_error_file</code></td>
+<td>HTTP错误日志的文件的路径</td>
+</tr>
+<tr>
+<td><code>ssl_crt</code></td>
+<td>SSL证书的路径</td>
+</tr>
+<tr>
+<td><code>ssl_key</code></td>
+<td>SSL证书的私钥路径</td>
+</tr>
+<tr>
+<td><code>ssl_chain</code></td>
+<td>将证书链传递给Context.load_verify_locations，（使用PyOpenSSL时可选）</td>
+</tr>
+<tr>
+<td><code>disable_ssl</code></td>
+<td>禁用SSL的标志，以明文方式传递</td>
+</tr>
+<tr>
+<td><code>webhook_disable_auth</code></td>
+<td>默认为False 需要身份验证，如果此项为 True将禁止身份验证，</td>
+</tr>
+<tr>
+<td><code>webhook_url</code></td>
+<td>配置Webhook入口点的URL地址，默认为  /hook</td>
+</tr>
+<tr>
+<td><code>thread_pool</code></td>
+<td>线程池中线程的数量，默认100</td>
+</tr>
+<tr>
+<td><code>socket_queue_size</code></td>
+<td>HTTP连接队列的最大长度，默认20</td>
+</tr>
+<tr>
+<td><code>expire_responses</code></td>
+<td>是否自动停止超时的HTTP，默认True</td>
+</tr>
+<tr>
+<td><code>max_request_body_size</code></td>
+<td>HTTP请求正文的最大大小，默认 1048576</td>
+</tr>
+<tr>
+<td><code>collect_stats</code></td>
+<td>收集并报告有关CherryPy服务器的统计信息，报告可通过统计URL获得。默认：False</td>
+</tr>
+<tr>
+<td><code>stats_disable_auth</code></td>
+<td>不需要身份验证即可访问 /stats 地址，默认False</td>
+</tr>
+<tr>
+<td><code>static</code></td>
+<td>静态HTML / JavaScript / CSS /图像等文件系统路径。</td>
+</tr>
+<tr>
+<td><code>static_path</code></td>
+<td>从静态设置中指定的目录中提供静态资产时使用的URL前缀。默认： /static</td>
+</tr>
+<tr>
+<td><code>enable_sessions</code></td>
+<td>启用或禁用所有依赖 cookie 的会话，这对于仅强制执行基于标头的身份验证非常有用，默认True</td>
+</tr>
+<tr>
+<td><code>app</code></td>
+<td>HTML文件的文件系统路径，将作为静态文件提供，不建议。默认：index.html</td>
+</tr>
+<tr>
+<td><code>app_path</code></td>
+<td>用于提供应用程序设置中指定的HTML文件的URL前缀。默认：/app</td>
+</tr>
+<tr>
+<td><code>root_prefix</code></td>
+<td>指向应用程序主入口点的URL路径，这对于从同一URL提供多个应用程序非常有用。</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>重启守护进程，API 开始提供服务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">systemctl restart salt-master</span><br><span class="line">systemctl restart salt-api</span><br></pre></td></tr></table></figure>
+<h2 id="认证会话"><a href="#认证会话" class="headerlink" title="认证会话"></a>认证会话</h2><p>每个请求需要传递 Token 进行身份验证来维持会话，Token 通过 POST 访问 <code>/login</code> 登陆来得到，得到 Token 后有两种方式来认证后续的会话连接：1、在每次请求头中添加名为 <code>X-Auth-Token</code> 的HTTP头部来连接会话，2、使用 Cookie 来保持登陆会话状态。</p>
+<h3 id="自定义头部方式"><a href="#自定义头部方式" class="headerlink" title="自定义头部方式"></a>自定义头部方式</h3><ul>
+<li>以 POST 方式访问 <code>/login</code> 得到 Token</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527/login \</span><br><span class="line">    -H &apos;Accept: application/x-yaml&apos; \</span><br><span class="line">    -d username=saltapi \</span><br><span class="line">    -d password=123456 \</span><br><span class="line">    -d eauth=pam</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 POST 请求头中设定 Token ，POST 请求数据中设定指令，来使用API控制。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527 \</span><br><span class="line">    -H &apos;Accept: application/x-yaml&apos; \</span><br><span class="line">    -H &apos;X-Auth-Token: 9d3dc1cbde80642f8edda3b783970b4ca73ab3d6&apos;\</span><br><span class="line">    -d client=local \</span><br><span class="line">    -d tgt=&apos;*&apos; \</span><br><span class="line">    -d fun=test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="使用Cookie方式"><a href="#使用Cookie方式" class="headerlink" title="使用Cookie方式"></a>使用Cookie方式</h3><ul>
+<li>以 POST 方式访问 <code>/login</code> 得到 Token，保存 Cookie 信息。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527/login \</span><br><span class="line">    -c ~/cookies.txt \</span><br><span class="line">    -H &apos;Accept: application/x-yaml&apos; \</span><br><span class="line">    -d username=saltapi \</span><br><span class="line">    -d password=123456 \</span><br><span class="line">    -d eauth=pam</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 POST 请求时将 Cookie 文件发送给服务器，服务器根据 Cookie 来认证会话</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527 \</span><br><span class="line">    -b ~/cookies.txt \</span><br><span class="line">    -H &apos;Accept: application/x-yaml&apos; \</span><br><span class="line">    -d client=local \</span><br><span class="line">    -d tgt=&apos;*&apos; \</span><br><span class="line">    -d fun=test.ping</span><br></pre></td></tr></table></figure>
+<h2 id="用法示例"><a href="#用法示例" class="headerlink" title="用法示例"></a>用法示例</h2><h3 id="内容协商"><a href="#内容协商" class="headerlink" title="内容协商"></a>内容协商</h3><p>这个REST接口可以灵活地接受它将接受的数据格式以及它将返回的格式（例如，JSON，YAML，urlencoded）。</p>
+<ol>
+<li>通过设置请求头中的 Content-type 来指定请求正文中的数据格式。</li>
+<li>通过设置请求头中的 Accept 来指定响应正文中需要的数据格式。</li>
+</ol>
+<p>对于大多数HTTP请求，我们建议使用JSON格式。 </p>
+<h3 id="参数介绍"><a href="#参数介绍" class="headerlink" title="参数介绍"></a>参数介绍</h3><ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527 \</span><br><span class="line">    -H &apos;Content-type: application/json&apos; \</span><br><span class="line">    -H &apos;X-Auth-Token: 9d3dc1cbde80642f8edda3b783970b4ca73ab3d6&apos;\</span><br><span class="line">    -d &apos;[</span><br><span class="line">            &#123;</span><br><span class="line">                &quot;client&quot;: &quot;local&quot;,</span><br><span class="line">                &quot;tgt&quot;: &quot;*&quot;,</span><br><span class="line">                &quot;fun&quot;: &quot;test.ping&quot;</span><br><span class="line">            &#125;</span><br><span class="line">    ]&apos;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>client，表示使用什么客户端，该字段表示是对 Salt 的 API 中主要 Python 类的引用（API使用Python编写）</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>选项</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>local</code></td>
+<td>使用 LocalClient 将命令发送给 Minions。 相当于salt CLI命令</td>
+</tr>
+<tr>
+<td><code>runner</code></td>
+<td>使用 RunnerClient 调用 Master 上的 runner 模块。 相当于 salt-run CLI命令</td>
+</tr>
+<tr>
+<td><code>wheel</code></td>
+<td>使用 WheelClient 调用 Master 上的 wheel 模块，Wheel模块没有直接的CLI相同的功能，但是它们通常管理主端资源，比如状态文件、支柱文件、Salt配置文件，而 Wheel 模块提供了与 Salt -key CLI命令类似的功能。</td>
+</tr>
+</tbody>
+</table>
+<p>每种客户端需要不同的参数，例如，<code>local</code> 需要 <code>tgt</code> 参数来指定目标客户端， <code>local</code> 可以接受 <code>arg（数组）</code>和 <code>kwarg（字典）</code>参数，这些值会被发送到客户端由客户端函数来处理。<code>runner</code> 和 <code>wheel</code> 直接在 Master 上执行，因此不需要或接受这些参数。</p>
+<ul>
+<li>官方文档示例</li>
+</ul>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527 \</span><br><span class="line">    -H 'Content-type: application/json' \</span><br><span class="line">    -H 'X-Auth-Token: 6455367f150426fab3fa8d75ba589e1e78e40e13' \</span><br><span class="line">    -d '[</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"client"</span>: <span class="string">"local"</span>,</span><br><span class="line">                <span class="attr">"tgt"</span>: <span class="string">"*"</span>,</span><br><span class="line">                <span class="attr">"fun"</span>: <span class="string">"test.arg"</span>,</span><br><span class="line">                <span class="attr">"arg"</span>: [<span class="string">"positional arg one"</span>, <span class="string">"positional arg two"</span>],</span><br><span class="line">                <span class="attr">"kwarg"</span>: &#123;</span><br><span class="line">                    <span class="attr">"keyword arg one"</span>: <span class="string">"Hello from a minion"</span>,</span><br><span class="line">                    <span class="attr">"keyword arg two"</span>: <span class="string">"Hello again from a minion"</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"client"</span>: <span class="string">"runner"</span>,</span><br><span class="line">                <span class="attr">"fun"</span>: <span class="string">"test.arg"</span>,</span><br><span class="line">                <span class="attr">"keyword arg one"</span>: <span class="string">"Hello from a master"</span>,</span><br><span class="line">                <span class="attr">"keyword arg two"</span>: <span class="string">"Runners do not support positional args"</span></span><br><span class="line">            &#125;</span><br><span class="line">        ]'</span><br></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"return"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"jerry"</span>: &#123;</span><br><span class="line">        <span class="attr">"args"</span>: [</span><br><span class="line">          <span class="string">"positional arg one"</span>,</span><br><span class="line">          <span class="string">"positional arg two"</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="attr">"kwargs"</span>: &#123;</span><br><span class="line">          <span class="attr">"keyword arg one"</span>: <span class="string">"Hello from a minion"</span>,</span><br><span class="line">          <span class="attr">"keyword arg two"</span>: <span class="string">"Hello again from a minion"</span>,</span><br><span class="line">          [...snip...]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"args"</span>: [],</span><br><span class="line">      <span class="attr">"kwargs"</span>: &#123;</span><br><span class="line">            <span class="attr">"keyword arg one"</span>: <span class="string">"Hello from a master"</span>,</span><br><span class="line">            <span class="attr">"keyword arg two"</span>: <span class="string">"Runners do not support positional args"</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>再举个例子</li>
+</ul>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527 \</span><br><span class="line">    -H 'Content-type: application/json' \</span><br><span class="line">    -H 'X-Auth-Token: 6455367f150426fab3fa8d75ba589e1e78e40e13' \</span><br><span class="line">    -d '[</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"client"</span>: <span class="string">"local"</span>,</span><br><span class="line">                <span class="attr">"tgt"</span>: <span class="string">"*"</span>,</span><br><span class="line">                <span class="attr">"fun"</span>: <span class="string">"state.sls"</span>,</span><br><span class="line">                <span class="attr">"kwarg"</span>: &#123;</span><br><span class="line">                    <span class="attr">"mods"</span>: <span class="string">"apache"</span>,</span><br><span class="line">                    <span class="attr">"pillar"</span>: &#123;</span><br><span class="line">                        <span class="attr">"lookup"</span>: &#123;</span><br><span class="line">                            <span class="attr">"wwwdir"</span>: <span class="string">"/srv/httpd/htdocs"</span></span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">"client"</span>: <span class="string">"runner"</span>,</span><br><span class="line">                <span class="attr">"fun"</span>: <span class="string">"cloud.create"</span>,</span><br><span class="line">                <span class="attr">"provider"</span>: <span class="string">"my-ec2-provider"</span>,</span><br><span class="line">                <span class="attr">"instances"</span>: <span class="string">"my-centos-6"</span>,</span><br><span class="line">                <span class="attr">"image"</span>: <span class="string">"ami-1624987f"</span>,</span><br><span class="line">                "delvol_on_destroy", true</span><br><span class="line">            &#125;</span><br><span class="line">        ]'</span><br></pre></td></tr></table></figure>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"return"</span>: [</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="attr">"jerry"</span>: &#123;</span><br><span class="line">        <span class="attr">"pkg_|-install_apache_|-httpd_|-installed"</span>: &#123;</span><br><span class="line">            [...snip full state return here...]</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">      [...snip other minion returns here...]</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        [...snip full salt-cloud output here...]</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="接口定义"><a href="#接口定义" class="headerlink" title="接口定义"></a>接口定义</h2><h3 id><a href="#" class="headerlink" title="/"></a>/</h3><ul>
+<li>Salt 的 REST API 的主要入口点</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -k https://172.16.100.253:9527 -H &quot;Accept: application/x-yaml&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">clients:</span><br><span class="line">- _is_master_running</span><br><span class="line">- local</span><br><span class="line">- local_async</span><br><span class="line">- local_batch</span><br><span class="line">- runner</span><br><span class="line">- runner_async</span><br><span class="line">- ssh</span><br><span class="line">- ssh_async</span><br><span class="line">- wheel</span><br><span class="line">- wheel_async</span><br><span class="line">return: Welcome</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回状态码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">200 - 成功</span><br><span class="line">401 - 需要验证</span><br><span class="line">406 - 请求的内容类型不可用</span><br></pre></td></tr></table></figure>
+<h3 id="login"><a href="#login" class="headerlink" title="/login"></a>/login</h3><p>登录界面</p>
+<h4 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h4><p>返回请登陆文字</p>
+<ul>
+<li>用法</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -k https://172.16.100.253:9527/login -H &quot;Accept: application/json&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;&quot;status&quot;: null, &quot;return&quot;: &quot;Please log in&quot;&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="POST"><a href="#POST" class="headerlink" title="POST"></a>POST</h4><p>对登陆 Salt 进行身份验证</p>
+<ul>
+<li>所需要的请求头</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">X-Auth-Token    # 来自已登陆会话的 Token</span><br><span class="line">Accept          # 所需的响应格式</span><br><span class="line">Content-Type    # 请求正文的格式</span><br></pre></td></tr></table></figure>
+<ul>
+<li>所需要的 POST 表单数据</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">eauth           # 服务器支持的认证方式</span><br><span class="line">username        # 用户名</span><br><span class="line">password        # 密码</span><br></pre></td></tr></table></figure>
+<ul>
+<li>响应的状态码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">200 - 成功</span><br><span class="line">401 - 需要验证</span><br><span class="line">406 - 请求的内容类型不可用</span><br></pre></td></tr></table></figure>
+<ul>
+<li>接口示例</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:<span class="number">9527</span>/login \</span><br><span class="line">    -H <span class="string">'Accept: application/x-yaml'</span> \</span><br><span class="line">    -d username=saltapi \</span><br><span class="line">    -d password=<span class="number">123456</span> \</span><br><span class="line">    -d eauth=pam</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">return:</span><br><span class="line">- eauth: pam</span><br><span class="line">  expire: 1534123855.063944</span><br><span class="line">  perms:</span><br><span class="line">  - &apos;*&apos;</span><br><span class="line">  start: 1534080655.063944</span><br><span class="line">  token: 03420d9caba5f2ded411410c4e27803e857c516e</span><br><span class="line">  user: saltapi</span><br></pre></td></tr></table></figure>
+<h3 id="logout"><a href="#logout" class="headerlink" title="/logout"></a>/logout</h3><h4 id="POST-1"><a href="#POST-1" class="headerlink" title="POST"></a>POST</h4><p>销毁当前活动的会话并使会话cookie过期</p>
+<h3 id="minions"><a href="#minions" class="headerlink" title="/minions/"></a>/minions/</h3><p>获取 Minions 列表或获取 Minion   详细信息的便捷 URL</p>
+<h4 id="GET-1"><a href="#GET-1" class="headerlink" title="GET"></a>GET</h4><ul>
+<li>所需的请求头</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">X-Auth-Token    # 来自已登陆会话的 Token</span><br><span class="line">Accept          # 所需的响应格式</span><br></pre></td></tr></table></figure>
+<ul>
+<li>响应的状态码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">200 - 成功</span><br><span class="line">401 - 需要验证</span><br><span class="line">406 - 请求的内容类型不可用</span><br></pre></td></tr></table></figure>
+<ul>
+<li>接口示例，获取全部、获取单个</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527/minions \</span><br><span class="line">    -H &apos;X-Auth-Token: 8215fbca6712b0f2e0155db5479a7bf6458643a2&apos; \</span><br><span class="line">    -H &apos;Accept: application/x-yaml&apos;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527/minions/node2 \</span><br><span class="line">    -H &apos;X-Auth-Token: 8215fbca6712b0f2e0155db5479a7bf6458643a2&apos; \</span><br><span class="line">    -H &apos;Accept: application/x-yaml&apos;</span><br></pre></td></tr></table></figure>
+<h4 id="POST-2"><a href="#POST-2" class="headerlink" title="POST"></a>POST</h4><p>启动执行命令并立即返回作业ID</p>
+<ul>
+<li>所需的请求头</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">X-Auth-Token    # 来自已登陆会话的 Token</span><br><span class="line">Accept          # 所需的响应格式</span><br><span class="line">Content-Type    # 请求正文的格式</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回的响应码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">200 - 成功</span><br><span class="line">400 - 错误或格式错误的请求</span><br><span class="line">401 - 需要验证</span><br><span class="line">406 - 请求的内容类型不可用</span><br></pre></td></tr></table></figure>
+<ul>
+<li>请求体，描述Salt命令的 Lowstate 必须在请求体中发送。lowstate 我认为是基础的指令，highstate 表现是 SLS文件。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527/minions \</span><br><span class="line">    -H &apos;Accept: application/x-yaml&apos; \</span><br><span class="line">    -H &apos;X-Auth-Token: 4954334e216fcec05b3eaa6da545a6af1a0a316a&apos; \</span><br><span class="line">    -d client=local_async \</span><br><span class="line">    -d tgt=&apos;*&apos; \</span><br><span class="line">    -d fun=test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="jobs"><a href="#jobs" class="headerlink" title="/jobs/"></a>/jobs/</h3><h4 id="GET-2"><a href="#GET-2" class="headerlink" title="GET"></a>GET</h4><p>用于获取以前运行的作业列表，或者指定单个作业得到其返回值</p>
+<ul>
+<li>所需的请求头</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">X-Auth-Token    # 来自已登陆会话的 Token</span><br><span class="line">Accept          # 所需的响应格式</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回的响应码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">200 - 成功</span><br><span class="line">401 - 需要验证</span><br><span class="line">406 - 请求的内容类型不可用</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查询所有作业列表，查询单个任务的返回结果</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -k https://localhost:9527/jobs/ \</span><br><span class="line">	-H &quot;Accept: application/x-yaml&quot; \</span><br><span class="line">	-H &quot;X-Auth-Token: 4954334e216fcec05b3eaa6da545a6af1a0a316a&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -k https://172.16.100.253:9527/jobs/20180813013253427489 \</span><br><span class="line">	-H &quot;Accept: application/x-yaml&quot; \</span><br><span class="line">	-H &quot;X-Auth-Token: 4954334e216fcec05b3eaa6da545a6af1a0a316a&quot;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>  这个接口，我测试的时候一直是身份无法认证，原因未知。</p>
+</blockquote>
+<h4 id="POST-3"><a href="#POST-3" class="headerlink" title="POST"></a>POST</h4><ul>
+<li>提交任务</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527/jobs \</span><br><span class="line">    -H &apos;Accept: application/x-yaml&apos; \</span><br><span class="line">    -H &apos;X-Auth-Token: 4954334e216fcec05b3eaa6da545a6af1a0a316a&apos; \</span><br><span class="line">    -d client=local_async \</span><br><span class="line">    -d tgt=&apos;*&apos; \</span><br><span class="line">    -d fun=test.ping</span><br></pre></td></tr></table></figure>
+<h3 id="run"><a href="#run" class="headerlink" title="/run"></a>/run</h3><p>运行命令绕过正常的会话处理，除此之外，此URL与根URL（/）相同。</p>
+<h4 id="POST-4"><a href="#POST-4" class="headerlink" title="POST"></a>POST</h4><ul>
+<li>使用用户名密码直接执行指令</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://localhost:9527/run \</span><br><span class="line">    -H &apos;Accept: application/json&apos; \</span><br><span class="line">    -H &apos;Content-type: application/json&apos; \</span><br><span class="line">    -d &apos;[&#123;</span><br><span class="line">        &quot;client&quot;: &quot;local&quot;,</span><br><span class="line">        &quot;tgt&quot;: &quot;*&quot;,</span><br><span class="line">        &quot;fun&quot;: &quot;test.ping&quot;,</span><br><span class="line">        &quot;username&quot;: &quot;saltapi&quot;,</span><br><span class="line">        &quot;password&quot;: &quot;123456&quot;,</span><br><span class="line">        &quot;eauth&quot;: &quot;pam&quot;</span><br><span class="line">    &#125;]&apos;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>salt-ssh TODO</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><a href="https://www.cnblogs.com/kevingrace/p/6379141.html" target="_blank" rel="noopener">https://www.cnblogs.com/kevingrace/p/6379141.html</a></p>
+<h3 id="events"><a href="#events" class="headerlink" title="/events"></a>/events</h3><p>Salt主事件总线的HTTP流，根据服务器发送事件（SSE）规范格式化此流。 每个事件都格式化为JSON。</p>
+<h4 id="GET-3"><a href="#GET-3" class="headerlink" title="GET"></a>GET</h4><ul>
+<li>请求参数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">X-Auth-Token    # 来自已登陆会话的 Token</span><br><span class="line">Accept          # 所需的响应格式</span><br><span class="line">Content-Type    # 请求正文的格式</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -k https://172.16.100.253:9527/events \</span><br><span class="line">	-H &quot;Accept: application/x-yaml&quot; \</span><br><span class="line">	-H &quot;X-Auth-Token: 312bf96695dc260cd0cdd34b5c96161094d90f9f&quot;</span><br></pre></td></tr></table></figure>
+<h3 id="hook"><a href="#hook" class="headerlink" title="/hook"></a>/hook</h3><p>在Salt的事件总线上触发事件的通用Web钩子</p>
+<p>外部服务可以将数据POST到此URL以触发Salt中的事件。 例如，Amazon SNS，Jenkins-CI或Travis-CI，或GitHub Web挂钩。</p>
+<p>此接口需要配置 Matser 接受 webhook 的请求，需要修改在Master的配置文件中找到 rest_cherrypy 的配置，将webhook_Disable_auth 设置为 True。</p>
+<h4 id="POST-5"><a href="#POST-5" class="headerlink" title="POST"></a>POST</h4><p>事件标记以 <code>salt/netapi/hook</code>  为前缀，URL路径附加到末尾。 例如，发送到 <code>/hook/mycompany/myapp/mydata</code>  的 POST 请求将生成一个带有标签 <code>salt/netapi/hook/mycompany/myapp/mydata</code> 的Salt事件。</p>
+<ul>
+<li>返回响应码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">200 - 成功</span><br><span class="line">401 - 需要验证</span><br><span class="line">406 - 请求的内容类型不可用</span><br><span class="line">413 - 请求正文太大</span><br></pre></td></tr></table></figure>
+<ul>
+<li>示例</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -k https://172.16.100.253:9527/hook  \</span><br><span class="line">	-H &quot;Accept: application/json&quot; \</span><br><span class="line">	-H &quot;X-Auth-Token: 312bf96695dc260cd0cdd34b5c96161094d90f9f&quot; \</span><br><span class="line">	-d &apos;&#123;&quot;foo&quot;: &quot;Foo!&quot;, &quot;bar&quot;: &quot;Bar!&quot;&#125;&apos;</span><br></pre></td></tr></table></figure>
+<h3 id="keys"><a href="#keys" class="headerlink" title="/keys/"></a>/keys/</h3><h4 id="GET-4"><a href="#GET-4" class="headerlink" title="GET"></a>GET</h4><p>显示 Minion keys 列表，或特定 keys 的详细信息</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -k https://172.16.100.253:9527/keys  \</span><br><span class="line">	-H &quot;Accept: application/json&quot; \</span><br><span class="line">	-H &quot;X-Auth-Token: c5976b09663d1a0cfc3c60cc83e7c3ed0842e885&quot;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -k https://172.16.100.253:9527/keys/node2  \</span><br><span class="line">	-H &quot;Accept: application/json&quot; \</span><br><span class="line">	-H &quot;X-Auth-Token: c5976b09663d1a0cfc3c60cc83e7c3ed0842e885&quot;</span><br></pre></td></tr></table></figure>
+<h4 id="POST-6"><a href="#POST-6" class="headerlink" title="POST"></a>POST</h4><p>轻松为 Minion 生成钥匙，并自动接受新密钥</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">curl -sSk https://172.16.100.253:9527/keys \</span><br><span class="line">        -d mid=172.16.100.252 \</span><br><span class="line">        -d username=saltapi \</span><br><span class="line">        -d password=123456 \</span><br><span class="line">        -d eauth=pam</span><br></pre></td></tr></table></figure>
+<h3 id="ws"><a href="#ws" class="headerlink" title="/ws/"></a>/ws/</h3><h4 id="GET-5"><a href="#GET-5" class="headerlink" title="GET"></a>GET</h4><p>打开与 Salt 的事件总线的 WebSocket 连接 </p>
+<p>Salt Master 的事件总线暴露了各种各样的事情，特别是当 Master 开始执行时以及当最终结果返回结果时。此URL为正在运行的Salt基础结构提供实时窗口。使用 websocket 作为传输机制。 </p>
+<h3 id="stats"><a href="#stats" class="headerlink" title="/stats"></a>/stats</h3><h4 id="GET-6"><a href="#GET-6" class="headerlink" title="GET"></a>GET</h4><p>返回从 CherryPy 服务器收集的统计信息转储</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/10/Linux/SaltStack/" rel="next" title="SaltStack笔记整理">
+                <i class="fa fa-chevron-left"></i> SaltStack笔记整理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/01/web/DOM/" rel="prev" title="BOM 和 DOM">
+                BOM 和 DOM <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#REST-API"><span class="nav-number">1.</span> <span class="nav-text">REST API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#依赖组件"><span class="nav-number">1.1.</span> <span class="nav-text">依赖组件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部署API"><span class="nav-number">1.2.</span> <span class="nav-text">部署API</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#认证会话"><span class="nav-number">2.</span> <span class="nav-text">认证会话</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义头部方式"><span class="nav-number">2.1.</span> <span class="nav-text">自定义头部方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用Cookie方式"><span class="nav-number">2.2.</span> <span class="nav-text">使用Cookie方式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#用法示例"><span class="nav-number">3.</span> <span class="nav-text">用法示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#内容协商"><span class="nav-number">3.1.</span> <span class="nav-text">内容协商</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参数介绍"><span class="nav-number">3.2.</span> <span class="nav-text">参数介绍</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口定义"><span class="nav-number">4.</span> <span class="nav-text">接口定义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#null"><span class="nav-number">4.1.</span> <span class="nav-text">/</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#login"><span class="nav-number">4.2.</span> <span class="nav-text">/login</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GET"><span class="nav-number">4.2.1.</span> <span class="nav-text">GET</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#POST"><span class="nav-number">4.2.2.</span> <span class="nav-text">POST</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#logout"><span class="nav-number">4.3.</span> <span class="nav-text">/logout</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#POST-1"><span class="nav-number">4.3.1.</span> <span class="nav-text">POST</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#minions"><span class="nav-number">4.4.</span> <span class="nav-text">/minions/</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GET-1"><span class="nav-number">4.4.1.</span> <span class="nav-text">GET</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#POST-2"><span class="nav-number">4.4.2.</span> <span class="nav-text">POST</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jobs"><span class="nav-number">4.5.</span> <span class="nav-text">/jobs/</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GET-2"><span class="nav-number">4.5.1.</span> <span class="nav-text">GET</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#POST-3"><span class="nav-number">4.5.2.</span> <span class="nav-text">POST</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#run"><span class="nav-number">4.6.</span> <span class="nav-text">/run</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#POST-4"><span class="nav-number">4.6.1.</span> <span class="nav-text">POST</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#events"><span class="nav-number">4.7.</span> <span class="nav-text">/events</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GET-3"><span class="nav-number">4.7.1.</span> <span class="nav-text">GET</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hook"><span class="nav-number">4.8.</span> <span class="nav-text">/hook</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#POST-5"><span class="nav-number">4.8.1.</span> <span class="nav-text">POST</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#keys"><span class="nav-number">4.9.</span> <span class="nav-text">/keys/</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GET-4"><span class="nav-number">4.9.1.</span> <span class="nav-text">GET</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#POST-6"><span class="nav-number">4.9.2.</span> <span class="nav-text">POST</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ws"><span class="nav-number">4.10.</span> <span class="nav-text">/ws/</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GET-5"><span class="nav-number">4.10.1.</span> <span class="nav-text">GET</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stats"><span class="nav-number">4.11.</span> <span class="nav-text">/stats</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GET-6"><span class="nav-number">4.11.1.</span> <span class="nav-text">GET</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

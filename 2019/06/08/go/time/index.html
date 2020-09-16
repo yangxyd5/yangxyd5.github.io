@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="时间类型时间类型在实际开发中使用频率很高，代表现实世界的时间 Go 语言中时间类型不是关键字，而是使用 time 包下的 Time 结构体 格式常量这些是在 Time.Format 和 time.Parse 中使用的预定义常量，需要注意的是无论格式如何变，模板必须为：2006 年 1 月 2 日 15 点 04 分 05 秒，快捷记忆：2016/1/2/3/4/5 即可。 const (">
+<meta property="og:type" content="article">
+<meta property="og:title" content="go 标准库之 time">
+<meta property="og:url" content="https://yangjinheng.github.io/2019/06/08/go/time/index.html">
+<meta property="og:site_name" content="默默">
+<meta property="og:description" content="时间类型时间类型在实际开发中使用频率很高，代表现实世界的时间 Go 语言中时间类型不是关键字，而是使用 time 包下的 Time 结构体 格式常量这些是在 Time.Format 和 time.Parse 中使用的预定义常量，需要注意的是无论格式如何变，模板必须为：2006 年 1 月 2 日 15 点 04 分 05 秒，快捷记忆：2016/1/2/3/4/5 即可。 const (">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-10-22T04:01:46.190Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="go 标准库之 time">
+<meta name="twitter:description" content="时间类型时间类型在实际开发中使用频率很高，代表现实世界的时间 Go 语言中时间类型不是关键字，而是使用 time 包下的 Time 结构体 格式常量这些是在 Time.Format 和 time.Parse 中使用的预定义常量，需要注意的是无论格式如何变，模板必须为：2006 年 1 月 2 日 15 点 04 分 05 秒，快捷记忆：2016/1/2/3/4/5 即可。 const (">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://yangjinheng.github.io/2019/06/08/go/time/">
+
+
+
+
+
+  <title>go 标准库之 time | 默默</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?be46574a10a6c2b7f67e9c32a008cbd5";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">默默</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-前端知识">
+          <a href="/categories/web/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-asterisk"></i> <br>
+            
+            前端知识
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-kubernetes">
+          <a href="/categories/Kubernetes/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-cog"></i> <br>
+            
+            Kubernetes
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-运维笔记">
+          <a href="/categories/运维笔记/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br>
+            
+            运维笔记
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-python">
+          <a href="/categories/Python/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-laptop"></i> <br>
+            
+            Python
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-golang">
+          <a href="/categories/golang/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>
+            
+            Golang
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-个人日志">
+          <a href="/categories/个人日志/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-github-alt"></i> <br>
+            
+            个人日志
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-guestbook">
+          <a href="/guestbook" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-question-circle"></i> <br>
+            
+            给我留言
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://yangjinheng.github.io/2019/06/08/go/time/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jin Heng">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="默默">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">go 标准库之 time</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-08T00:00:00+08:00">
+                2019-06-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/golang/" itemprop="url" rel="index">
+                    <span itemprop="name">golang</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="时间类型"><a href="#时间类型" class="headerlink" title="时间类型"></a>时间类型</h1><p>时间类型在实际开发中使用频率很高，代表现实世界的时间</p>
+<p>Go 语言中时间类型不是关键字，而是使用 time 包下的 Time 结构体</p>
+<h2 id="格式常量"><a href="#格式常量" class="headerlink" title="格式常量"></a>格式常量</h2><p>这些是在 Time.Format 和 time.Parse 中使用的预定义常量，需要注意的是无论格式如何变，模板必须为：2006 年 1 月 2 日 15 点 04 分 05 秒，快捷记忆：2016/1/2/3/4/5 即可。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">        ANSIC       = <span class="string">"Mon Jan _2 15:04:05 2006"</span></span><br><span class="line">        UnixDate    = <span class="string">"Mon Jan _2 15:04:05 MST 2006"</span></span><br><span class="line">        RubyDate    = <span class="string">"Mon Jan 02 15:04:05 -0700 2006"</span></span><br><span class="line">        RFC822      = <span class="string">"02 Jan 06 15:04 MST"</span></span><br><span class="line">        RFC822Z     = <span class="string">"02 Jan 06 15:04 -0700"</span> <span class="comment">// RFC822 with numeric zone</span></span><br><span class="line">        RFC850      = <span class="string">"Monday, 02-Jan-06 15:04:05 MST"</span></span><br><span class="line">        RFC1123     = <span class="string">"Mon, 02 Jan 2006 15:04:05 MST"</span></span><br><span class="line">        RFC1123Z    = <span class="string">"Mon, 02 Jan 2006 15:04:05 -0700"</span> <span class="comment">// RFC1123 with numeric zone</span></span><br><span class="line">        RFC3339     = <span class="string">"2006-01-02T15:04:05Z07:00"</span></span><br><span class="line">        RFC3339Nano = <span class="string">"2006-01-02T15:04:05.999999999Z07:00"</span></span><br><span class="line">        Kitchen     = <span class="string">"3:04PM"</span></span><br><span class="line">        <span class="comment">// Handy time stamps.</span></span><br><span class="line">        Stamp      = <span class="string">"Jan _2 15:04:05"</span></span><br><span class="line">        StampMilli = <span class="string">"Jan _2 15:04:05.000"</span></span><br><span class="line">        StampMicro = <span class="string">"Jan _2 15:04:05.000000"</span></span><br><span class="line">        StampNano  = <span class="string">"Jan _2 15:04:05.000000000"</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	_                        = <span class="literal">iota</span></span><br><span class="line">	stdLongMonth             = <span class="literal">iota</span> + stdNeedDate  <span class="comment">// "January"</span></span><br><span class="line">	stdMonth                                       <span class="comment">// "Jan"</span></span><br><span class="line">	stdNumMonth                                    <span class="comment">// "1"</span></span><br><span class="line">	stdZeroMonth                                   <span class="comment">// "01"</span></span><br><span class="line">	stdLongWeekDay                                 <span class="comment">// "Monday"</span></span><br><span class="line">	stdWeekDay                                     <span class="comment">// "Mon"</span></span><br><span class="line">	stdDay                                         <span class="comment">// "2"</span></span><br><span class="line">	stdUnderDay                                    <span class="comment">// "_2"</span></span><br><span class="line">	stdZeroDay                                     <span class="comment">// "02"</span></span><br><span class="line">	stdHour                  = <span class="literal">iota</span> + stdNeedClock <span class="comment">// "15"</span></span><br><span class="line">	stdHour12                                      <span class="comment">// "3"</span></span><br><span class="line">	stdZeroHour12                                  <span class="comment">// "03"</span></span><br><span class="line">	stdMinute                                      <span class="comment">// "4"</span></span><br><span class="line">	stdZeroMinute                                  <span class="comment">// "04"</span></span><br><span class="line">	stdSecond                                      <span class="comment">// "5"</span></span><br><span class="line">	stdZeroSecond                                  <span class="comment">// "05"</span></span><br><span class="line">	stdLongYear              = <span class="literal">iota</span> + stdNeedDate  <span class="comment">// "2006"</span></span><br><span class="line">	stdYear                                        <span class="comment">// "06"</span></span><br><span class="line">	stdPM                    = <span class="literal">iota</span> + stdNeedClock <span class="comment">// "PM"</span></span><br><span class="line">	stdpm                                          <span class="comment">// "pm"</span></span><br><span class="line">	stdTZ                    = <span class="literal">iota</span>                <span class="comment">// "MST"</span></span><br><span class="line">	stdISO8601TZ                                   <span class="comment">// "Z0700"  // prints Z for UTC</span></span><br><span class="line">	stdISO8601SecondsTZ                            <span class="comment">// "Z070000"</span></span><br><span class="line">	stdISO8601ShortTZ                              <span class="comment">// "Z07"</span></span><br><span class="line">	stdISO8601ColonTZ                              <span class="comment">// "Z07:00" // prints Z for UTC</span></span><br><span class="line">	stdISO8601ColonSecondsTZ                       <span class="comment">// "Z07:00:00"</span></span><br><span class="line">	stdNumTZ                                       <span class="comment">// "-0700"  // always numeric</span></span><br><span class="line">	stdNumSecondsTz                                <span class="comment">// "-070000"</span></span><br><span class="line">	stdNumShortTZ                                  <span class="comment">// "-07"    // always numeric</span></span><br><span class="line">	stdNumColonTZ                                  <span class="comment">// "-07:00" // always numeric</span></span><br><span class="line">	stdNumColonSecondsTZ                           <span class="comment">// "-07:00:00"</span></span><br><span class="line">	stdFracSecond0                                 <span class="comment">// ".0", ".00", ... , trailing zeros included</span></span><br><span class="line">	stdFracSecond9                                 <span class="comment">// ".9", ".99", ..., trailing zeros omitted</span></span><br><span class="line"></span><br><span class="line">	stdNeedDate  = <span class="number">1</span> &lt;&lt; <span class="number">8</span>             <span class="comment">// need month, day, year</span></span><br><span class="line">	stdNeedClock = <span class="number">2</span> &lt;&lt; <span class="number">8</span>             <span class="comment">// need hour, minute, second</span></span><br><span class="line">	stdArgShift  = <span class="number">16</span>                 <span class="comment">// extra argument in high bits, above low stdArgShift</span></span><br><span class="line">	stdMask      = <span class="number">1</span>&lt;&lt;stdArgShift - <span class="number">1</span> <span class="comment">// mask out argument</span></span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func After(d Duration) &lt;-chan Time</td>
+<td>TODO</td>
+</tr>
+<tr>
+<td>func Sleep(d Duration)</td>
+<td>睡眠</td>
+</tr>
+<tr>
+<td>func Tick(d Duration) &lt;-chan Time</td>
+<td>TODO</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Sleep睡眠"><a href="#Sleep睡眠" class="headerlink" title="Sleep睡眠"></a>Sleep睡眠</h2><p>Go 语言中 main() 函数为主线程（协程），程序是从上向下执行的，可以通过 time.Sleep(n) 设置让程序阻塞多少纳秒</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	time.Sleep(<span class="number">10</span> * time.Second)</span><br><span class="line">	fmt.Print(<span class="string">"ok"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">"1"</span>)</span><br><span class="line">	time.Sleep(<span class="number">1e9</span>)</span><br><span class="line">	fmt.Println(<span class="string">"2"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="计时器"><a href="#计时器" class="headerlink" title="计时器"></a>计时器</h2><p>延迟指定时间后执行一次，计时器不会阻塞主线程</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Println(<span class="string">"开始"</span>)</span><br><span class="line">	time.AfterFunc(<span class="number">2e9</span>, <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		fmt.Println(<span class="string">"延迟触发"</span>)</span><br><span class="line">	&#125;)</span><br><span class="line">	time.Sleep(<span class="number">10e9</span>) <span class="comment">// 一定要休眠，否则程序就结束了</span></span><br><span class="line">	fmt.Println(<span class="string">"结束"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Month类型"><a href="#Month类型" class="headerlink" title="Month类型"></a>Month类型</h1><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">"一月%d\n"</span>, time.January)</span><br><span class="line">	fmt.Printf(<span class="string">"二月%d\n"</span>, time.February)</span><br><span class="line">	fmt.Printf(<span class="string">"三月%d\n"</span>, time.March)</span><br><span class="line">	fmt.Printf(<span class="string">"四月%d\n"</span>, time.April)</span><br><span class="line">	fmt.Printf(<span class="string">"五月%d\n"</span>, time.May)</span><br><span class="line">	fmt.Printf(<span class="string">"六月%d\n"</span>, time.June)</span><br><span class="line">	fmt.Printf(<span class="string">"七月%d\n"</span>, time.July)</span><br><span class="line">	fmt.Printf(<span class="string">"八月%d\n"</span>, time.August)</span><br><span class="line">	fmt.Printf(<span class="string">"九月%d\n"</span>, time.September)</span><br><span class="line">	fmt.Printf(<span class="string">"十月%d\n"</span>, time.October)</span><br><span class="line">	fmt.Printf(<span class="string">"十一月%d\n"</span>, time.November)</span><br><span class="line">	fmt.Printf(<span class="string">"十二月%d\n"</span>, time.December)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Weekday类型"><a href="#Weekday类型" class="headerlink" title="Weekday类型"></a>Weekday类型</h1><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	fmt.Printf(<span class="string">"星期天%d\n"</span>, time.Sunday)</span><br><span class="line">	fmt.Printf(<span class="string">"星期一%d\n"</span>, time.Monday)</span><br><span class="line">	fmt.Printf(<span class="string">"星期二%d\n"</span>, time.Tuesday)</span><br><span class="line">	fmt.Printf(<span class="string">"星期三%d\n"</span>, time.Wednesday)</span><br><span class="line">	fmt.Printf(<span class="string">"星期四%d\n"</span>, time.Thursday)</span><br><span class="line">	fmt.Printf(<span class="string">"星期五%d\n"</span>, time.Friday)</span><br><span class="line">	fmt.Printf(<span class="string">"星期六%d\n"</span>, time.Saturday)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">星期天0</span><br><span class="line">星期一1</span><br><span class="line">星期二2</span><br><span class="line">星期三3</span><br><span class="line">星期四4</span><br><span class="line">星期五5</span><br><span class="line">星期六6</span><br></pre></td></tr></table></figure>
+<h1 id="Duration类型"><a href="#Duration类型" class="headerlink" title="Duration类型"></a>Duration类型</h1><p>Duration 类型代表两个时间点之间经过的时间，以纳秒为单位。可表示的最长时间段大约290年。</p>
+<h2 id="时间常量"><a href="#时间常量" class="headerlink" title="时间常量"></a>时间常量</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> (</span><br><span class="line">        Nanosecond  Duration = <span class="number">1</span></span><br><span class="line">        Microsecond          = <span class="number">1000</span> * Nanosecond</span><br><span class="line">        Millisecond          = <span class="number">1000</span> * Microsecond</span><br><span class="line">        Second               = <span class="number">1000</span> * Millisecond</span><br><span class="line">        Minute               = <span class="number">60</span> * Second</span><br><span class="line">        Hour                 = <span class="number">60</span> * Minute</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<h2 id="快速预览"><a href="#快速预览" class="headerlink" title="快速预览"></a>快速预览</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func ParseDuration(s string) (Duration, error)</td>
+<td>将字符串解析为 Duration 类型，有效单位：”ns”, “us”, “ms”, “s”, “m”, “h”。</td>
+</tr>
+<tr>
+<td>func Since(t Time) Duration</td>
+<td>返回从 t 到现在经历了多久，是：time.Now().Sub(t) 的缩写</td>
+</tr>
+<tr>
+<td>func Until(t Time) Duration</td>
+<td>返回到 t 需要多久，是 t.Sub(time.Now()) 的缩写</td>
+</tr>
+<tr>
+<td>func (d Duration) Hours() float64</td>
+<td>返回指定的 Duration 是多少小时</td>
+</tr>
+<tr>
+<td>func (d Duration) Minutes() float64</td>
+<td>返回指定的 Duration 是多少分钟</td>
+</tr>
+<tr>
+<td>func (d Duration) Nanoseconds() int64</td>
+<td>返回指定的 Duration 是多少纳秒</td>
+</tr>
+<tr>
+<td>func (d Duration) Round(m Duration) Duration</td>
+<td>返回 Duration 四舍五入的结果</td>
+</tr>
+<tr>
+<td>func (d Duration) Truncate(m Duration) Duration</td>
+<td>返回 Duration 截短后的结果</td>
+</tr>
+</tbody>
+</table>
+<h2 id="ParseDuration字符串解析为Duration"><a href="#ParseDuration字符串解析为Duration" class="headerlink" title="ParseDuration字符串解析为Duration"></a>ParseDuration字符串解析为Duration</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	hours, _ := time.ParseDuration(<span class="string">"10h"</span>)</span><br><span class="line">	<span class="built_in">complex</span>, _ := time.ParseDuration(<span class="string">"1h10m10s"</span>)</span><br><span class="line"></span><br><span class="line">	fmt.Println(hours)</span><br><span class="line">	fmt.Println(<span class="built_in">complex</span>)</span><br><span class="line">	fmt.Printf(<span class="string">"%T %T"</span>, hours, <span class="built_in">complex</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">10h0m0s</span><br><span class="line">1h10m10s</span><br><span class="line">time.Duration time.Duration</span><br></pre></td></tr></table></figure>
+<h2 id="Since指定时间到现在已经过去的时间"><a href="#Since指定时间到现在已经过去的时间" class="headerlink" title="Since指定时间到现在已经过去的时间"></a>Since指定时间到现在已经过去的时间</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t0 := time.Now()</span><br><span class="line">	time.Sleep(<span class="number">3</span> * time.Second)</span><br><span class="line">	fmt.Println(time.Since(t0))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">3.0002169s</span><br></pre></td></tr></table></figure>
+<h2 id="Until指定时间距当前还有多久的时间"><a href="#Until指定时间距当前还有多久的时间" class="headerlink" title="Until指定时间距当前还有多久的时间"></a>Until指定时间距当前还有多久的时间</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t0 := time.Now()</span><br><span class="line">	time.Sleep(<span class="number">3</span> * time.Second)</span><br><span class="line">	fmt.Println(time.Until(t0))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="number">-3.0005766</span>s</span><br></pre></td></tr></table></figure>
+<h2 id="Hours、Minutes、Seconds、Nanoseconds"><a href="#Hours、Minutes、Seconds、Nanoseconds" class="headerlink" title="Hours、Minutes、Seconds、Nanoseconds"></a>Hours、Minutes、Seconds、Nanoseconds</h2><ul>
+<li>返回 Duration 是多少小时、分钟、秒、纳秒</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	h, _ := time.ParseDuration(<span class="string">"4h30m"</span>)</span><br><span class="line">	fmt.Println(h.Hours())</span><br><span class="line">	fmt.Println(h.Minutes())</span><br><span class="line">	fmt.Println(h.Seconds())</span><br><span class="line">	fmt.Println(h.Nanoseconds())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">4.5</span><br><span class="line">270</span><br><span class="line">16200</span><br><span class="line">16200000000000</span><br></pre></td></tr></table></figure>
+<p>String返回Duration的字符串表示</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	h, _ := time.ParseDuration(<span class="string">"4h30m"</span>)</span><br><span class="line">	fmt.Printf(h.String())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">4440h0m0s</span><br></pre></td></tr></table></figure>
+<h2 id="Round返回Duration的四舍五入"><a href="#Round返回Duration的四舍五入" class="headerlink" title="Round返回Duration的四舍五入"></a>Round返回Duration的四舍五入</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	d, err := time.ParseDuration(<span class="string">"1h30m30.918273645s"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	round := []time.Duration&#123;</span><br><span class="line">		time.Nanosecond,</span><br><span class="line">		time.Microsecond,</span><br><span class="line">		time.Millisecond,</span><br><span class="line">		time.Second,</span><br><span class="line">		<span class="number">2</span> * time.Second,</span><br><span class="line">		time.Minute,</span><br><span class="line">		<span class="number">10</span> * time.Minute,</span><br><span class="line">		time.Hour,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, r := <span class="keyword">range</span> round &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"d.Round(%6s) = %s\n"</span>, r, d.Round(r).String())</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">d.Round(   1ns) = 1h30m30.918273645s</span><br><span class="line">d.Round(   1µs) = 1h30m30.918274s</span><br><span class="line">d.Round(   1ms) = 1h30m30.918s</span><br><span class="line">d.Round(    1s) = 1h30m31s</span><br><span class="line">d.Round(    2s) = 1h30m30s</span><br><span class="line">d.Round(  1m0s) = 1h31m0s</span><br><span class="line">d.Round( 10m0s) = 1h30m0s</span><br><span class="line">d.Round(1h0m0s) = 2h0m0s</span><br></pre></td></tr></table></figure>
+<h2 id="Truncate返回Duration的截短表示"><a href="#Truncate返回Duration的截短表示" class="headerlink" title="Truncate返回Duration的截短表示"></a>Truncate返回Duration的截短表示</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	d, err := time.ParseDuration(<span class="string">"1h30m30.918273645s"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	trunc := []time.Duration&#123;</span><br><span class="line">		time.Nanosecond,</span><br><span class="line">		time.Microsecond,</span><br><span class="line">		time.Millisecond,</span><br><span class="line">		time.Second,</span><br><span class="line">		<span class="number">2</span> * time.Second,</span><br><span class="line">		time.Minute,</span><br><span class="line">		<span class="number">10</span> * time.Minute,</span><br><span class="line">		time.Hour,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, t := <span class="keyword">range</span> trunc &#123;</span><br><span class="line">		fmt.Printf(<span class="string">"d.Truncate(%6s) = %s\n"</span>, t, d.Truncate(t).String())</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">d.Truncate(   1ns) = 1h30m30.918273645s</span><br><span class="line">d.Truncate(   1µs) = 1h30m30.918273s</span><br><span class="line">d.Truncate(   1ms) = 1h30m30.918s</span><br><span class="line">d.Truncate(    1s) = 1h30m30s</span><br><span class="line">d.Truncate(    2s) = 1h30m30s</span><br><span class="line">d.Truncate(  1m0s) = 1h30m0s</span><br><span class="line">d.Truncate( 10m0s) = 1h30m0s</span><br><span class="line">d.Truncate(1h0m0s) = 1h0m0s</span><br></pre></td></tr></table></figure>
+<h1 id="Location类型"><a href="#Location类型" class="headerlink" title="Location类型"></a>Location类型</h1><p>Location 将时间映射到当前的时区，通常表示在地理区域中使用的时间偏移集合。</p>
+<p>Local表示系统的本地时区。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> Local *Location = &amp;localLoc</span><br></pre></td></tr></table></figure>
+<p>UTC表示通用协调时间（UTC）。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> UTC *Location = &amp;utcLoc</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func FixedZone(name string, offset int) *Location</td>
+<td>给定名称和偏移量返回 Location</td>
+</tr>
+<tr>
+<td>func LoadLocation(name string) (*Location, error)</td>
+<td>返回使用给定名字创建的 Location，如果名称为””或”UTC”，则返回UTC，如果名称为”Local”，则返回Local，其他视作 从 IANA 时区数据库文件中对应的位置名称，例如：Asia/Shanghai。</td>
+</tr>
+<tr>
+<td>func LoadLocationFromTZData(name string, data []byte) (*Location, error)</td>
+<td>接收时区名称和时区数据文件，格式必须是：/etc/localtime， 返回一个 Location。</td>
+</tr>
+</tbody>
+</table>
+<h2 id="FixedZone给定名称和偏移量创建时区"><a href="#FixedZone给定名称和偏移量创建时区" class="headerlink" title="FixedZone给定名称和偏移量创建时区"></a>FixedZone给定名称和偏移量创建时区</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	location := time.FixedZone(<span class="string">"TEST"</span>, <span class="number">8</span>*<span class="number">60</span>*<span class="number">60</span>)</span><br><span class="line">	fmt.Printf(<span class="string">"%T\n"</span>, location)</span><br><span class="line">	utctime := time.Date(<span class="number">2018</span>, <span class="number">8</span>, <span class="number">30</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, time.UTC)</span><br><span class="line">	fmt.Println(utctime.In(location))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">*time.Location</span><br><span class="line">2018-08-30 08:00:00 +0800 TEST</span><br></pre></td></tr></table></figure>
+<h2 id="LoadLocation根据名称创建时区"><a href="#LoadLocation根据名称创建时区" class="headerlink" title="LoadLocation根据名称创建时区"></a>LoadLocation根据名称创建时区</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	location, err := time.LoadLocation(<span class="string">"Asia/Shanghai"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">"%T\n"</span>, location)</span><br><span class="line">	utctime := time.Date(<span class="number">2018</span>, <span class="number">8</span>, <span class="number">30</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, time.UTC)</span><br><span class="line">	fmt.Println(utctime.In(location))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">*time.Location</span><br><span class="line">2018-08-30 08:00:00 +0800 CST</span><br></pre></td></tr></table></figure>
+<h2 id="String返回一个时区对象的字符串表示"><a href="#String返回一个时区对象的字符串表示" class="headerlink" title="String返回一个时区对象的字符串表示"></a>String返回一个时区对象的字符串表示</h2><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	location, err := time.LoadLocation(<span class="string">"Asia/Shanghai"</span>)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="built_in">panic</span>(err)</span><br><span class="line">	&#125;</span><br><span class="line">	fmt.Printf(<span class="string">"%T\n"</span>, location)</span><br><span class="line">	fmt.Println(location.String())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">*time.Location</span><br><span class="line">Asia/Shanghai</span><br></pre></td></tr></table></figure>
+<h1 id="Ticker类型"><a href="#Ticker类型" class="headerlink" title="Ticker类型"></a>Ticker类型</h1><p>Ticker 保管一个通道，并每隔一段时间向其传递 tick。</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func NewTicker(d Duration) *Ticker</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t *Ticker) Stop()</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Time类型"><a href="#Time类型" class="headerlink" title="Time类型"></a>Time类型</h1><p>时间代表具有纳秒精度的瞬间。</p>
+<h2 id="获取时间信息"><a href="#获取时间信息" class="headerlink" title="获取时间信息"></a>获取时间信息</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func Now() Time</td>
+<td>当前时间</td>
+</tr>
+<tr>
+<td>func (t Time) Unix() int64</td>
+<td>获取时间对象 Unix 时间</td>
+</tr>
+<tr>
+<td>func (t Time) UnixNano() int64</td>
+<td>获取时间对象纳秒级别 UnixNano 时间</td>
+</tr>
+<tr>
+<td>func (t Time) UTC() Time</td>
+<td>获取时间对象的 UTC 时间</td>
+</tr>
+<tr>
+<td>func (t Time) Date() (year int, month Month, day int)</td>
+<td>返回时间对象的日期</td>
+</tr>
+<tr>
+<td>func (t Time) Clock() (hour, min, sec int)</td>
+<td>返回时间对象的时间</td>
+</tr>
+<tr>
+<td>func (t Time) Year()、Month() 、Day() Month \</td>
+<td>int</td>
+<td>返回时间对象的年、月、日</td>
+</tr>
+<tr>
+<td>func (t Time) Hour()、Minute()、Second()、Nanosecond()int</td>
+<td>返回时间对象的时、分、秒、纳秒</td>
+</tr>
+<tr>
+<td>func (t Time) Zone() (name string, offset int)</td>
+<td>返回时间对象的时区和时差</td>
+</tr>
+<tr>
+<td>func (t Time) Weekday() Weekday</td>
+<td>获取时间处于一周中的第几天</td>
+</tr>
+<tr>
+<td>func (t Time) YearDay() int</td>
+<td>获取时间处于一年中的第几天</td>
+</tr>
+<tr>
+<td>func (t Time) ISOWeek() (year, week int)</td>
+<td>返回本周是一年中的第几周</td>
+</tr>
+<tr>
+<td>func (t Time) Local() Time</td>
+<td>转换时间对象返回为本地时间</td>
+</tr>
+<tr>
+<td>func (t Time) Location() *Location</td>
+<td>显示时间对象的位置信息</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Now当前时间"><a href="#Now当前时间" class="headerlink" title="Now当前时间"></a>Now当前时间</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t := time.Now()</span><br><span class="line">	fmt.Println(t)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-08 19:54:00.6406089 +0800 CST m=+0.002037601</span><br></pre></td></tr></table></figure>
+<h3 id="Unix获取时间对象的Unix时间"><a href="#Unix获取时间对象的Unix时间" class="headerlink" title="Unix获取时间对象的Unix时间"></a>Unix获取时间对象的Unix时间</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.Unix())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1560072911</span><br></pre></td></tr></table></figure>
+<h3 id="UnixNano纳秒级别的Unix时间"><a href="#UnixNano纳秒级别的Unix时间" class="headerlink" title="UnixNano纳秒级别的Unix时间"></a>UnixNano纳秒级别的Unix时间</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.UnixNano())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1560073022478293600</span><br></pre></td></tr></table></figure>
+<h3 id="UTC获取时间对象的UTC时间"><a href="#UTC获取时间对象的UTC时间" class="headerlink" title="UTC获取时间对象的UTC时间"></a>UTC获取时间对象的UTC时间</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1)</span><br><span class="line">	fmt.Println(t1.UTC())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-09 17:34:44.3403735 +0800 CST m=+0.001994901</span><br><span class="line">2019-06-09 09:34:44.3403735 +0000 UTC</span><br></pre></td></tr></table></figure>
+<h3 id="Date返回日期部分"><a href="#Date返回日期部分" class="headerlink" title="Date返回日期部分"></a>Date返回日期部分</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.Date())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019 June 9</span><br></pre></td></tr></table></figure>
+<h3 id="Clock返回时间部分"><a href="#Clock返回时间部分" class="headerlink" title="Clock返回时间部分"></a>Clock返回时间部分</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.Clock())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">16 37 41</span><br></pre></td></tr></table></figure>
+<h3 id="Year、Month、Day"><a href="#Year、Month、Day" class="headerlink" title="Year、Month、Day"></a>Year、Month、Day</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.Year())</span><br><span class="line">	fmt.Println(t1.Month())</span><br><span class="line">	fmt.Println(t1.Day())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019</span><br><span class="line">June</span><br><span class="line">9</span><br></pre></td></tr></table></figure>
+<h3 id="Hour、Minute、Second、Nanosecond"><a href="#Hour、Minute、Second、Nanosecond" class="headerlink" title="Hour、Minute、Second、Nanosecond"></a>Hour、Minute、Second、Nanosecond</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.Hour())</span><br><span class="line">	fmt.Println(t1.Minute())</span><br><span class="line">	fmt.Println(t1.Second())</span><br><span class="line">	fmt.Println(t1.Nanosecond())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">17</span><br><span class="line">20</span><br><span class="line">19</span><br><span class="line">594656600</span><br></pre></td></tr></table></figure>
+<h3 id="Zone获取时间的时区和时差"><a href="#Zone获取时间的时区和时差" class="headerlink" title="Zone获取时间的时区和时差"></a>Zone获取时间的时区和时差</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.Zone())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">CST 28800</span><br></pre></td></tr></table></figure>
+<h3 id="YearDay获取时间处于一年中的第几天"><a href="#YearDay获取时间处于一年中的第几天" class="headerlink" title="YearDay获取时间处于一年中的第几天"></a>YearDay获取时间处于一年中的第几天</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.YearDay())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">160</span><br></pre></td></tr></table></figure>
+<h3 id="ISOWeek返回本周是一年中的第几周"><a href="#ISOWeek返回本周是一年中的第几周" class="headerlink" title="ISOWeek返回本周是一年中的第几周"></a>ISOWeek返回本周是一年中的第几周</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.ISOWeek())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019 23</span><br></pre></td></tr></table></figure>
+<h3 id="Weekday获取时间处于一周中的第几天"><a href="#Weekday获取时间处于一周中的第几天" class="headerlink" title="Weekday获取时间处于一周中的第几天"></a>Weekday获取时间处于一周中的第几天</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.Weekday())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Sunday</span><br></pre></td></tr></table></figure>
+<h3 id="Local返回为本地时间"><a href="#Local返回为本地时间" class="headerlink" title="Local返回为本地时间"></a>Local返回为本地时间</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Date(<span class="number">2019</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, time.UTC)</span><br><span class="line">	fmt.Println(t1)</span><br><span class="line">	fmt.Println(t1.Local())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-09 00:00:00 +0000 UTC</span><br><span class="line">2019-06-09 08:00:00 +0800 CST</span><br></pre></td></tr></table></figure>
+<h3 id="Location显示时区位置"><a href="#Location显示时区位置" class="headerlink" title="Location显示时区位置"></a>Location显示时区位置</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// 创建一个时区</span></span><br><span class="line">	location := time.FixedZone(<span class="string">"TEST"</span>, <span class="number">8</span>*<span class="number">60</span>*<span class="number">60</span>)</span><br><span class="line">	<span class="comment">// 创建一个时间</span></span><br><span class="line">	t1 := time.Date(<span class="number">2019</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, location)</span><br><span class="line">	t2 := time.Now()</span><br><span class="line">	<span class="comment">// 打印时间的时区位置</span></span><br><span class="line">	fmt.Println(t1.Location())</span><br><span class="line">	fmt.Println(t2.Location())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line">TEST</span><br><span class="line">Local</span><br></pre></td></tr></table></figure>
+<h2 id="计算新时间"><a href="#计算新时间" class="headerlink" title="计算新时间"></a>计算新时间</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func (t Time) Add(d Duration) Time</td>
+<td>为时间做加法（Duration）</td>
+</tr>
+<tr>
+<td>func (t Time) AddDate(years int, months int, days int) Time</td>
+<td>为时间做加法（年月日）的整数</td>
+</tr>
+<tr>
+<td>func (t Time) Sub(u Time) Duration</td>
+<td>计算两个时间对象的时间差</td>
+</tr>
+<tr>
+<td>func (t Time) Round(d Duration) Time</td>
+<td>根据一个 Duration 返回一个四舍五入的时间</td>
+</tr>
+<tr>
+<td>func (t Time) Truncate(d Duration) Time</td>
+<td>根据一个 Duration 返回截短后的时间</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Add时间加法"><a href="#Add时间加法" class="headerlink" title="Add时间加法"></a>Add时间加法</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	start := time.Now()</span><br><span class="line">	end := start.Add(time.Hour * <span class="number">24</span>)</span><br><span class="line">	fmt.Println(start)</span><br><span class="line">	fmt.Println(end)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-09 16:05:35.1952646 +0800 CST m=+0.001995601</span><br><span class="line">2019-06-10 16:05:35.1952646 +0800 CST m=+86400.001995601</span><br></pre></td></tr></table></figure>
+<h3 id="AddDate日期加法"><a href="#AddDate日期加法" class="headerlink" title="AddDate日期加法"></a>AddDate日期加法</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	start := time.Now()</span><br><span class="line">	fmt.Println(start)</span><br><span class="line"></span><br><span class="line">	oneYearLater := start.AddDate(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>)</span><br><span class="line">	oneMonthLater := start.AddDate(<span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">	oneDayLater := start.AddDate(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">	fmt.Println(oneDayLater)</span><br><span class="line">	fmt.Println(oneMonthLater)</span><br><span class="line">	fmt.Println(oneYearLater)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-09 16:12:10.8930671 +0800 CST m=+0.001994701</span><br><span class="line">2019-06-10 16:12:10.8930671 +0800 CST</span><br><span class="line">2019-07-09 16:12:10.8930671 +0800 CST</span><br><span class="line">2020-06-09 16:12:10.8930671 +0800 CST</span><br></pre></td></tr></table></figure>
+<h3 id="Sub计算时间对象的时间差"><a href="#Sub计算时间对象的时间差" class="headerlink" title="Sub计算时间对象的时间差"></a>Sub计算时间对象的时间差</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	time.Sleep(<span class="number">3</span> * time.Second)</span><br><span class="line">	t2 := time.Now()</span><br><span class="line">	fmt.Println(t2.Sub(t1))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">3.0000961s</span><br></pre></td></tr></table></figure>
+<h3 id="Round返回根据Duration四舍五入的时间"><a href="#Round返回根据Duration四舍五入的时间" class="headerlink" title="Round返回根据Duration四舍五入的时间"></a>Round返回根据Duration四舍五入的时间</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1)</span><br><span class="line">	fmt.Println(t1.Round(time.Hour))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-09 17:14:29.7525024 +0800 CST m=+0.001994701</span><br><span class="line">2019-06-09 17:00:00 +0800 CST</span><br></pre></td></tr></table></figure>
+<h3 id="Truncate直接截短时间"><a href="#Truncate直接截短时间" class="headerlink" title="Truncate直接截短时间"></a>Truncate直接截短时间</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.Truncate(time.Hour))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-09 17:00:00 +0800 CST</span><br></pre></td></tr></table></figure>
+<h2 id="从字符串解析"><a href="#从字符串解析" class="headerlink" title="从字符串解析"></a>从字符串解析</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func Unix(sec int64, nsec int64) Time</td>
+<td>给定整数的秒和闹秒，返回一个时间对象</td>
+</tr>
+<tr>
+<td>func Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time</td>
+<td>制作时间</td>
+</tr>
+<tr>
+<td>func Parse(layout, value string) (Time, error)</td>
+<td>按照指定的时间格式解析字符串为时间对象</td>
+</tr>
+<tr>
+<td>func ParseInLocation(layout, value string, loc *Location) (Time, error)</td>
+<td>按照指定的时间格式解析字符串为时间对象，设置默认时区</td>
+</tr>
+</tbody>
+</table>
+<h3 id="Unix从时间戳解析时间"><a href="#Unix从时间戳解析时间" class="headerlink" title="Unix从时间戳解析时间"></a>Unix从时间戳解析时间</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t := time.Unix(<span class="number">1487780010</span>, <span class="number">123456</span>)</span><br><span class="line">	fmt.Print(t)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2017-02-23 00:13:30.000123456 +0800 CST</span><br></pre></td></tr></table></figure>
+<h3 id="Date从数字制作时间"><a href="#Date从数字制作时间" class="headerlink" title="Date从数字制作时间"></a>Date从数字制作时间</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t := time.Date(<span class="number">2009</span>, <span class="number">11</span>, <span class="number">10</span>, <span class="number">23</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, time.UTC)</span><br><span class="line">	fmt.Printf(<span class="string">"%s"</span>, t.Local())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2009-11-11 07:00:00 +0800 CST</span><br></pre></td></tr></table></figure>
+<h3 id="Parse指定格式将字符串解析为时间"><a href="#Parse指定格式将字符串解析为时间" class="headerlink" title="Parse指定格式将字符串解析为时间"></a>Parse指定格式将字符串解析为时间</h3><p>Parse 将时间解释为 UTC; 当给定区域偏移或缩写时，Parse 会尝试将其与本地位置匹配; </p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">const</span> teststr = <span class="string">"2006/01/02 15:04:05 -07:00"</span></span><br><span class="line">	t, _ := time.Parse(teststr, <span class="string">"2019/06/09 15:22:33 +08:00"</span>)</span><br><span class="line">	fmt.Println(t)</span><br><span class="line">	fmt.Printf(<span class="string">"%T\n"</span>, t)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-09 15:22:33 +0800 CST</span><br><span class="line">time.Time</span><br></pre></td></tr></table></figure>
+<h3 id="ParseInLocation指定格式将字符串解析为时间，备选时区信息"><a href="#ParseInLocation指定格式将字符串解析为时间，备选时区信息" class="headerlink" title="ParseInLocation指定格式将字符串解析为时间，备选时区信息"></a>ParseInLocation指定格式将字符串解析为时间，备选时区信息</h3><p>与 Parse 一样，但在没有时区信息的情况下，ParseInLocation 将时间解释为给定位置，当给定时区时，ParseInLocation 使用给定的位置。 </p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	loc, _ := time.LoadLocation(<span class="string">"Asia/Shanghai"</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 没有时区，使用传参给定的时区</span></span><br><span class="line">	<span class="keyword">const</span> teststr = <span class="string">"2006/01/02 15:04:05"</span></span><br><span class="line">	t, _ := time.ParseInLocation(teststr, <span class="string">"2019/06/09 15:22:33"</span>, loc)</span><br><span class="line">	fmt.Println(t)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 有时区信息则使用</span></span><br><span class="line">	<span class="keyword">const</span> timzone = <span class="string">"2006/01/02 15:04:05 -07:00"</span></span><br><span class="line">	t, _ = time.ParseInLocation(timzone, <span class="string">"2019/06/09 15:22:33 +09:00"</span>, loc)</span><br><span class="line">	fmt.Println(t)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-09 15:22:33 +0800 CST</span><br><span class="line">2019-06-09 15:22:33 +0900 +0900</span><br></pre></td></tr></table></figure>
+<h2 id="格式化为字符串"><a href="#格式化为字符串" class="headerlink" title="格式化为字符串"></a>格式化为字符串</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func (t Time) String() string</td>
+<td>返回一个时间的字符串表示</td>
+</tr>
+<tr>
+<td>func (t Time) Format(layout string) string</td>
+<td>格式化输出时间</td>
+</tr>
+<tr>
+<td>func (t Time) AppendFormat(b []byte, layout string) []byte</td>
+<td>将返回的格式化的时间追加到缓冲区</td>
+</tr>
+</tbody>
+</table>
+<h3 id="String返回时间的字符串表示"><a href="#String返回时间的字符串表示" class="headerlink" title="String返回时间的字符串表示"></a>String返回时间的字符串表示</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.String())</span><br><span class="line">	fmt.Printf(<span class="string">"%T"</span>, t1.String())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019-06-09 17:28:00.0984589 +0800 CST m=+0.002030001</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
+<h3 id="Format格式化输出时间为字符串"><a href="#Format格式化输出时间为字符串" class="headerlink" title="Format格式化输出时间为字符串"></a>Format格式化输出时间为字符串</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t4 := time.Now()</span><br><span class="line">	fmt.Println(t4.Format(<span class="string">"2006.01.02 15.04.05 +08:00"</span>))</span><br><span class="line">	fmt.Printf(<span class="string">"%T"</span>, t4.Format(<span class="string">"2006.01.02 15.04.05 +08:00"</span>))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">2019.06.09 16.31.24 +08:00</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
+<h3 id="AppendFormat将格式化的时间追加到缓冲区"><a href="#AppendFormat将格式化的时间追加到缓冲区" class="headerlink" title="AppendFormat将格式化的时间追加到缓冲区"></a>AppendFormat将格式化的时间追加到缓冲区</h3><p>就像Format一样，但是将文本表示附加到b并返回扩展缓冲区。</p>
+<figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t := time.Now()</span><br><span class="line">	text := []<span class="keyword">byte</span>(<span class="string">"Time: "</span>)</span><br><span class="line"></span><br><span class="line">	text = t.AppendFormat(text, time.RFC3339)</span><br><span class="line">	fmt.Println(<span class="keyword">string</span>(text))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Time: 2019-06-09T16:23:39+08:00</span><br></pre></td></tr></table></figure>
+<h2 id="判断时间"><a href="#判断时间" class="headerlink" title="判断时间"></a>判断时间</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func (t Time) After(u Time) bool</td>
+<td>判断是否在某个时间之后</td>
+</tr>
+<tr>
+<td>func (t Time) Before(u Time) bool</td>
+<td>判断是否在某个时间之前</td>
+</tr>
+<tr>
+<td>func (t Time) Equal(u Time) bool</td>
+<td>判断不同时间是否表示同一时刻</td>
+</tr>
+<tr>
+<td>func (t Time) IsZero() bool</td>
+<td>报告时间是否是 0001 年 1 月 1 日 00:00:00</td>
+</tr>
+</tbody>
+</table>
+<h3 id="After判断是否在某个时间之后"><a href="#After判断是否在某个时间之后" class="headerlink" title="After判断是否在某个时间之后"></a>After判断是否在某个时间之后</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	t2 := time.Date(<span class="number">3000</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, time.UTC)</span><br><span class="line"></span><br><span class="line">	fmt.Println(t1.After(t2))</span><br><span class="line">	fmt.Println(t2.After(t1))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">false</span><br><span class="line">true</span><br></pre></td></tr></table></figure>
+<h3 id="Before判断是否在某个时间之前"><a href="#Before判断是否在某个时间之前" class="headerlink" title="Before判断是否在某个时间之前"></a>Before判断是否在某个时间之前</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	t2 := time.Date(3000, 1, 1, 0, 0, 0, 0, time.UTC)</span><br><span class="line"></span><br><span class="line">	fmt.Println(t1.Before(t2))</span><br><span class="line">	fmt.Println(t2.Before(t1))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">true</span><br><span class="line">false</span><br></pre></td></tr></table></figure>
+<h3 id="Equal判断不同时间是否表示同一时刻"><a href="#Equal判断不同时间是否表示同一时刻" class="headerlink" title="Equal判断不同时间是否表示同一时刻"></a>Equal判断不同时间是否表示同一时刻</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	loc, _ := time.LoadLocation(<span class="string">"Asia/Shanghai"</span>)</span><br><span class="line"></span><br><span class="line">	d1 := time.Date(<span class="number">2019</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, time.UTC)</span><br><span class="line">	d2 := time.Date(<span class="number">2019</span>, <span class="number">6</span>, <span class="number">9</span>, <span class="number">8</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, loc)</span><br><span class="line"></span><br><span class="line">	fmt.Println(d1 == d2)</span><br><span class="line">	fmt.Println(d1.Equal(d2))</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">false</span><br><span class="line">true</span><br></pre></td></tr></table></figure>
+<h3 id="IsZero报告时间是否是-0001-1-1-00-00-00"><a href="#IsZero报告时间是否是-0001-1-1-00-00-00" class="headerlink" title="IsZero报告时间是否是 0001/1/1 00:00:00"></a>IsZero报告时间是否是 0001/1/1 00:00:00</h3><figure class="highlight go"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	t1 := time.Now()</span><br><span class="line">	fmt.Println(t1.IsZero())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">false</span><br></pre></td></tr></table></figure>
+<h2 id="未整理TODO"><a href="#未整理TODO" class="headerlink" title="未整理TODO"></a>未整理TODO</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func (t *Time) GobDecode(data []byte) error</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t Time) GobEncode() ([]byte, error)</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t Time) MarshalBinary() ([]byte, error)</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t Time) MarshalJSON() ([]byte, error)</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t Time) MarshalText() ([]byte, error)</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t *Time) UnmarshalBinary(data []byte) error</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t *Time) UnmarshalJSON(data []byte) error</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t *Time) UnmarshalText(data []byte) error</td>
+</tr>
+</tbody>
+</table>
+<h1 id="Timer-类型"><a href="#Timer-类型" class="headerlink" title="Timer 类型"></a>Timer 类型</h1><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>func AfterFunc(d Duration, f func()) *Timer</td>
+<td></td>
+</tr>
+<tr>
+<td>func NewTimer(d Duration) *Timer</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t *Timer) Reset(d Duration) bool</td>
+<td></td>
+</tr>
+<tr>
+<td>func (t *Timer) Stop() bool</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/02/python/webshell和paramiko/" rel="next" title="webshell和paramiko">
+                <i class="fa fa-chevron-left"></i> webshell和paramiko
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/09/go/strings/" rel="prev" title="go 标准库之 strings">
+                go 标准库之 strings <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Jin Heng">
+            
+              <p class="site-author-name" itemprop="name">Jin Heng</p>
+              <p class="site-description motion-element" itemprop="description">越努力越幸运</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">86</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/yangjinheng" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:jinhengyang@foxmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#时间类型"><span class="nav-number">1.</span> <span class="nav-text">时间类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#格式常量"><span class="nav-number">1.1.</span> <span class="nav-text">格式常量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sleep睡眠"><span class="nav-number">1.2.</span> <span class="nav-text">Sleep睡眠</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#计时器"><span class="nav-number">1.3.</span> <span class="nav-text">计时器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Month类型"><span class="nav-number">2.</span> <span class="nav-text">Month类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Weekday类型"><span class="nav-number">3.</span> <span class="nav-text">Weekday类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Duration类型"><span class="nav-number">4.</span> <span class="nav-text">Duration类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#时间常量"><span class="nav-number">4.1.</span> <span class="nav-text">时间常量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#快速预览"><span class="nav-number">4.2.</span> <span class="nav-text">快速预览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ParseDuration字符串解析为Duration"><span class="nav-number">4.3.</span> <span class="nav-text">ParseDuration字符串解析为Duration</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Since指定时间到现在已经过去的时间"><span class="nav-number">4.4.</span> <span class="nav-text">Since指定时间到现在已经过去的时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Until指定时间距当前还有多久的时间"><span class="nav-number">4.5.</span> <span class="nav-text">Until指定时间距当前还有多久的时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hours、Minutes、Seconds、Nanoseconds"><span class="nav-number">4.6.</span> <span class="nav-text">Hours、Minutes、Seconds、Nanoseconds</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Round返回Duration的四舍五入"><span class="nav-number">4.7.</span> <span class="nav-text">Round返回Duration的四舍五入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Truncate返回Duration的截短表示"><span class="nav-number">4.8.</span> <span class="nav-text">Truncate返回Duration的截短表示</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Location类型"><span class="nav-number">5.</span> <span class="nav-text">Location类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#FixedZone给定名称和偏移量创建时区"><span class="nav-number">5.1.</span> <span class="nav-text">FixedZone给定名称和偏移量创建时区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LoadLocation根据名称创建时区"><span class="nav-number">5.2.</span> <span class="nav-text">LoadLocation根据名称创建时区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#String返回一个时区对象的字符串表示"><span class="nav-number">5.3.</span> <span class="nav-text">String返回一个时区对象的字符串表示</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Ticker类型"><span class="nav-number">6.</span> <span class="nav-text">Ticker类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Time类型"><span class="nav-number">7.</span> <span class="nav-text">Time类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#获取时间信息"><span class="nav-number">7.1.</span> <span class="nav-text">获取时间信息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Now当前时间"><span class="nav-number">7.1.1.</span> <span class="nav-text">Now当前时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Unix获取时间对象的Unix时间"><span class="nav-number">7.1.2.</span> <span class="nav-text">Unix获取时间对象的Unix时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UnixNano纳秒级别的Unix时间"><span class="nav-number">7.1.3.</span> <span class="nav-text">UnixNano纳秒级别的Unix时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UTC获取时间对象的UTC时间"><span class="nav-number">7.1.4.</span> <span class="nav-text">UTC获取时间对象的UTC时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Date返回日期部分"><span class="nav-number">7.1.5.</span> <span class="nav-text">Date返回日期部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Clock返回时间部分"><span class="nav-number">7.1.6.</span> <span class="nav-text">Clock返回时间部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Year、Month、Day"><span class="nav-number">7.1.7.</span> <span class="nav-text">Year、Month、Day</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hour、Minute、Second、Nanosecond"><span class="nav-number">7.1.8.</span> <span class="nav-text">Hour、Minute、Second、Nanosecond</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Zone获取时间的时区和时差"><span class="nav-number">7.1.9.</span> <span class="nav-text">Zone获取时间的时区和时差</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#YearDay获取时间处于一年中的第几天"><span class="nav-number">7.1.10.</span> <span class="nav-text">YearDay获取时间处于一年中的第几天</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ISOWeek返回本周是一年中的第几周"><span class="nav-number">7.1.11.</span> <span class="nav-text">ISOWeek返回本周是一年中的第几周</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Weekday获取时间处于一周中的第几天"><span class="nav-number">7.1.12.</span> <span class="nav-text">Weekday获取时间处于一周中的第几天</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Local返回为本地时间"><span class="nav-number">7.1.13.</span> <span class="nav-text">Local返回为本地时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Location显示时区位置"><span class="nav-number">7.1.14.</span> <span class="nav-text">Location显示时区位置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#计算新时间"><span class="nav-number">7.2.</span> <span class="nav-text">计算新时间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Add时间加法"><span class="nav-number">7.2.1.</span> <span class="nav-text">Add时间加法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AddDate日期加法"><span class="nav-number">7.2.2.</span> <span class="nav-text">AddDate日期加法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Sub计算时间对象的时间差"><span class="nav-number">7.2.3.</span> <span class="nav-text">Sub计算时间对象的时间差</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Round返回根据Duration四舍五入的时间"><span class="nav-number">7.2.4.</span> <span class="nav-text">Round返回根据Duration四舍五入的时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Truncate直接截短时间"><span class="nav-number">7.2.5.</span> <span class="nav-text">Truncate直接截短时间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从字符串解析"><span class="nav-number">7.3.</span> <span class="nav-text">从字符串解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Unix从时间戳解析时间"><span class="nav-number">7.3.1.</span> <span class="nav-text">Unix从时间戳解析时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Date从数字制作时间"><span class="nav-number">7.3.2.</span> <span class="nav-text">Date从数字制作时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Parse指定格式将字符串解析为时间"><span class="nav-number">7.3.3.</span> <span class="nav-text">Parse指定格式将字符串解析为时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ParseInLocation指定格式将字符串解析为时间，备选时区信息"><span class="nav-number">7.3.4.</span> <span class="nav-text">ParseInLocation指定格式将字符串解析为时间，备选时区信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#格式化为字符串"><span class="nav-number">7.4.</span> <span class="nav-text">格式化为字符串</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#String返回时间的字符串表示"><span class="nav-number">7.4.1.</span> <span class="nav-text">String返回时间的字符串表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Format格式化输出时间为字符串"><span class="nav-number">7.4.2.</span> <span class="nav-text">Format格式化输出时间为字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AppendFormat将格式化的时间追加到缓冲区"><span class="nav-number">7.4.3.</span> <span class="nav-text">AppendFormat将格式化的时间追加到缓冲区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#判断时间"><span class="nav-number">7.5.</span> <span class="nav-text">判断时间</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#After判断是否在某个时间之后"><span class="nav-number">7.5.1.</span> <span class="nav-text">After判断是否在某个时间之后</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Before判断是否在某个时间之前"><span class="nav-number">7.5.2.</span> <span class="nav-text">Before判断是否在某个时间之前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Equal判断不同时间是否表示同一时刻"><span class="nav-number">7.5.3.</span> <span class="nav-text">Equal判断不同时间是否表示同一时刻</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IsZero报告时间是否是-0001-1-1-00-00-00"><span class="nav-number">7.5.4.</span> <span class="nav-text">IsZero报告时间是否是 0001/1/1 00:00:00</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#未整理TODO"><span class="nav-number">7.6.</span> <span class="nav-text">未整理TODO</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Timer-类型"><span class="nav-number">8.</span> <span class="nav-text">Timer 类型</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jin Heng</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
